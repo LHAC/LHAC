@@ -7,8 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D4FBD18116AD90C7006E7958 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = D4FBD18016AD90C7006E7958 /* main.c */; };
+		D42CE5D916D677E4007B54BD /* sics_lhac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D42CE5D716D677E4007B54BD /* sics_lhac.cpp */; };
+		D443207216C84F5400112D18 /* myUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D443207016C84F5400112D18 /* myUtilities.cpp */; };
+		D480ECF116B58AD500BECB33 /* l1log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D480ECEF16B58AD500BECB33 /* l1log.cpp */; };
+		D4B48E2116C1EA3F00107AB3 /* lhac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4B48E2016C1EA3F00107AB3 /* lhac.cpp */; };
 		D4FBD18316AD90C7006E7958 /* LHAC_v1.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = D4FBD18216AD90C7006E7958 /* LHAC_v1.1 */; };
+		D4FBD18A16AD9104006E7958 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4FBD18916AD9104006E7958 /* Accelerate.framework */; };
+		D4FE841C16B97155004371C4 /* Lbfgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4FE841A16B97155004371C4 /* Lbfgs.cpp */; };
+		D4FE841F16B99683004371C4 /* drive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4FE841D16B99683004371C4 /* drive.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,9 +31,20 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D42CE5D716D677E4007B54BD /* sics_lhac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sics_lhac.cpp; sourceTree = "<group>"; };
+		D42CE5D816D677E4007B54BD /* sics_lhac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sics_lhac.h; sourceTree = "<group>"; };
+		D443207016C84F5400112D18 /* myUtilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = myUtilities.cpp; sourceTree = "<group>"; };
+		D443207116C84F5400112D18 /* myUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = myUtilities.h; sourceTree = "<group>"; };
+		D480ECEF16B58AD500BECB33 /* l1log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l1log.cpp; sourceTree = "<group>"; };
+		D480ECF016B58AD500BECB33 /* l1log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = l1log.h; sourceTree = "<group>"; };
+		D4B48E2016C1EA3F00107AB3 /* lhac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lhac.cpp; sourceTree = "<group>"; };
 		D4FBD17C16AD90C7006E7958 /* LHAC_v1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LHAC_v1; sourceTree = BUILT_PRODUCTS_DIR; };
-		D4FBD18016AD90C7006E7958 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		D4FBD18216AD90C7006E7958 /* LHAC_v1.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = LHAC_v1.1; sourceTree = "<group>"; };
+		D4FBD18916AD9104006E7958 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		D4FE841A16B97155004371C4 /* Lbfgs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lbfgs.cpp; sourceTree = "<group>"; };
+		D4FE841B16B97155004371C4 /* Lbfgs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lbfgs.h; sourceTree = "<group>"; };
+		D4FE841D16B99683004371C4 /* drive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = drive.cpp; sourceTree = "<group>"; };
+		D4FE842116BB6BD8004371C4 /* lhac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lhac.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4FBD18A16AD9104006E7958 /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +62,7 @@
 		D4FBD17116AD90C6006E7958 = {
 			isa = PBXGroup;
 			children = (
+				D4FBD18916AD9104006E7958 /* Accelerate.framework */,
 				D4FBD17F16AD90C7006E7958 /* LHAC_v1 */,
 				D4FBD17D16AD90C7006E7958 /* Products */,
 			);
@@ -60,7 +79,17 @@
 		D4FBD17F16AD90C7006E7958 /* LHAC_v1 */ = {
 			isa = PBXGroup;
 			children = (
-				D4FBD18016AD90C7006E7958 /* main.c */,
+				D4FE841D16B99683004371C4 /* drive.cpp */,
+				D42CE5D716D677E4007B54BD /* sics_lhac.cpp */,
+				D42CE5D816D677E4007B54BD /* sics_lhac.h */,
+				D480ECEF16B58AD500BECB33 /* l1log.cpp */,
+				D480ECF016B58AD500BECB33 /* l1log.h */,
+				D4FE842116BB6BD8004371C4 /* lhac.h */,
+				D4B48E2016C1EA3F00107AB3 /* lhac.cpp */,
+				D443207016C84F5400112D18 /* myUtilities.cpp */,
+				D443207116C84F5400112D18 /* myUtilities.h */,
+				D4FE841A16B97155004371C4 /* Lbfgs.cpp */,
+				D4FE841B16B97155004371C4 /* Lbfgs.h */,
 				D4FBD18216AD90C7006E7958 /* LHAC_v1.1 */,
 			);
 			path = LHAC_v1;
@@ -117,7 +146,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D4FBD18116AD90C7006E7958 /* main.c in Sources */,
+				D480ECF116B58AD500BECB33 /* l1log.cpp in Sources */,
+				D4FE841C16B97155004371C4 /* Lbfgs.cpp in Sources */,
+				D4FE841F16B99683004371C4 /* drive.cpp in Sources */,
+				D4B48E2116C1EA3F00107AB3 /* lhac.cpp in Sources */,
+				D443207216C84F5400112D18 /* myUtilities.cpp in Sources */,
+				D42CE5D916D677E4007B54BD /* sics_lhac.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -148,8 +182,21 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/extern/include;
+				INSTALL_PATH = "";
+				LD_DYLIB_INSTALL_NAME = "";
+				LD_RUNPATH_SEARCH_PATHS = "/Applications/MATLAB_R2012a.app/bin/maci64 /Applications/MATLAB_R2010a.app/bin/maci64";
+				LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
+				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-lmex",
+					"-lmx",
+					"-lmat",
+					"-undefined",
+					error,
+				);
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -172,7 +219,20 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/extern/include;
+				INSTALL_PATH = "";
+				LD_DYLIB_INSTALL_NAME = "";
+				LD_RUNPATH_SEARCH_PATHS = "/Applications/MATLAB_R2012a.app/bin/maci64 /Applications/MATLAB_R2010a.app/bin/maci64";
+				LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
+				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = (
+					"-lmex",
+					"-lmx",
+					"-lmat",
+					"-undefined",
+					error,
+				);
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -180,6 +240,10 @@
 		D4FBD18716AD90C7006E7958 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LD_DYLIB_INSTALL_NAME = "";
+				LD_RUNPATH_SEARCH_PATHS = "/Applications/MATLAB_R2012a.app/bin/maci64 ./";
+				LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
+				MACH_O_TYPE = mh_execute;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -187,6 +251,10 @@
 		D4FBD18816AD90C7006E7958 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LD_DYLIB_INSTALL_NAME = "";
+				LD_RUNPATH_SEARCH_PATHS = "/Applications/MATLAB_R2012a.app/bin/maci64 ./";
+				LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
+				MACH_O_TYPE = mh_execute;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -210,6 +278,7 @@
 				D4FBD18816AD90C7006E7958 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
