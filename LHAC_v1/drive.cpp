@@ -212,6 +212,9 @@ void libsvmExperiment(command_line_param* cparam)
     training_set_sp* Dset_sp = new training_set_sp;
     readLibsvm(cparam->fileName, Dset_sp);
     
+    /* statistics of the problem */
+    printf("p = %ld, N = %ld, nnz = %ld\n", Dset_sp->p, Dset_sp->N, Dset_sp->nnz);
+    
     l1log_param* param = new l1log_param;
     param->l = 10;
     param->work_size = 10000;
@@ -351,32 +354,11 @@ void parse_command_line(int argc, const char * argv[],
 
 int main(int argc, const char * argv[])
 {
-//    randomSparseExperiment();
-//    rcvExperiment("rcv1_train.binary");
-//    rcvExperiment("rcv1_500_c.mat");
     command_line_param* cparam = new command_line_param;
     parse_command_line(argc, argv, cparam);
     
-    switch (cparam->alg) {
-        case ALG_L1LOG:
-            
-            if (cparam->randomData) {
-                randomExperiment(cparam);
-            }
-            else
-                libsvmExperiment(cparam);
-            break;
-            
-        default:
-            break;
-    }
+    libsvmExperiment(cparam);
     
-    
-
-//    training_set* Dset = new training_set;
-//    readMatFiles("test_mat_c.mat", Dset);
-////    readMatFiles("rcv1_500_c", Dset);
-//    printout("Dset = ", Dset->X, Dset->N, Dset->p, FULL);
     
     delete [] cparam->fileName;
     delete cparam;
