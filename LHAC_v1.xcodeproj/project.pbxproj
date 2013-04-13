@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D42CE5D916D677E4007B54BD /* sics_lhac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D42CE5D716D677E4007B54BD /* sics_lhac.cpp */; };
 		D443207216C84F5400112D18 /* myUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D443207016C84F5400112D18 /* myUtilities.cpp */; };
 		D480ECF116B58AD500BECB33 /* l1log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D480ECEF16B58AD500BECB33 /* l1log.cpp */; };
 		D4B48E2116C1EA3F00107AB3 /* lhac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4B48E2016C1EA3F00107AB3 /* lhac.cpp */; };
@@ -31,8 +30,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		D42CE5D716D677E4007B54BD /* sics_lhac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sics_lhac.cpp; sourceTree = "<group>"; };
-		D42CE5D816D677E4007B54BD /* sics_lhac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sics_lhac.h; sourceTree = "<group>"; };
 		D443207016C84F5400112D18 /* myUtilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = myUtilities.cpp; sourceTree = "<group>"; };
 		D443207116C84F5400112D18 /* myUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = myUtilities.h; sourceTree = "<group>"; };
 		D480ECEF16B58AD500BECB33 /* l1log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l1log.cpp; sourceTree = "<group>"; };
@@ -80,8 +77,6 @@
 			isa = PBXGroup;
 			children = (
 				D4FE841D16B99683004371C4 /* drive.cpp */,
-				D42CE5D716D677E4007B54BD /* sics_lhac.cpp */,
-				D42CE5D816D677E4007B54BD /* sics_lhac.h */,
 				D480ECEF16B58AD500BECB33 /* l1log.cpp */,
 				D480ECF016B58AD500BECB33 /* l1log.h */,
 				D4FE842116BB6BD8004371C4 /* lhac.h */,
@@ -151,7 +146,6 @@
 				D4FE841F16B99683004371C4 /* drive.cpp in Sources */,
 				D4B48E2116C1EA3F00107AB3 /* lhac.cpp in Sources */,
 				D443207216C84F5400112D18 /* myUtilities.cpp in Sources */,
-				D42CE5D916D677E4007B54BD /* sics_lhac.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -15,7 +15,6 @@
 #include "Lbfgs.h"
 #include "lhac.h"
 #include "myUtilities.h"
-#include "sics_lhac.h"
 
 /* Auxiliary routines prototypes */
 //extern void print_matrix( char* desc, int m, int n, double* a, int lda );
@@ -268,45 +267,6 @@ void libsvmExperiment(command_line_param* cparam)
     return;
 }
 
-void sicsExperiment(command_line_param* cparam)
-{
-    double* S = NULL;
-    unsigned long p;
-    readMatFiles(cparam->fileName, S, &p);
-    
-    param* _param = new param;
-    
-    
-    double lmdi;
-    _param->l = 20;
-    _param->work_size = 1000000;
-    _param->max_iter = cparam->max_iter;
-    lmdi = cparam->lmd;
-    _param->max_inner_iter = 10;
-    _param->opt_inner_tol = 0.05;
-    _param->opt_outer_tol = 1e-5;
-    _param->max_linesearch_iter = 1000;
-    _param->bbeta = 0.5;
-    _param->ssigma = 0.001;
-    _param->verbose = cparam->verbose;
-    
-    double* lmd_vec = new double[p*p];
-    for (unsigned long i = 0; i < p*p; i++) {
-        lmd_vec[i] = lmdi;
-    }
-    _param->lmd = lmd_vec;
-    
-    solution* sols;
-    sols = sics_lhac(S, p, _param);
-    
-    printout("logs = ", sols);
-    
-    releaseSolution(sols);
-    
-    
-    return;
-}
-
 void parse_command_line(int argc, const char * argv[],
                         command_line_param* cparam)
 {
@@ -407,10 +367,6 @@ int main(int argc, const char * argv[])
                 libsvmExperiment(cparam);
             break;
             
-        case ALG_SICS:
-            sicsExperiment(cparam);
-            break;
-            
         default:
             break;
     }
@@ -426,102 +382,4 @@ int main(int argc, const char * argv[])
     delete cparam;
     exit( 0 );
 }
-
-
-/* Main program */
-//int main(int argc, const char * argv[])
-//{
-//    double x[3*1] = {
-//        1, 1, 1,
-//    };
-//    
-//    double y[3*1] = {
-//        2,2,2,
-//    };
-//    
-//    double z[1] = {
-//        0
-//    };
-//    
-//    double Q[12];
-//    double Q_bar[12];
-//    double R[16];
-//    
-//    double d[2] = { 6 };
-//    
-//    LMatrix* Sm = new LMatrix(3, 2);
-//    LMatrix* Tm = new LMatrix(3, 2);
-//    LMatrix* Lm = new LMatrix(2, 2);
-//    
-//    Sm->init(x, 3, 1);
-//    Tm->init(y, 3, 1);
-//    Lm->init(z, 1, 1);
-//    
-//    double gama;
-//    computeLBFGS(Q, Q_bar, R, Sm, Tm, Lm, d, &gama);
-//    
-//    for (int i = 0; i < 12; i++) {
-//        printf(" %f\n", Q_bar[i]);
-//    }
-//    
-//    exit(0);
-//}
-
-//int main(int argc, const char * argv[])
-//{
-//
-//    /* Locals */
-//    int n = 5, nrhs = NRHS, lda = LDA, ldb = LDB, info;
-//    /* Local arrays */
-//    int ipiv[5];
-//    double a[LDA*5] = {
-//        6.80, -2.11,  5.66,  5.97,  8.23,
-//        -6.05, -3.30,  5.36, -4.44,  1.08,
-//        -0.45,  2.58, -2.70,  0.27,  9.04,
-//        8.32,  2.71,  4.35, -7.17,  2.14,
-//        -9.67, -5.14, -7.26,  6.08, -6.87
-//    };
-//    double b[LDB*NRHS] = {
-//        4.02,  6.19, -8.22, -7.57, -3.03,
-//        -1.56,  4.00, -8.67,  1.75,  2.86,
-//        9.81, -4.09, -4.57, -8.61,  8.99
-//    };
-//    /* Executable statements */
-//    printf( " DGESV Example Program Results\n" );
-//    /* Solve the equations A*X = B */
-//    dgesv_( &n, &nrhs, a, &lda, ipiv, b, &ldb, &info );
-//    /* Check for the exact singularity */
-//    if( info > 0 ) {
-//        printf( "The diagonal element of the triangular factor of A,\n" );
-//        printf( "U(%i,%i) is zero, so that A is singular;\n", info, info );
-//        printf( "the solution could not be computed.\n" );
-//        exit( 1 );
-//    }
-//    /* Print solution */
-//    print_matrix( "Solution", n, nrhs, b, ldb );
-//    /* Print details of LU factorization */
-//    print_matrix( "Details of LU factorization", n, n, a, lda );
-//    /* Print pivot indices */
-//    print_int_vector( "Pivot indices", n, ipiv );
-//    exit( 0 );
-//} /* End of DGESV Example */
-
-/* Auxiliary routine: printing a matrix */
-//void print_matrix( char* desc, int m, int n, double* a, int lda ) {
-//    int i, j;
-//    printf( "\n %s\n", desc );
-//    for( i = 0; i < m; i++ ) {
-//        for( j = 0; j < n; j++ ) printf( " %6.2f", a[i+j*lda] );
-//        printf( "\n" );
-//    }
-//}
-//
-///* Auxiliary routine: printing a vector of integers */
-//void print_int_vector( char* desc, int n, int* a ) {
-//    int j;
-//    printf( "\n %s\n", desc );
-//    for( j = 0; j < n; j++ ) printf( " %6i", a[j] );
-//    printf( "\n" );
-//}
-
 
