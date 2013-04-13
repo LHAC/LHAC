@@ -60,6 +60,10 @@ solution* lhac(l1log* mdl)
     sols->fval = new double[max_iter];
     sols->normgs = new double[max_iter];
     sols->t = new double[max_iter];
+    sols->cdTime = 0;
+    sols->lbfgsTime1 = 0;
+    sols->lbfgsTime2 = 0;
+    sols->lsTime = 0;
     
     unsigned long p = mdl->p;
     
@@ -252,7 +256,7 @@ void libsvmExperiment(command_line_param* cparam)
         releaseSolution(sols);
     }
     else {
-        solution* sols;
+        solution* sols;;
         
         l1log* mdl = new l1log(Dset_sp, param);
         //    l1log* mdl = new l1log(Dset);

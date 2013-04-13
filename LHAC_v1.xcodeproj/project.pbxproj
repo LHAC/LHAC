@@ -235,7 +235,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				LD_DYLIB_INSTALL_NAME = "";
-				LD_RUNPATH_SEARCH_PATHS = "/Applications/MATLAB_R2012a.app/bin/maci64 ./";
+				LD_RUNPATH_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
 				LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -246,7 +246,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				LD_DYLIB_INSTALL_NAME = "";
-				LD_RUNPATH_SEARCH_PATHS = "/Applications/MATLAB_R2012a.app/bin/maci64 ./";
+				LD_RUNPATH_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
 				LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_NAME = "$(TARGET_NAME)";
