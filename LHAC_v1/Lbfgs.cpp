@@ -334,7 +334,7 @@ void LBFGS::computeLowRankApprox(work_set_struct* work_set)
     int _rows = (int)Tm->rows;
     unsigned short _cols = Tm->cols;
     int _2cols = 2*_cols;
-    unsigned long _p_sics_ = work_set->_p_sics_;
+//    unsigned long _p_sics_ = work_set->_p_sics_;
     
     computeQR();
     
@@ -376,9 +376,9 @@ void LBFGS::computeLowRankApprox(work_set_struct* work_set)
 
 //    write2mat("Qm_bar.mat", "Qm_bar", Q_bar, _2cols, _p_sics_);
     
-    unsigned long* idxs_vec_u = work_set->idxs_vec_u;
+    ushort_pair_t* idxs = work_set->idxs;
     for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
-        unsigned long ij = idxs_vec_u[ii];
+        unsigned long ij = idxs[ii].j;
         unsigned long k1 = ij*_2cols;
         cblas_dgemv(CblasColMajor, CblasNoTrans, _2cols, _2cols, 1.0, R, _2cols, &Q[ij], _rows, 0.0, &Q_bar[k1], 1);
     }

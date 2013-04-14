@@ -354,8 +354,8 @@ void l1log::computeWorkSet( work_set_struct* &work_set )
     numActive = (numActive<work_size)?numActive:work_size;
     for (unsigned long j = 0; j < p; j++) {
         if (w[j] != 0) {
-            idxs[numActive].i = (unsigned short) j;
-            idxs[numActive].j = (unsigned short) j;
+            idxs[numActive].i = j;
+            idxs[numActive].j = j;
             numActive++;
         }
     }

@@ -91,7 +91,8 @@ solution* lhac(l1log* mdl)
                    elapsedTime, newton_iter, mdl->f_current, normsg, work_set->numActive);
         }
         
-        lR->computeLowRankApprox();
+//        lR->computeLowRankApprox();
+        lR->computeLowRankApprox(work_set);
         
 //        computeLBFGS(Q, Q_bar, R, Sm, Tm, Lm, Dm, &gama);
         
