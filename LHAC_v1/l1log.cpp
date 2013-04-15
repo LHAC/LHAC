@@ -638,9 +638,9 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)
     
     // Hessian diagonal: H_diag = gama - sum(Q'.*Q_bar);
     
-    for (unsigned long k = 0, i = 0; i < p; i++, k += m) {
+    for (unsigned long k = 0, i = 0; i < work_set->numActive; i++, k += m) {
         H_diag[i] = gama;
-        for (unsigned long j = 0, o = 0; j < m; j++, o += p)
+        for (unsigned long j = 0, o = 0; j < m; j++, o += work_set->numActive)
             H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
     }
 //    lR->computeHDiag(H_diag);
@@ -675,16 +675,18 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)
         ushort_pair_t* idxs = work_set->idxs;
         for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
             unsigned long idx = idxs[ii].j;
+            unsigned long idx_Q = permut[ii];
+//            unsigned long idx_Q = idx;
             
             //            printout("d_bar = ", d_bar, m, FULL);
 //            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[idx], (int)p, d_bar, 1);
-            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[permut[ii]], (int)work_set->numActive, d_bar, 1);
+            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[idx_Q], (int)work_set->numActive, d_bar, 1);
 //            Hd_j = lR->computeHdj(D[idx], d_bar, idx);
             //            Hd_j = gama*D[idx];
             //            for (unsigned long k = 0, j = 0; j < m; j++, k+=p)
             //                Hd_j = Hd_j - Q[k+idx]*d_bar[j];
             
-            Hii = H_diag[idx];
+            Hii = H_diag[idx_Q];
             G = Hd_j + L_grad[idx];
             Gp = G + lmd;
             Gn = G - lmd;
@@ -700,7 +702,7 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)
             D[idx] = D[idx] + z;
             
 //            lR->updateDbar(d_bar, idx, z);
-            for (unsigned long k = permut[ii]*m, j = 0; j < m; j++)
+            for (unsigned long k = idx_Q*m, j = 0; j < m; j++)
 //            for (unsigned long k = idx*m, j = 0; j < m; j++)
                 d_bar[j] = d_bar[j] + z*Q_bar[k+j];
             
