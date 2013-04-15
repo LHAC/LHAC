@@ -286,6 +286,133 @@ void LBFGS::computeQR()
     return;
 }
 
+void LBFGS::computeQR_v2(work_set_struct* work_set)
+{
+    int _rows = (int)Tm->rows;
+    unsigned short _cols = Tm->cols;
+    
+    double* Tend;
+    Tend = Tm->data[_cols-1];
+    
+    double vv = 0.0;
+    vv = cblas_ddot(_rows, Tend, 1, Tend, 1);
+    
+    gama = vv / Dm[_cols-1];
+    
+    ushort_pair_t* idxs = work_set->idxs;
+    unsigned long numActive = work_set->numActive;
+    
+    /* Q */
+    //    printout("Sm =", Sm);
+    double** S = Sm->data;
+    double** T = Tm->data;
+    double* cl;
+    unsigned long num = 0;
+    for (unsigned long i = 0; i < _cols; i++) {
+        cl = S[i];
+        for (unsigned long jj = 0; jj < numActive; jj++) {
+            Q[num] = gama*cl[idxs[jj].j];
+            num++;
+        }
+    }
+    
+    for (unsigned long i = 0; i < _cols; i++) {
+        cl = T[i];
+        for (unsigned long jj = 0; jj < numActive; jj++) {
+            Q[num] = cl[idxs[jj].j];
+            num++;
+        }
+    }
+    
+//    write2mat("Sm.mat", "Sm", Sm);
+//    write2mat("Tm.mat", "Tm", Tm);
+//    write2mat("Dm.mat", "Dm", Dm, _cols, 1);
+//    write2mat("Qm.mat", "Qm", Q, numActive, 2*_cols);
+//    write2mat("work_set.mat", "work_set", work_set);
+    
+    /* R */
+    double* cl1;
+    //    double* cl2;
+    double** L = Lm->data;
+    unsigned short _2cols = 2*_cols;
+    memset(R, 0, _2cols*_2cols*sizeof(double));
+    
+    double** STSdata = STS->data;
+    for (unsigned short i = 0, k = 0; i < _cols; i++, k += _2cols) {
+        cl1 = STSdata[i];
+        for (unsigned short j = 0; j < i; j++) {
+            unsigned short ji = k + j;
+            unsigned short ij = j*_2cols+i;
+            R[ji] = cl1[j];
+            R[ji] = gama*R[ji];
+            R[ij] = R[ji];
+        }
+    }
+    
+    
+    for (unsigned short i = 0, k = 0; i < _cols; i++, k += (_2cols+1)) {
+        cl1 = STSdata[i];
+        R[k] = cl1[i];
+        R[k] = gama*R[k];
+    }
+    
+    
+    for (unsigned short i = _cols, k = _cols*_2cols, o = 0; i < _2cols; i++, k += _2cols, o++) {
+        cl1 = L[o];
+        for (unsigned short j = 0; j < _cols; j++) {
+            R[k+j] = cl1[j];
+        }
+    }
+    
+    for (unsigned short i = _cols, o = 0; i < _2cols; i++, o++) {
+        cl1 = L[o];
+        for (unsigned short j = 0, k = 0; j < _cols; j++, k += _2cols) {
+            R[k+i] = cl1[j];
+        }
+    }
+    
+    for (unsigned short i = _cols, k = _cols*_2cols, j = 0; i < _2cols; i++, k += _2cols, j++) {
+        R[k+i] = -Dm[j];
+    }
+    
+    return;
+}
+
+void LBFGS::computeLowRankApprox_v2(work_set_struct *work_set)
+{
+//    int _rows = (int)Tm->rows;
+    unsigned short _cols = Tm->cols;
+    int _2cols = 2*_cols;
+    //    unsigned long _p_sics_ = work_set->_p_sics_;
+    
+    computeQR_v2(work_set);
+    
+    /* solve R*Q_bar = Q' for Q_bar */
+    
+    int info;
+    dgetrf_(&_2cols, &_2cols, R, &_2cols, ipiv, &info);
+    dgetri_(&_2cols, R, &_2cols, ipiv, work, &lwork, &info);
+    /* R now store R-1 */
+    
+    
+    int cblas_N = (int) work_set->numActive;
+    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, cblas_N, 0.0, Q_bar, _2cols);
+//    write2mat("Qm.mat", "Qm", Q, cblas_N, _2cols);
+//    write2mat("Rm.mat", "Rm", R, _2cols, _2cols);
+//    write2mat("Q_barm.mat", "Q_barm", Q_bar, _2cols, cblas_N);
+    
+//    ushort_pair_t* idxs = work_set->idxs;
+//    for (unsigned long i1 = 0; i1 < work_set->numActive; i1++) {
+//        unsigned long i2 = idxs[i1].j;
+//        unsigned long i3 = i2*_2cols;
+//        
+//    }
+    
+    m = _2cols;
+    
+    return;
+}
+
 void LBFGS::computeLowRankApprox()
 {
     int _rows = (int)Tm->rows;

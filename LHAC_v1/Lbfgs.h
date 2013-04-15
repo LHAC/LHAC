@@ -63,6 +63,8 @@ public:
     
     void computeLowRankApprox(work_set_struct* work_set);
     
+    void computeLowRankApprox_v2(work_set_struct* work_set);
+    
     void updateLBFGS(double* w, double* w_prev, double* L_grad, double* L_grad_prev);
     
     void computeHDiag(double* H_diag);
@@ -88,6 +90,7 @@ private:
     double work[MAX_SY_PAIRS*MAX_SY_PAIRS];
     
     void computeQR();
+    void computeQR_v2(work_set_struct* work_set);
 //    unsigned long* Q_bar_idxs; // cols of Q_bar to update
     
 };

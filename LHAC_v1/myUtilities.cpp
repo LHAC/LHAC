@@ -748,6 +748,33 @@ void readMatFiles(const char* fileName, training_set* Dset)
 }
 
 void write2mat(const char* fileName, const char* name,
+               work_set_struct* work_set)
+{
+    MATFile *pmat;
+    mxArray *pa;
+    pmat = matOpen(fileName, "w");
+    if (pmat == NULL) {
+        printf("Error opening file %s\n", fileName);
+        return;
+    }
+    
+    unsigned long s1 = work_set->numActive;
+    ushort_pair_t* idxs = work_set->idxs;
+    double* x = new double[s1];
+    for (unsigned long j = 0; j < s1; j++) {
+        x[j] = (double)idxs[j].j+1;
+    }
+    pa = mxCreateDoubleMatrix(s1, 1, mxREAL);
+    memcpy((void *)(mxGetPr(pa)), (void *)x, s1*1*sizeof(double));
+    matPutVariable(pmat, name, pa);
+    
+    mxDestroyArray(pa);
+    matClose(pmat);
+    delete [] x;
+    return;
+}
+
+void write2mat(const char* fileName, const char* name,
                double* x, unsigned long s1, unsigned long s2)
 {
     MATFile *pmat;

@@ -66,6 +66,9 @@ void write2mat(const char* fileName, const char* name,
 
 void write2mat(const char* fileName, const char* name, LMatrix* x);
 
+void write2mat(const char* fileName, const char* name,
+               work_set_struct* work_set);
+
 void readMatFiles(const char* fileName, training_set* Dset);
 #endif
 

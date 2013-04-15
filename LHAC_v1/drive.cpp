@@ -74,6 +74,7 @@ solution* lhac(l1log* mdl)
     // active set
     work_set_struct* work_set = new work_set_struct;
     work_set->idxs = new ushort_pair_t[p];
+    work_set->permut = new unsigned long[p];
     
     double normsg = mdl->computeSubgradient();
     unsigned short newton_iter;
@@ -92,7 +93,7 @@ solution* lhac(l1log* mdl)
         }
         
 //        lR->computeLowRankApprox();
-        lR->computeLowRankApprox(work_set);
+        lR->computeLowRankApprox_v2(work_set);
         
 //        computeLBFGS(Q, Q_bar, R, Sm, Tm, Lm, Dm, &gama);
         

@@ -64,6 +64,7 @@ typedef struct {
 
 typedef struct {
     ushort_pair_t* idxs; //p*(p+1)/2
+    unsigned long* permut; //p
     unsigned long* idxs_vec_l; // vectorized lower
     unsigned long* idxs_vec_u; // vectorized upper
     unsigned long numActive;

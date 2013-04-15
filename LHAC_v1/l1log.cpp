@@ -23,11 +23,12 @@ static inline void shuffle( work_set_struct* work_set )
 {
     unsigned long lens = work_set->numActive;
     ushort_pair_t* idxs = work_set->idxs;
+    unsigned long* permut = work_set->permut;       
     
     for (unsigned long i = 0; i < lens; i++) {
         unsigned long j = i + rand()%(lens - i);
-        unsigned short k1 = idxs[i].i;
-        unsigned short k2 = idxs[i].j;
+        unsigned long k1 = idxs[i].i;
+        unsigned long k2 = idxs[i].j;
         double vlt = idxs[i].vlt;
         idxs[i].i = idxs[j].i;
         idxs[i].j = idxs[j].j;
@@ -35,6 +36,11 @@ static inline void shuffle( work_set_struct* work_set )
         idxs[j].i = k1;
         idxs[j].j = k2;
         idxs[j].vlt = vlt;
+        
+        /* update permutation */
+        k1 = permut[i];
+        permut[i] = permut[j];
+        permut[j] = k1;
     }
     
     return;
@@ -389,6 +395,11 @@ void l1log::computeWorkSet( work_set_struct* &work_set )
 //    }
 //    
 //    work_set->numActive = numActive;
+    
+    /* reset permutation */
+    for (unsigned long j = 0; j < numActive; j++) {
+        work_set->permut[j] = j;
+    }
     return;
 }
 
@@ -654,6 +665,7 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)
     //    if (max_inneriter > (param->max_inner_iter)) {
     //        max_inneriter = param->max_inner_iter;
     //    }
+    unsigned long* permut = work_set->permut;
     for (unsigned long inneriter = 1; inneriter <= max_inneriter; inneriter++) {
         double diffd = 0;
         double normd = 0;
@@ -665,7 +677,8 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)
             unsigned long idx = idxs[ii].j;
             
             //            printout("d_bar = ", d_bar, m, FULL);
-            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[idx], (int)p, d_bar, 1);
+//            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[idx], (int)p, d_bar, 1);
+            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[permut[ii]], (int)work_set->numActive, d_bar, 1);
 //            Hd_j = lR->computeHdj(D[idx], d_bar, idx);
             //            Hd_j = gama*D[idx];
             //            for (unsigned long k = 0, j = 0; j < m; j++, k+=p)
@@ -687,7 +700,8 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)
             D[idx] = D[idx] + z;
             
 //            lR->updateDbar(d_bar, idx, z);
-            for (unsigned long k = idx*m, j = 0; j < m; j++)
+            for (unsigned long k = permut[ii]*m, j = 0; j < m; j++)
+//            for (unsigned long k = idx*m, j = 0; j < m; j++)
                 d_bar[j] = d_bar[j] + z*Q_bar[k+j];
             
             /* libsvm format */
