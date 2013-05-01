@@ -223,16 +223,22 @@ void libsvmExperiment(command_line_param* cparam)
     
     l1log_param* param = new l1log_param;
     param->l = 10;
-    param->work_size = 10000;
+    param->work_size = 8000;
     param->max_iter = cparam->max_iter;
     param->lmd = cparam->lmd;
-    param->max_inner_iter = 20;
-    param->opt_inner_tol = 0.05;
+    param->max_inner_iter = 100;
+    param->opt_inner_tol = 5*1e-2;
     param->opt_outer_tol = 1e-5;
     param->max_linesearch_iter = 1000;
     param->bbeta = 0.5;
     param->ssigma = 0.001;
     param->verbose = cparam->verbose;
+    
+    /* elapsed time (not cputime) */
+    time_t start;
+    time_t end;
+    time(&start);
+    double elapsedtime = 0;
     
 //    training_set* Dset = new training_set;
 //    training_set_sp* Dset_sp = new training_set_sp;
@@ -251,7 +257,7 @@ void libsvmExperiment(command_line_param* cparam)
         
         sols = lhac(mdl);
         
-        printout("logs = ", sols);
+//        printout("logs = ", sols);
         
         //    releaseProb(Dset);
         releaseProb(Dset);
@@ -271,6 +277,10 @@ void libsvmExperiment(command_line_param* cparam)
         releaseProb(Dset_sp);
         releaseSolution(sols);
     }
+    
+    time(&end);
+    elapsedtime = difftime(end, start);
+    printf("%.f seconds\n", elapsedtime);
 
     delete param;
     return;
@@ -283,7 +293,7 @@ void parse_command_line(int argc, const char * argv[],
     // default value
     cparam->dense = 0;
     cparam->lmd = 0.5;
-    cparam->max_iter = 300;
+    cparam->max_iter = 400;
     cparam->randomData = 0;
     cparam->random_p = 0;
     cparam->random_N = 0;

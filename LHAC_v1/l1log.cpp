@@ -47,72 +47,6 @@ static inline void shuffle( work_set_struct* work_set )
 }
 
 
-/********* sics version *********/
-/*
-double l1log::getSubgradient( double* w, double* L_grad, double* lmd )
-{
-    
-    double subgrad = 0.0;
-    
-    for (unsigned long k = 0, i = 0; i < p; i++, k += p) {
-        for (unsigned long j = 0; j <= i; j++) {
-            double g = L_grad[k+j];
-            if (w[k+j] != 0.0 || (fabs(g) > lmd[k+j])) {
-                if (w[k+j] > 0)
-                    g += lmd[k+j];
-                else if (w[k+j] < 0)
-                    g -= lmd[k+j];
-                else
-                    g = fabs(g) - lmd[k+j];
-                subgrad += fabs(g);
-            }
-        }
-    }
-    
-    return subgrad;
-}
-
-void getWorkSet( double* w, double* L_grad, double* lmd, work_set_struct* work_set )
-{
-    ushort_pair_t* idxs = work_set->idxs;
-    unsigned long numActive = 0;
-    
-    for (unsigned long k = 0, i = 0; i < p; i++, k += p) {
-        for (unsigned long j = 0; j <= i; j++) {
-            double g = L_grad[k+j];
-            if (w[k+j] == 0.0 && (fabs(g) > lmd[k+j])) {
-                idxs[numActive].i = (unsigned short) i;
-                idxs[numActive].j = (unsigned short) j;
-                if (w[k+j] > 0)
-                    g += lmd[k+j];
-                else if (w[k+j] < 0)
-                    g -= lmd[k+j];
-                else
-                    g = fabs(g) - lmd[k+j];
-                idxs[numActive].vlt = fabs(g);
-                numActive++;
-            }
-        }
-    }
-    qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
-    
-    numActive = (numActive<work_size)?numActive:work_size;
-    for (unsigned long k = 0, i = 0; i < p; i++, k += p) {
-        for (unsigned long j = 0; j <= i; j++) {
-            if (w[k+j] != 0) {
-                idxs[numActive].i = (unsigned short) i;
-                idxs[numActive].j = (unsigned short) j;
-                numActive++;
-            }
-        }
-    }
-    
-    work_set->numActive = numActive;
-    
-    return;
-}
- */
-
 void l1log::initData(training_set_sp* Dset)
 {
     unsigned long dim_x_space = Dset->nnz+Dset->p;
@@ -345,9 +279,34 @@ void l1log::computeWorkSet( work_set_struct* &work_set )
     unsigned long work_size = param->work_size;
     
     /*** select rule 1 ***/
+//    for (unsigned long j = 0; j < p; j++) {
+//        double g = L_grad[j];
+//        if (w[j] == 0.0 && (fabs(g) > lmd)) {
+//            idxs[numActive].i = (unsigned short) j;
+//            idxs[numActive].j = (unsigned short) j;
+//            g = fabs(g) - lmd;
+//            idxs[numActive].vlt = fabs(g);
+//            numActive++;
+//        }
+//    }
+//    qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
+//    
+//    numActive = (numActive<work_size)?numActive:work_size;
+//    for (unsigned long j = 0; j < p; j++) {
+//        if (w[j] != 0) {
+//            idxs[numActive].i = j;
+//            idxs[numActive].j = j;
+//            numActive++;
+//        }
+//    }
+//    
+//    work_set->numActive = numActive;
+    
+    
+    /*** select rule 2 ***/
     for (unsigned long j = 0; j < p; j++) {
         double g = L_grad[j];
-        if (w[j] == 0.0 && (fabs(g) > lmd)) {
+        if (w[j] != 0.0 || (fabs(g) > lmd)) {
             idxs[numActive].i = (unsigned short) j;
             idxs[numActive].j = (unsigned short) j;
             g = fabs(g) - lmd;
@@ -358,31 +317,8 @@ void l1log::computeWorkSet( work_set_struct* &work_set )
     qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
     
     numActive = (numActive<work_size)?numActive:work_size;
-    for (unsigned long j = 0; j < p; j++) {
-        if (w[j] != 0) {
-            idxs[numActive].i = j;
-            idxs[numActive].j = j;
-            numActive++;
-        }
-    }
     
     work_set->numActive = numActive;
-    
-    
-    /*** select rule 2 ***/
-//    for (unsigned long j = 0; j < p; j++) {
-//        double g = L_grad[j];
-//        if (w[j] != 0.0 || (fabs(g) > lmd)) {
-//            idxs[numActive].i = (unsigned short) j;
-//            idxs[numActive].j = (unsigned short) j;
-//            g = fabs(g) - lmd;
-//            idxs[numActive].vlt = fabs(g);
-//            numActive++;
-//        }
-//    }
-//    qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
-//    
-//    work_set->numActive = numActive;
 
     
     
@@ -473,21 +409,19 @@ void l1log::computeGradient()
     for (unsigned long i = 0; i < N; i++) {
         B[i] = -y[i]/(1+e_ywx[i]);
     }
-//    double alpha = 1.0;
-//    double beta = 0.0;
     
     switch (mode) {
         case GENERAL:
-            for (unsigned long i = 0, k = 0; i < p; i++, k += N) {
-                double gi = 0;
-//                for (unsigned long j = 0; j < N; j++) {
-//                    gi += B[j]*X[k+j];
-//                }
-                gi = cblas_ddot((int)N, B, 1, &X[k], 1);
-//                printf("%.5e\n", gi-gi2);
-                L_grad[i] = gi;
-            }
-//            cblas_dgemv(CblasColMajor, CblasTrans, (int)N, (int)p, alpha, X, (int)N, B, 1, beta, L_grad, 1);
+//            for (unsigned long i = 0, k = 0; i < p; i++, k += N) {
+//                double gi = 0;
+////                for (unsigned long j = 0; j < N; j++) {
+////                    gi += B[j]*X[k+j];
+////                }
+//                gi = cblas_ddot((int)N, B, 1, &X[k], 1);
+////                printf("%.5e\n", gi-gi2);
+//                L_grad[i] = gi;
+//            }
+            cblas_dgemv(CblasColMajor, CblasTrans, (int)N, (int)p, 1.0, X, (int)N, B, 1, 0.0, L_grad, 1);
             break;
         
         case LIBSVM:
@@ -643,13 +577,6 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)
         for (unsigned long j = 0, o = 0; j < m; j++, o += work_set->numActive)
             H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
     }
-//    lR->computeHDiag(H_diag);
-    
-    //    printout("Q_bar = ", Q_bar, m, p, FULL);
-    //    printout("Q = ", Q, p, (unsigned long) m, FULL);
-    //    printout("w = ", w, p, FULL);
-    //    printout("L_grad = ", L_grad, p, FULL);
-    //    printout("H_diag = ", H_diag, p, FULL);
     
     double z = 0.0;
     double Hd_j;
