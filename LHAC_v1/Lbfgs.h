@@ -47,6 +47,7 @@ public:
     double* Q_bar;
     unsigned short m; // no. of cols in Q
     double gama;
+    double* buff; // p
     
     // for test
     double tQ = 0;
@@ -79,7 +80,6 @@ private:
     LMatrix* Lm;
     LMatrix* STS;
     double* Dm;
-    double* buff;
     double* R;
     unsigned long p; // no. of rows in Q
     unsigned short l; // lbfgs param

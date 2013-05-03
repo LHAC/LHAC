@@ -361,6 +361,35 @@ double l1log::computeSubgradient()
     return subgrad;
 }
 
+double l1log::computeObject()
+{
+    double fval = 0.0;
+    
+    
+    for (unsigned long i = 0; i < p; i++) {
+        w[i] = w_prev[i] + D[i];
+    }
+    
+    double lmd = param->lmd;
+    
+    double alpha = 1.0;
+    double beta = 0.0;
+    cblas_dgemv(CblasColMajor, CblasNoTrans, (int)N, (int)p, alpha, X, (int)N, w, 1, beta, e_ywx, 1);
+    for (unsigned long i = 0; i < N; i++) {
+        //        for (unsigned long j = 0, k = 0; j < p; j++, k += N) {
+        //            e_ywx[i] += X[k+i]*wnew[j];
+        //        }
+        e_ywx[i] = exp(e_ywx[i]*y[i]);
+        fval += log((1+e_ywx[i])/e_ywx[i]);
+    }
+    
+    for (unsigned long i = 0; i < p; i++) {
+        fval += lmd*fabs(w[i]);
+    }
+    
+    return fval;
+}
+
 double l1log::computeObject(double* wnew)
 {
     double fval = 0.0;
@@ -476,15 +505,18 @@ void l1log::lineSearch()
     delta += l1_next - l1_current;
     
 //    printout("w = ",w, p);
-    unsigned long lineiter;
+    int lineiter;
+    static int iter_counter = 0;
     switch (mode) {
         case GENERAL:
             f1 = computeObject(w);
             for (lineiter = 0; lineiter < max_linesearch_iter; lineiter++) {
                 if (f1 < f_current + a*ssigma*delta) {
                     f_current = f1;
+                    printf(" # of line searches = %d\n", iter_counter);
                     break;
                 }
+                iter_counter++;
                 
                 a = bbeta*a;
                 
@@ -542,13 +574,179 @@ void l1log::lineSearch()
 
     
     if (MSG >= LHAC_MSG_LINE) {
-        printf("\t\t\t Line search step size = %+.4e   Trial step = %ld\n", a, lineiter);
+        printf("\t\t\t Line search step size = %+.4e   Trial step = %d\n", a, lineiter);
     }
     
 //    printout("w_prev = ", w_prev, p);
 //    printout("w = ",w, p);
     
     return;
+}
+
+/*******************************************************************************
+ compute model function value
+ mu*H
+ *******************************************************************************/
+double l1log::computeModelValue(LBFGS* lR, work_set_struct* work_set, double mu)
+{
+    double fval = f_current;
+    double order1 = cblas_ddot((int)p, D, 1, L_grad, 1);
+    double order2 = 0;
+    double vp = 0;
+    
+    const double* Q = lR->Q;
+    const double* Q_bar = lR->Q_bar;
+    const unsigned short m = lR->m; // # of cols in Q
+    const double gama = mu*lR->gama;
+    double* buffer = lR->buff;
+    
+    order2 += gama*cblas_ddot((int)p, D, 1, D, 1);
+    
+    int cblas_M = (int) work_set->numActive;
+    int cblas_N = (int) m;
+    int cblas_lda = cblas_M;
+    cblas_dgemv(CblasColMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_lda, d_bar, 1, 0.0, buffer, 1);
+    
+    ushort_pair_t* idxs = work_set->idxs;
+    unsigned long* permut = work_set->permut;
+    for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
+        unsigned long idx = idxs[ii].j;
+        unsigned long idx_Q = permut[ii];
+        vp += D[idx]*buffer[idx_Q];
+    }
+    /* mu*H */
+    vp = mu*vp;
+    
+    order2 = order2-vp;
+    order2 = order2*0.5;
+    
+    fval += order1 + order2;
+    
+    return fval;
+}
+
+
+/*******************************************************************************
+ modify H by mu*H
+ warm start with D and d_bar
+ *******************************************************************************/
+void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set, double mu)
+{
+    /* libsvm format */
+    if (mode == LIBSVM) {
+        memset(Xd, 0, N*sizeof(double));
+    }
+    
+    double lmd = param->lmd;
+    unsigned long l = param->l;
+    double opt_inner_tol = param->opt_inner_tol;
+    
+    /* first time no modification or warm start */
+    if (mu == 1) {
+        memset(D, 0, p*sizeof(double));
+        memset(d_bar, 0, 2*l*sizeof(double));
+    }
+
+    
+    const double* Q = lR->Q;
+    const double* Q_bar = lR->Q_bar;
+    const unsigned short m = lR->m;
+    const double gama = mu*lR->gama;
+    
+    // Hessian diagonal: H_diag = gama - sum(Q'.*Q_bar);
+    
+    for (unsigned long k = 0, i = 0; i < work_set->numActive; i++, k += m) {
+        H_diag[i] = gama;
+        for (unsigned long j = 0, o = 0; j < m; j++, o += work_set->numActive)
+            H_diag[i] = H_diag[i] - mu*Q_bar[k+j]*Q[o+i];
+    }
+    
+    double z = 0.0;
+    double Hd_j;
+    double Hii;
+    double G;
+    double Gp;
+    double Gn;
+    double wpd;
+    double Hwd;
+    
+    unsigned long max_inneriter;
+    max_inneriter = std::min(1 + iter/3, param->max_inner_iter);
+    //    if (max_inneriter > (param->max_inner_iter)) {
+    //        max_inneriter = param->max_inner_iter;
+    //    }
+    unsigned long* permut = work_set->permut;
+    for (unsigned long inneriter = 1; inneriter <= max_inneriter; inneriter++) {
+        double diffd = 0;
+        double normd = 0;
+        
+        //        printout(work_set);
+        
+        ushort_pair_t* idxs = work_set->idxs;
+        for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
+            unsigned long idx = idxs[ii].j;
+            unsigned long idx_Q = permut[ii];
+            //            unsigned long idx_Q = idx;
+            
+            //            printout("d_bar = ", d_bar, m, FULL);
+            //            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[idx], (int)p, d_bar, 1);
+            Hd_j = gama*D[idx] - mu*cblas_ddot(m, &Q[idx_Q], (int)work_set->numActive, d_bar, 1);
+            //            Hd_j = lR->computeHdj(D[idx], d_bar, idx);
+            //            Hd_j = gama*D[idx];
+            //            for (unsigned long k = 0, j = 0; j < m; j++, k+=p)
+            //                Hd_j = Hd_j - Q[k+idx]*d_bar[j];
+            
+            Hii = H_diag[idx_Q];
+            G = Hd_j + L_grad[idx];
+            Gp = G + lmd;
+            Gn = G - lmd;
+            wpd = w[idx] + D[idx];
+            Hwd = Hii * wpd;
+            
+            z = -wpd;
+            if (Gp <= Hwd)
+                z = -Gp/Hii;
+            if (Gn >= Hwd)
+                z = -Gn/Hii;
+            
+            D[idx] = D[idx] + z;
+            
+            //            lR->updateDbar(d_bar, idx, z);
+            for (unsigned long k = idx_Q*m, j = 0; j < m; j++)
+                //            for (unsigned long k = idx*m, j = 0; j < m; j++)
+                d_bar[j] = d_bar[j] + z*Q_bar[k+j];
+            
+            /* libsvm format */
+            if (mode == LIBSVM) {
+                feature_node* xnode = X_libsvm[idx];
+                while (xnode->index != -1) {
+                    int ind = xnode->index-1;
+                    Xd[ind] += z*(xnode->value);
+                    xnode++;
+                }
+            }
+            
+            diffd += fabs(z);
+            normd += fabs(D[idx]);
+            
+        }
+        
+        if (MSG >= LHAC_MSG_CD) {
+            printf("\t\t Coordinate descent pass %ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
+                   inneriter, diffd, normd);
+        }
+        
+        if (diffd < opt_inner_tol*normd) {
+            break;
+        }
+        
+        shuffle( work_set );
+    }
+    
+    //    printout(D, p);
+    
+    return;
+    
 }
 
 void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)

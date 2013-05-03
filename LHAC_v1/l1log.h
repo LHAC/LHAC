@@ -41,12 +41,16 @@ public:
                            double gama, work_set_struct* work_set,
                            unsigned short m);
     void coordinateDsecent(LBFGS* lR, work_set_struct* work_set);
+    void coordinateDsecent(LBFGS* lR, work_set_struct* work_set, double step_size);
+    
+    double computeModelValue(LBFGS* lR, work_set_struct* work_set, double step_size);
     
     double computeSubgradient();
     
     double computeObject(double* wnew); // cache e_ywx;
     
     double computeObject(double* wnew, double _a); // update e_ywx using a and Xd
+    double computeObject(); // w = w + D;
     
     void lineSearch();
     

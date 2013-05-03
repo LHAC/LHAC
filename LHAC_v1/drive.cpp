@@ -107,28 +107,39 @@ solution* lhac(l1log* mdl)
 //        write2mat("Qm.mat", "Qm", Q, mdl->p, 2*(Lm->rows));
 //        write2mat("Qm_bar.mat", "Qm_bar", Q_bar, 2*(Lm->rows), mdl->p);
 
-        mdl->coordinateDsecent(lR, work_set);
-//        mdl->coordinateDescent(Q_bar, Q, gama, work_set, 2*Sm->cols);
+        /* old sufficient decrease condition */
+//        mdl->coordinateDsecent(lR, work_set);
+//        double eTime = clock();
+//        mdl->lineSearch();
+//        eTime = (clock() - eTime)/CLOCKS_PER_SEC;
         
-        double eTime = clock();
-        mdl->lineSearch();
-        eTime = (clock() - eTime)/CLOCKS_PER_SEC;
-//        printf("%.4e\n", eTime);
+        /* new condition */
+        double mu = 1.0;
+        double b1 = 1/(param->bbeta);
+        memcpy(mdl->w_prev, mdl->w, p*sizeof(double));
+        mdl->coordinateDsecent(lR, work_set, mu);
+        double f_mdl = mdl->computeModelValue(lR, work_set, mu);
+        double f_trial = mdl->computeObject();
+        static int lineiter = 0;
+        while (f_trial >= mdl->f_current) {
+            lineiter++;
+            mu = mu*b1;
+            mdl->coordinateDsecent(lR, work_set, mu);
+            f_trial = mdl->computeObject();
+        }
+        printf(" model quality: %f\n", (f_trial-mdl->f_current)/(f_mdl-mdl->f_current));
+        printf(" # of line searches = %d\n", lineiter);
+        mdl->f_current = f_trial;
+        
         
         memcpy(mdl->L_grad_prev, mdl->L_grad, p*sizeof(double));
         
         double gradientTime = clock();
         mdl->computeGradient();
         gradientTime = (clock() - gradientTime)/CLOCKS_PER_SEC;
-//        printf("%.4e\n", gradientTime);
         
         /* update LBFGS */
         lR->updateLBFGS(mdl->w, mdl->w_prev, mdl->L_grad, mdl->L_grad_prev);
-        
-        //        printout("Sm = ", Sm,FULL);
-        //        printout("Tm = ", Tm, FULL);
-        //        printout("Lm = ", Lm, FULL);
-        //        printout("Dm = ", Dm, Lm->rows, FULL);
         
         
         normsg = mdl->computeSubgradient();
