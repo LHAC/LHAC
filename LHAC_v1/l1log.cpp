@@ -585,42 +585,52 @@ void l1log::lineSearch()
 
 /*******************************************************************************
  compute model function value
- mu*H
+ H = mu*H
  *******************************************************************************/
 double l1log::computeModelValue(LBFGS* lR, work_set_struct* work_set, double mu)
 {
-    double fval = f_current;
+    double fval = 0;
     double order1 = cblas_ddot((int)p, D, 1, L_grad, 1);
     double order2 = 0;
-    double vp = 0;
+    double l1norm = 0;
     
-    const double* Q = lR->Q;
-    const double* Q_bar = lR->Q_bar;
+    double lmd = param->lmd;
+    
+    double* Q = lR->Q;
+    double* Q_bar = lR->Q_bar;    
     const unsigned short m = lR->m; // # of cols in Q
-    const double gama = mu*lR->gama;
+    const double gama = lR->gama;
     double* buffer = lR->buff;
-    
-    order2 += gama*cblas_ddot((int)p, D, 1, D, 1);
     
     int cblas_M = (int) work_set->numActive;
     int cblas_N = (int) m;
     int cblas_lda = cblas_M;
     cblas_dgemv(CblasColMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_lda, d_bar, 1, 0.0, buffer, 1);
+//    write2mat("Qm.mat", "Qm", Q, (unsigned long) cblas_M, (unsigned long) cblas_N);
+//    write2mat("Qm_bar.mat", "Qm_bar", Q_bar, cblas_N, cblas_M);
+//    write2mat("d_bar.mat", "d_bar", d_bar, cblas_N, 1);
+//    write2mat("Dm.mat", "Dm", D, p, 1);
+//    write2mat("work_set.mat", "work_set", work_set);
+
     
+    double vp = 0;
     ushort_pair_t* idxs = work_set->idxs;
     unsigned long* permut = work_set->permut;
+//    write2mat("permut.mat", "permut", permut, cblas_M, 1);
     for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
         unsigned long idx = idxs[ii].j;
         unsigned long idx_Q = permut[ii];
         vp += D[idx]*buffer[idx_Q];
     }
-    /* mu*H */
-    vp = mu*vp;
     
-    order2 = order2-vp;
-    order2 = order2*0.5;
+    order2 = gama*cblas_ddot((int)p, D, 1, D, 1)-vp;
+    order2 = mu*order2*0.5;
     
-    fval += order1 + order2;
+    for (unsigned long i = 0; i < p; i++) {
+        l1norm += lmd*(fabs(w[i]) - fabs(w_prev[i]));
+    }
+    
+    fval = f_current + order1 + order2 + l1norm;
     
     return fval;
 }

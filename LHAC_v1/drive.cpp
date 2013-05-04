@@ -118,17 +118,21 @@ solution* lhac(l1log* mdl)
         double b1 = 1/(param->bbeta);
         memcpy(mdl->w_prev, mdl->w, p*sizeof(double));
         mdl->coordinateDsecent(lR, work_set, mu);
-        double f_mdl = mdl->computeModelValue(lR, work_set, mu);
         double f_trial = mdl->computeObject();
-        static int lineiter = 0;
-        while (f_trial >= mdl->f_current) {
+        double f_mdl = mdl->computeModelValue(lR, work_set, mu);
+        int lineiter = 0;
+        double rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
+        while (rho <= 0.5 && lineiter <= 20) {
             lineiter++;
             mu = mu*b1;
             mdl->coordinateDsecent(lR, work_set, mu);
             f_trial = mdl->computeObject();
+            f_mdl = mdl->computeModelValue(lR, work_set, mu);
+            rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
+            printf("\t \t \t # of line searches = %d; model quality: %f\n", lineiter, rho);
         }
-        printf(" model quality: %f\n", (f_trial-mdl->f_current)/(f_mdl-mdl->f_current));
-        printf(" # of line searches = %d\n", lineiter);
+//        printf(" model quality: %f\n", rho);
+//        printf(" # of line searches = %d\n", lineiter);
         mdl->f_current = f_trial;
         
         
@@ -237,8 +241,8 @@ void libsvmExperiment(command_line_param* cparam)
     param->work_size = 8000;
     param->max_iter = cparam->max_iter;
     param->lmd = cparam->lmd;
-    param->max_inner_iter = 100;
-    param->opt_inner_tol = 5*1e-2;
+    param->max_inner_iter = 30;
+    param->opt_inner_tol = 5*1e-4;
     param->opt_outer_tol = 1e-5;
     param->max_linesearch_iter = 1000;
     param->bbeta = 0.5;

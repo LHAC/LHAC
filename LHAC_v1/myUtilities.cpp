@@ -794,6 +794,26 @@ void write2mat(const char* fileName, const char* name,
     return;
 }
 
+void write2mat(const char* fileName, const char* name,
+               unsigned long* x, unsigned long s1, unsigned long s2)
+{
+    MATFile *pmat;
+    mxArray *pa;
+    pmat = matOpen(fileName, "w");
+    if (pmat == NULL) {
+        printf("Error opening file %s\n", fileName);
+        return;
+    }
+    
+    pa = mxCreateNumericMatrix(s1, s2, mxUINT64_CLASS, mxREAL);
+    memcpy((void *)(mxGetPr(pa)), (void *)x, s1*s2*sizeof(unsigned long));
+    matPutVariable(pmat, name, pa);
+    
+    mxDestroyArray(pa);
+    matClose(pmat);
+    return;
+}
+
 void write2mat(const char* fileName, const char* name, LMatrix* x)
 {
     unsigned long s1 = x->rows;
