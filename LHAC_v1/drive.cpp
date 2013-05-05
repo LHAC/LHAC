@@ -122,7 +122,7 @@ solution* lhac(l1log* mdl)
         double f_mdl = mdl->computeModelValue(lR, work_set, mu);
         int lineiter = 0;
         double rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
-        while (rho <= 0.5 && lineiter <= 20) {
+        while (rho <= 0.5 && lineiter <= 100) {
             lineiter++;
             mu = mu*b1;
             mdl->coordinateDsecent(lR, work_set, mu);
@@ -131,8 +131,6 @@ solution* lhac(l1log* mdl)
             rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
             printf("\t \t \t # of line searches = %d; model quality: %f\n", lineiter, rho);
         }
-//        printf(" model quality: %f\n", rho);
-//        printf(" # of line searches = %d\n", lineiter);
         mdl->f_current = f_trial;
         
         

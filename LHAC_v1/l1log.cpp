@@ -597,7 +597,6 @@ double l1log::computeModelValue(LBFGS* lR, work_set_struct* work_set, double mu)
     double lmd = param->lmd;
     
     double* Q = lR->Q;
-    double* Q_bar = lR->Q_bar;    
     const unsigned short m = lR->m; // # of cols in Q
     const double gama = lR->gama;
     double* buffer = lR->buff;
@@ -646,30 +645,28 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set, double mu)
     if (mode == LIBSVM) {
         memset(Xd, 0, N*sizeof(double));
     }
-    
     double lmd = param->lmd;
     unsigned long l = param->l;
     double opt_inner_tol = param->opt_inner_tol;
-    
-    /* first time no modification or warm start */
-    if (mu == 1) {
-        memset(D, 0, p*sizeof(double));
-        memset(d_bar, 0, 2*l*sizeof(double));
-    }
-
     
     const double* Q = lR->Q;
     const double* Q_bar = lR->Q_bar;
     const unsigned short m = lR->m;
     const double gama = mu*lR->gama;
     
-    // Hessian diagonal: H_diag = gama - sum(Q'.*Q_bar);
-    
-    for (unsigned long k = 0, i = 0; i < work_set->numActive; i++, k += m) {
-        H_diag[i] = gama;
-        for (unsigned long j = 0, o = 0; j < m; j++, o += work_set->numActive)
-            H_diag[i] = H_diag[i] - mu*Q_bar[k+j]*Q[o+i];
+    /* first time no modification or warm start */
+    if (mu == 1) {
+        memset(D, 0, p*sizeof(double));
+        memset(d_bar, 0, 2*l*sizeof(double));
+        
+        // Hessian diagonal: H_diag = gama - sum(Q'.*Q_bar);
+        for (unsigned long k = 0, i = 0; i < work_set->numActive; i++, k += m) {
+            H_diag[i] = gama;
+            for (unsigned long j = 0, o = 0; j < m; j++, o += work_set->numActive)
+                H_diag[i] = H_diag[i] - mu*Q_bar[k+j]*Q[o+i];
+        }
     }
+
     
     double z = 0.0;
     double Hd_j;
@@ -706,7 +703,7 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set, double mu)
             //            for (unsigned long k = 0, j = 0; j < m; j++, k+=p)
             //                Hd_j = Hd_j - Q[k+idx]*d_bar[j];
             
-            Hii = H_diag[idx_Q];
+            Hii = mu*H_diag[idx_Q];
             G = Hd_j + L_grad[idx];
             Gp = G + lmd;
             Gn = G - lmd;
