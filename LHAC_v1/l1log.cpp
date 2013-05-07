@@ -376,11 +376,19 @@ double l1log::computeObject()
     double beta = 0.0;
     cblas_dgemv(CblasColMajor, CblasNoTrans, (int)N, (int)p, alpha, X, (int)N, w, 1, beta, e_ywx, 1);
     for (unsigned long i = 0; i < N; i++) {
-        //        for (unsigned long j = 0, k = 0; j < p; j++, k += N) {
-        //            e_ywx[i] += X[k+i]*wnew[j];
-        //        }
-        e_ywx[i] = exp(e_ywx[i]*y[i]);
-        fval += log((1+e_ywx[i])/e_ywx[i]);
+        double nc1;
+        double nc2;
+        nc1 = e_ywx[i]*y[i];
+        e_ywx[i] = exp(nc1);
+        if (nc1 <= 0) {
+            nc2 = e_ywx[i];
+            fval += log((1+nc2))-nc1;
+        }
+        else {
+            nc2 = exp(-nc1);
+            fval += log((1+nc2));
+        }
+
     }
     
     for (unsigned long i = 0; i < p; i++) {
@@ -402,12 +410,22 @@ double l1log::computeObject(double* wnew)
     double beta = 0.0;
     cblas_dgemv(CblasColMajor, CblasNoTrans, (int)N, (int)p, alpha, X, (int)N, wnew, 1, beta, e_ywx, 1);
     for (unsigned long i = 0; i < N; i++) {
-//        for (unsigned long j = 0, k = 0; j < p; j++, k += N) {
-//            e_ywx[i] += X[k+i]*wnew[j];
-//        }
-        e_ywx[i] = exp(e_ywx[i]*y[i]);
-        fval += log((1+e_ywx[i])/e_ywx[i]);
+        double nc1;
+        double nc2;
+        nc1 = e_ywx[i]*y[i];
+        e_ywx[i] = exp(nc1);
+        if (nc1 <= 0) {
+            nc2 = e_ywx[i];
+            fval += log((1+nc2))-nc1;
+        }
+        else {
+            nc2 = exp(-nc1);
+            fval += log((1+nc2));
+        }
+//        e_ywx[i] = exp(e_ywx[i]*y[i]);
+//        fval += log((1+e_ywx[i])/e_ywx[i]);
     }
+//    printf("fval1 - fval = %.f\n", fval1-fval);
     
     for (unsigned long i = 0; i < p; i++) {
         fval += lmd*fabs(wnew[i]);
@@ -677,13 +695,17 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set, double mu)
     double wpd;
     double Hwd;
     
-    unsigned long max_inneriter;
-    max_inneriter = std::min(1 + iter/3, param->max_inner_iter);
+    unsigned long max_inneriter = param->max_inner_iter;
+    if (mu == 1) {
+        max_inneriter = std::min(1 + iter/3, param->max_inner_iter);
+    }
+    
     //    if (max_inneriter > (param->max_inner_iter)) {
     //        max_inneriter = param->max_inner_iter;
     //    }
     unsigned long* permut = work_set->permut;
-    for (unsigned long inneriter = 1; inneriter <= max_inneriter; inneriter++) {
+    unsigned long inneriter;
+    for (inneriter = 1; inneriter <= max_inneriter; inneriter++) {
         double diffd = 0;
         double normd = 0;
         
@@ -751,6 +773,7 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set, double mu)
     }
     
     //    printout(D, p);
+    printf("\t\t # of Coordinate descent pass %ld\n", inneriter);
     
     return;
     

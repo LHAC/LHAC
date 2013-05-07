@@ -15,6 +15,7 @@
 #include "Lbfgs.h"
 #include "lhac.h"
 #include "myUtilities.h"
+#include <CoreFoundation/CoreFoundation.h>
 
 /* Auxiliary routines prototypes */
 //extern void print_matrix( char* desc, int m, int n, double* a, int lda );
@@ -51,6 +52,8 @@ solution* lhac(l1log* mdl)
 {
     double timeBegin = mdl->timeBegin;
     
+    double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
+    
     l1log_param* param = mdl->param;
     unsigned long l = param->l;
     double opt_outer_tol = param->opt_outer_tol;
@@ -78,15 +81,25 @@ solution* lhac(l1log* mdl)
     
     double normsg = mdl->computeSubgradient();
     unsigned short newton_iter;
+    sols->size = 0;
     for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
         mdl->iter = newton_iter;
         
         mdl->computeWorkSet(work_set);
         
-        double elapsedTime = (clock() - timeBegin)/CLOCKS_PER_SEC;
-        sols->fval[newton_iter-1] = mdl->f_current;
-        sols->normgs[newton_iter-1] = normsg;
-        sols->t[newton_iter-1] = elapsedTime;
+
+        /* cputime */
+        //        double elapsedTime = (clock() - timeBegin)/CLOCKS_PER_SEC;
+        
+        /* elapsed time */
+        double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
+        if (newton_iter == 1 || newton_iter % 30 == 0 || newton_iter == max_iter-1) {
+            sols->fval[sols->size] = mdl->f_current;
+            sols->normgs[sols->size] = normsg;
+            sols->t[sols->size] = elapsedTime;
+            (sols->size)++;
+        }
+
         if (mdl->MSG >= LHAC_MSG_NEWTON) {
             printf("%.4e  iter %2d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
                    elapsedTime, newton_iter, mdl->f_current, normsg, work_set->numActive);
@@ -151,80 +164,15 @@ solution* lhac(l1log* mdl)
         
     }
     
-    sols->size = newton_iter;
     
     
     delete mdl;
     delete lR;
-//    delete Tm;
-//    delete Lm;
-//    delete Sm;
-//    delete [] Dm;
-//    delete [] Q;
-//    delete [] Q_bar;
-//    delete [] R;
-//    delete [] buff;
     delete [] work_set->idxs;
     delete work_set;
     return sols;
 }
 
-
-/**** compare libsvm format with general format
-       on randomly generated data sets ****/
-void randomExperiment(command_line_param* cparam)
-{
-    l1log_param* param = new l1log_param;
-    param->l = 10;
-    param->work_size = 10000;
-    param->max_iter = cparam->max_iter;
-    param->lmd = cparam->lmd;
-    param->max_inner_iter = 20;
-    param->opt_inner_tol = 0.05;
-    param->opt_outer_tol = 1e-5;
-    param->max_linesearch_iter = 1000;
-    param->bbeta = 0.5;
-    param->ssigma = 0.001;
-    param->verbose = cparam->verbose;
-    
-    if (cparam->dense) {
-        training_set* Dset = new training_set;
-        generateRandomProb(Dset, cparam->random_p,
-                           cparam->random_N, cparam->nnz_perc);
-        l1log* mdl = new l1log(Dset, param);
-        
-        solution* sols;
-        sols = lhac(mdl);
-        
-        printout("logs = ", sols);
-        
-        releaseSolution(sols);
-        
-        releaseProb(Dset);
-    }
-    else {
-        training_set_sp* Dset_sp = new training_set_sp;
-        training_set* Dset = new training_set;
-        generateRandomProb(Dset_sp, Dset, cparam->random_p,
-                           cparam->random_N, cparam->nnz_perc);
-        l1log* mdl = new l1log(Dset_sp, param);
-        
-        solution* sols;
-        sols = lhac(mdl);
-        
-        printout("logs = ", sols);
-        
-        releaseSolution(sols);
-        releaseProb(Dset);
-        releaseProb(Dset_sp);
-    }
-    
-    
-    delete param;
-    return;
-
-   
-}
 
 void libsvmExperiment(command_line_param* cparam)
 {
@@ -239,9 +187,9 @@ void libsvmExperiment(command_line_param* cparam)
     param->work_size = 8000;
     param->max_iter = cparam->max_iter;
     param->lmd = cparam->lmd;
-    param->max_inner_iter = 30;
-    param->opt_inner_tol = 5*1e-4;
-    param->opt_outer_tol = 1e-5;
+    param->max_inner_iter = 100;
+    param->opt_inner_tol = 5*1e-6;
+    param->opt_outer_tol = 1e-8;
     param->max_linesearch_iter = 1000;
     param->bbeta = 0.5;
     param->ssigma = 0.001;
@@ -270,7 +218,7 @@ void libsvmExperiment(command_line_param* cparam)
         
         sols = lhac(mdl);
         
-//        printout("logs = ", sols);
+        printout("logs = ", sols);
         
         //    releaseProb(Dset);
         releaseProb(Dset);
@@ -392,5 +340,61 @@ int main(int argc, const char * argv[])
     delete [] cparam->fileName;
     delete cparam;
     exit( 0 );
+}
+
+/**** compare libsvm format with general format
+ on randomly generated data sets ****/
+void randomExperiment(command_line_param* cparam)
+{
+    l1log_param* param = new l1log_param;
+    param->l = 10;
+    param->work_size = 10000;
+    param->max_iter = cparam->max_iter;
+    param->lmd = cparam->lmd;
+    param->max_inner_iter = 20;
+    param->opt_inner_tol = 0.05;
+    param->opt_outer_tol = 1e-5;
+    param->max_linesearch_iter = 1000;
+    param->bbeta = 0.5;
+    param->ssigma = 0.001;
+    param->verbose = cparam->verbose;
+    
+    if (cparam->dense) {
+        training_set* Dset = new training_set;
+        generateRandomProb(Dset, cparam->random_p,
+                           cparam->random_N, cparam->nnz_perc);
+        l1log* mdl = new l1log(Dset, param);
+        
+        solution* sols;
+        sols = lhac(mdl);
+        
+        printout("logs = ", sols);
+        
+        releaseSolution(sols);
+        
+        releaseProb(Dset);
+    }
+    else {
+        training_set_sp* Dset_sp = new training_set_sp;
+        training_set* Dset = new training_set;
+        generateRandomProb(Dset_sp, Dset, cparam->random_p,
+                           cparam->random_N, cparam->nnz_perc);
+        l1log* mdl = new l1log(Dset_sp, param);
+        
+        solution* sols;
+        sols = lhac(mdl);
+        
+        printout("logs = ", sols);
+        
+        releaseSolution(sols);
+        releaseProb(Dset);
+        releaseProb(Dset_sp);
+    }
+    
+    
+    delete param;
+    return;
+    
+    
 }
 
