@@ -423,12 +423,28 @@ void printout(const char* desc, LMatrix* x)
     return;
 }
 
-double norm(double* x, unsigned long s1)
+double norm(double* x, unsigned long s1, int p)
 {
     double norm = 0.0;
-    
-    for (unsigned long i = 0; i < s1; i++) {
-        norm += fabs(x[i]);
+    switch (p) {
+        case 1:
+            for (unsigned long i = 0; i < s1; i++) {
+                norm += fabs(x[i]);
+            }
+            break;
+            
+        case 2:
+            for (unsigned long i = 0; i < s1; i++) {
+                norm += x[i]*x[i];
+            }
+            norm = sqrt(norm);
+            break;
+            
+        default:
+            for (unsigned long i = 0; i < s1; i++) {
+                norm += fabs(x[i]);
+            }
+            break;
     }
     
     return norm;

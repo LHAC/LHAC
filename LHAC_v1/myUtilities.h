@@ -34,7 +34,7 @@ void printout(const char* desc, training_set_sp* Dset, int mode);
 void printout(const char* desc, solution* sols);
 
 
-double norm(double* x, unsigned long s1);
+double norm(double* x, unsigned long s1, int p);
 
 void generateRandomProb(training_set* Dset,
                         unsigned long p, unsigned long N, double nnz_percent);
