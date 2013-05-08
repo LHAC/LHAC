@@ -122,10 +122,11 @@ void LMatrix::deleteCol()
     return;
 }
 
-LBFGS::LBFGS(unsigned long _p, unsigned short _l)
+LBFGS::LBFGS(unsigned long _p, unsigned short _l, double _s)
 {
     l = _l;
     p = _p;
+    shrink = _s;
     
     Sm = new LMatrix(p, l);
     Tm = new LMatrix(p, l);
@@ -187,7 +188,7 @@ void LBFGS::computeQR()
     double vv = 0.0;
     vv = cblas_ddot(_rows, Tend, 1, Tend, 1);
     
-    gama = vv / Dm[_cols-1];
+    gama = vv / Dm[_cols-1] / shrink;
     
     double et;
     et = clock();
@@ -297,7 +298,7 @@ void LBFGS::computeQR_v2(work_set_struct* work_set)
     double vv = 0.0;
     vv = cblas_ddot(_rows, Tend, 1, Tend, 1);
     
-    gama = vv / Dm[_cols-1];
+    gama = vv / Dm[_cols-1] / 32;
     
     ushort_pair_t* idxs = work_set->idxs;
     unsigned long numActive = work_set->numActive;

@@ -84,6 +84,12 @@ typedef struct {
     unsigned long max_linesearch_iter;
     unsigned long l; // lbfgs sy pair number <= MAX_SY_PAIRS
     int verbose; //
+    
+    /* line search */
+    int sd_flag; // 1 = sufficient decrease; 0 = line search
+    
+    /* gama in lbfgs */
+    double shrink = 1; // gama = gama/shrink
 } param;
 
 typedef struct {
@@ -98,6 +104,11 @@ typedef struct {
     int verbose; // LHAC_MSG_NO, etc.
     int alg = ALG_L1LOG; // ALG_L1LOG = 1, ALG_SICS
     
+    /* line search */
+    int sd_flag; // 1 = sufficient decrease; 0 = line search
+    
+    /* gama in lbfgs */
+    double shrink = 1; // gama = gama/shrink
 } command_line_param;
 
 

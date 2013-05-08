@@ -640,8 +640,8 @@ double l1log::computeModelValue(LBFGS* lR, work_set_struct* work_set, double mu)
         vp += D[idx]*buffer[idx_Q];
     }
     
-    order2 = gama*cblas_ddot((int)p, D, 1, D, 1)-vp;
-    order2 = mu*order2*0.5;
+    order2 = mu*gama*cblas_ddot((int)p, D, 1, D, 1)-vp;
+    order2 = order2*0.5;
     
     for (unsigned long i = 0; i < p; i++) {
         l1norm += lmd*(fabs(w[i]) - fabs(w_prev[i]));
@@ -719,7 +719,7 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set, double mu)
             
             //            printout("d_bar = ", d_bar, m, FULL);
             //            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[idx], (int)p, d_bar, 1);
-            Hd_j = gama*D[idx] - mu*cblas_ddot(m, &Q[idx_Q], (int)work_set->numActive, d_bar, 1);
+            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[idx_Q], (int)work_set->numActive, d_bar, 1);
             //            Hd_j = lR->computeHdj(D[idx], d_bar, idx);
             //            Hd_j = gama*D[idx];
             //            for (unsigned long k = 0, j = 0; j < m; j++, k+=p)

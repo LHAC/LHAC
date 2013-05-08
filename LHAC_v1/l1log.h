@@ -28,8 +28,15 @@ typedef struct {
     double bbeta;
     double ssigma;
     unsigned long max_linesearch_iter;
+    
     unsigned long l; // lbfgs sy pair number <= MAX_SY_PAIRS
     int verbose;
+    
+    /* line search */
+    int sd_flag; // 1 = sufficient decrease; 0 = line search
+    
+    /* gama in lbfgs */
+    double shrink = 1; // gama = gama/shrink
 } l1log_param;
 
 
@@ -71,6 +78,7 @@ public:
     /* Parameters */
     l1log_param* param;
     
+    double* D;
     double normsg0;
     double f_current;
     double* w_prev;
@@ -88,7 +96,6 @@ public:
     unsigned long N;
     
 private:
-    double* D;
     double* H_diag; // p
     double* d_bar; // 2*l
     double* e_ywx; // N

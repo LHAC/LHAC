@@ -55,6 +55,7 @@ solution* lhac(l1log* mdl)
     double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
     
     l1log_param* param = mdl->param;
+    double sd_flag = param->sd_flag;
     unsigned long l = param->l;
     double opt_outer_tol = param->opt_outer_tol;
     unsigned short max_iter = param->max_iter;
@@ -70,7 +71,7 @@ solution* lhac(l1log* mdl)
     
     unsigned long p = mdl->p;
     
-    LBFGS* lR = new LBFGS(p, l);
+    LBFGS* lR = new LBFGS(p, l, param->shrink);
     
     lR->initData(mdl->w, mdl->w_prev, mdl->L_grad, mdl->L_grad_prev);
     
@@ -89,7 +90,7 @@ solution* lhac(l1log* mdl)
         
 
         /* cputime */
-        //        double elapsedTime = (clock() - timeBegin)/CLOCKS_PER_SEC;
+//        double elapsedTime = (clock() - timeBegin)/CLOCKS_PER_SEC;
         
         /* elapsed time */
         double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
@@ -120,32 +121,45 @@ solution* lhac(l1log* mdl)
 //        write2mat("Qm.mat", "Qm", Q, mdl->p, 2*(Lm->rows));
 //        write2mat("Qm_bar.mat", "Qm_bar", Q_bar, 2*(Lm->rows), mdl->p);
 
-        /* old sufficient decrease condition */
-//        mdl->coordinateDsecent(lR, work_set);
-//        double eTime = clock();
-//        mdl->lineSearch();
-//        eTime = (clock() - eTime)/CLOCKS_PER_SEC;
-        
-        /* new condition */
-        double mu = 1.0;
-        double b1 = 1/(param->bbeta);
-        memcpy(mdl->w_prev, mdl->w, p*sizeof(double));
-        mdl->coordinateDsecent(lR, work_set, mu);
-        double f_trial = mdl->computeObject();
-        double f_mdl = mdl->computeModelValue(lR, work_set, mu);
-        int lineiter = 0;
-        double rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
-        while (rho <= 0.5 && lineiter <= 100) {
-            lineiter++;
-            mu = mu*b1;
-            mdl->coordinateDsecent(lR, work_set, mu);
-            f_trial = mdl->computeObject();
-            f_mdl = mdl->computeModelValue(lR, work_set, mu);
-            rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
-            printf("\t \t \t # of line searches = %d; model quality: %f\n", lineiter, rho);
+        double eTime = clock();
+        if (sd_flag == 0) {
+            /* old sufficient decrease condition */
+            mdl->coordinateDsecent(lR, work_set);
+            mdl->lineSearch();
         }
-        mdl->f_current = f_trial;
-        
+        else {
+            /* new condition */
+            double changeD = 0;
+            double changeF = 0;
+            
+            double mu = 1.0;
+            double b1 = 1/(param->bbeta);
+            memcpy(mdl->w_prev, mdl->w, p*sizeof(double));
+            mdl->coordinateDsecent(lR, work_set, mu);
+            double f_trial = mdl->computeObject();
+            double f_mdl = mdl->computeModelValue(lR, work_set, mu);
+            static int lineiter = 0;
+            double rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
+            
+            changeD = norm(mdl->D, mdl->p, 2);
+            changeF = f_trial;
+            
+            while (rho <= 0.5 && lineiter <= 500) {
+                lineiter++;
+                mu = mu*b1;
+                mdl->coordinateDsecent(lR, work_set, mu);
+                f_trial = mdl->computeObject();
+                f_mdl = mdl->computeModelValue(lR, work_set, mu);
+                rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
+                printf("\t \t \t # of line searches = %d; model quality: %f\n", lineiter, rho);
+            }
+            
+            changeF = (f_trial-changeF)/(f_trial-mdl->f_current);
+            changeD = norm(mdl->D, mdl->p, 2)/changeD;
+            printf("change in D = %f; change in f = %f\n", changeD, changeF);
+            mdl->f_current = f_trial;
+        }
+        eTime = (clock() - eTime)/CLOCKS_PER_SEC;
         
         memcpy(mdl->L_grad_prev, mdl->L_grad, p*sizeof(double));
         
@@ -159,11 +173,11 @@ solution* lhac(l1log* mdl)
         
         normsg = mdl->computeSubgradient();
         if (normsg <= opt_outer_tol*mdl->normsg0) {
+//            printf("# of line searches = %d.\n", lineiter);
             break;
         }
         
     }
-    
     
     
     delete mdl;
@@ -187,13 +201,15 @@ void libsvmExperiment(command_line_param* cparam)
     param->work_size = 8000;
     param->max_iter = cparam->max_iter;
     param->lmd = cparam->lmd;
-    param->max_inner_iter = 100;
+    param->max_inner_iter = 30;
     param->opt_inner_tol = 5*1e-6;
-    param->opt_outer_tol = 1e-8;
+    param->opt_outer_tol = 1e-6;
     param->max_linesearch_iter = 1000;
     param->bbeta = 0.5;
     param->ssigma = 0.001;
     param->verbose = cparam->verbose;
+    param->sd_flag = cparam->sd_flag;
+    param->shrink = cparam->shrink;
     
     /* elapsed time (not cputime) */
     time_t start;
@@ -260,6 +276,8 @@ void parse_command_line(int argc, const char * argv[],
     cparam->random_N = 0;
     cparam->fileName = new char[MAX_LENS];
     cparam->verbose = LHAC_MSG_CD;
+    cparam->sd_flag = 1; // default using suffcient decrease
+    cparam->shrink = 1; // default no shrink on gama
     
     // parse options
     int i;
@@ -307,6 +325,12 @@ void parse_command_line(int argc, const char * argv[],
             case 's':
                 cparam->alg = atoi(argv[i]);
                 break;
+                
+            case 'l':
+                cparam->sd_flag = atoi(argv[i]);
+                
+            case 'g':
+                cparam->shrink = atof(argv[i]);
                 
 			default:
 				printf("unknown option: -%c\n", argv[i-1][1]);

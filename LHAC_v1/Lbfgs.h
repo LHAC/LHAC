@@ -54,7 +54,7 @@ public:
     double tR = 0;
     double tQ_bar = 0;
     
-    LBFGS(unsigned long _p, unsigned short _l);
+    LBFGS(unsigned long _p, unsigned short _l, double _s);
     
     ~LBFGS();
     
@@ -83,6 +83,8 @@ private:
     double* R;
     unsigned long p; // no. of rows in Q
     unsigned short l; // lbfgs param
+    
+    double shrink;
     
     /* for lapack */
     int ipiv[MAX_SY_PAIRS+1];
