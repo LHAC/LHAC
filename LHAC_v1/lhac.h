@@ -54,6 +54,7 @@ typedef struct {
     double lbfgsTime1;
     double lbfgsTime2;
     unsigned long size; // max_newton_iter
+    int num_iter;
 } solution;
 
 typedef struct {

@@ -87,14 +87,13 @@ solution* lhac(l1log* mdl)
         mdl->iter = newton_iter;
         
         mdl->computeWorkSet(work_set);
-        
 
         /* cputime */
 //        double elapsedTime = (clock() - timeBegin)/CLOCKS_PER_SEC;
         
         /* elapsed time */
         double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
-        if (newton_iter == 1 || newton_iter % 30 == 0 || newton_iter == max_iter-1) {
+        if (newton_iter == 1 || newton_iter % 30 == 0 ) {
             sols->fval[sols->size] = mdl->f_current;
             sols->normgs[sols->size] = normsg;
             sols->t[sols->size] = elapsedTime;
@@ -121,7 +120,7 @@ solution* lhac(l1log* mdl)
 //        write2mat("Qm.mat", "Qm", Q, mdl->p, 2*(Lm->rows));
 //        write2mat("Qm_bar.mat", "Qm_bar", Q_bar, 2*(Lm->rows), mdl->p);
 
-        double eTime = clock();
+        double eTime = CFAbsoluteTimeGetCurrent();
         if (sd_flag == 0) {
             /* old sufficient decrease condition */
             mdl->coordinateDsecent(lR, work_set);
@@ -154,12 +153,14 @@ solution* lhac(l1log* mdl)
                 printf("\t \t \t # of line searches = %d; model quality: %f\n", lineiter, rho);
             }
             
-            changeF = (f_trial-changeF)/(f_trial-mdl->f_current);
-            changeD = norm(mdl->D, mdl->p, 2)/changeD;
-            printf("change in D = %f; change in f = %f\n", changeD, changeF);
+//            changeF = (f_trial-changeF)/(f_trial-mdl->f_current);
+//            changeD = norm(mdl->D, mdl->p, 2)/changeD;
+//            printf("change in D = %f; change in f = %f\n", changeD, changeF);
             mdl->f_current = f_trial;
         }
-        eTime = (clock() - eTime)/CLOCKS_PER_SEC;
+//        eTime = (clock() - eTime)/CLOCKS_PER_SEC;
+        eTime = CFAbsoluteTimeGetCurrent() - eTime;
+        sols->lsTime += eTime;
         
         memcpy(mdl->L_grad_prev, mdl->L_grad, p*sizeof(double));
         
@@ -174,6 +175,11 @@ solution* lhac(l1log* mdl)
         normsg = mdl->computeSubgradient();
         if (normsg <= opt_outer_tol*mdl->normsg0) {
 //            printf("# of line searches = %d.\n", lineiter);
+            elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
+            sols->fval[sols->size] = mdl->f_current;
+            sols->normgs[sols->size] = normsg;
+            sols->t[sols->size] = elapsedTime;
+            (sols->size)++;
             break;
         }
         
@@ -328,9 +334,11 @@ void parse_command_line(int argc, const char * argv[],
                 
             case 'l':
                 cparam->sd_flag = atoi(argv[i]);
+                break;
                 
             case 'g':
                 cparam->shrink = atof(argv[i]);
+                break;
                 
 			default:
 				printf("unknown option: -%c\n", argv[i-1][1]);

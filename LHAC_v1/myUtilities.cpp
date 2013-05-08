@@ -638,17 +638,27 @@ void releaseSolution(solution* sols)
 
 void printout(const char* desc, solution* sols)
 {
-    printf("\n %s \n", desc);
+    FILE *fp;
     
-    printf("fval\t time\t normgs\n");
+    fp = fopen( "LHAC_log", "w" );
+	if (fp == NULL)
+	{
+		perror ("Error opening file");
+		return;
+	}
+    fprintf(fp, "\n %s \n", desc);
+    
+    fprintf(fp, "fval\t time\t normgs\n");
     for (unsigned long i = 0; i < sols->size; i++) {
-        printf("%+.5e\t %.5e\t %.5e\n", sols->fval[i], sols->t[i], sols->normgs[i]);
+        fprintf(fp, "%+.5e\t %.5e\t %.5e\n", sols->fval[i], sols->t[i], sols->normgs[i]);
     }
     
-    printf(" CD Time = %.5e\n", sols->cdTime);
-    printf(" LS Time = %.5e\n", sols->lsTime);
-    printf(" LBFGS Time 1 = %.5e\n", sols->lbfgsTime1);
-    printf(" LBFGS Time 2 = %.5e\n", sols->lbfgsTime2);
+    fprintf(fp, "total \t LS \t ratio");
+    fprintf(fp, "%.5e \t %.5e \t %2.1f%%\n", sols->t[sols->size-1], sols->lsTime, sols->lsTime *100 / sols->t[sols->size-1]);
+//    fprintf(fp, " CD Time = %.5e\n", sols->cdTime);
+//    fprintf(fp, " LS Time = %.5e\n", sols->lsTime);
+//    fprintf(fp, " LBFGS Time 1 = %.5e\n", sols->lbfgsTime1);
+//    fprintf(fp, " LBFGS Time 2 = %.5e\n", sols->lbfgsTime2);
     return;
     
 }
