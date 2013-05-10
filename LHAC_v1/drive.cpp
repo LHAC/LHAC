@@ -224,7 +224,7 @@ void libsvmExperiment(command_line_param* cparam)
     param->work_size = 8000;
     param->max_iter = cparam->max_iter;
     param->lmd = cparam->lmd;
-    param->max_inner_iter = 60;
+    param->max_inner_iter = 600;
     param->opt_inner_tol = 5*1e-6;
     param->opt_outer_tol = 1e-6;
     param->max_linesearch_iter = 1000;

@@ -675,7 +675,7 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
     double Hwd;
     double Qd_bar;
     
-    double d1,d2,d3,d4,d5,d3_,z_square,d6;
+    double d1,d2,d3,d4,d5,d3_,z_square,d6,redc;
     
     double f_trial;
     double f_mdl;
@@ -727,7 +727,8 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
         
         for (cd_pass = 1; cd_pass <= max_cd_pass; cd_pass++) {
             double diffd = 0;
-            double normd = 0;            
+            double normd = 0;
+            double max_redc = 0;
             
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
                 unsigned long idx = idxs[ii].j;
@@ -759,7 +760,8 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
                 d4 = z*L_grad[idx];
                 d3_ = fabs(wpd + z) - fabs(wpd);
                 d5 = lmd*(d3_);
-                d6 += 0.5*(d1 + d2 + d3) + d4 + d5;
+                redc = 0.5*(d1 + d2 + d3) + d4 + d5;
+                d6 += redc;
                 
 //                double f_mdl_ = computeModelValue(lR, work_set, mu);
                 D[idx] = D[idx] + z;
@@ -771,7 +773,7 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
 //                double gap = dQ - f_mdl + f_current;
 //                printf("sd_iters %3d; ii %3ld; idx %3ld; idx_Q %3ld, gap = %+.3e", sd_iters, ii, idx, idx_Q, gap);
 //                printf("\t\t d6 = %+.3e, f_mdl-f_mdl_= %+.3e, dQ = %+.3e, z = %+.3e\n", d6, f_mdl-f_mdl_, dQ, z);
-                
+//                printf("function reduction = %+.3e\n", redc);
                 
                 /* libsvm format */
                 if (mode == LIBSVM) {
@@ -785,8 +787,14 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
                 
                 diffd += fabs(z);
                 normd += fabs(D[idx]);
+                max_redc = std::min(redc, max_redc);
                 
                 
+            }
+            printf("max function reduction = %+.3e\n", max_redc);
+            
+            if (-max_redc <= 1e-6 ) {
+                break;
             }
             
             if (MSG >= LHAC_MSG_CD) {
@@ -808,7 +816,7 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
 //        rho_trial = (f_trial-f_current)/(f_mdl-f_current);
         
 //        printf("gap = %.3e, dQ = %.3e, d6 = %.3e\n", dQ - f_mdl + f_current, dQ, d6);
-        printf("\t \t \t # of line searches = %d; model quality: %+.3f\n", sd_iters, rho_trial);
+        printf("\t \t \t # of line searches = %3d; model quality: %+.3f\n", sd_iters, rho_trial);
 
         
         if (rho_trial > rho) {
