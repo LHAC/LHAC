@@ -49,12 +49,12 @@ typedef struct {
     double* t;
     double* fval;
     double* normgs;
+    int* niter;
     double cdTime;
     double lsTime;
     double lbfgsTime1;
     double lbfgsTime2;
     unsigned long size; // max_newton_iter
-    int num_iter;
 } solution;
 
 typedef struct {

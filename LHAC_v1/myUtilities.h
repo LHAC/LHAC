@@ -11,6 +11,7 @@
 
 #include "lhac.h"
 #include "Lbfgs.h"
+#include "l1log.h"
 
 
 enum { ROW_MAJOR, COL_MAJOR };
@@ -31,7 +32,7 @@ void printout(const char* desc, LMatrix* x, int mode);
 
 void printout(const char* desc, training_set_sp* Dset, int mode);
 
-void printout(const char* desc, solution* sols);
+void printout(const char* desc, solution* sols, l1log_param* param);
 
 
 double norm(double* x, unsigned long s1, int p);

@@ -18,6 +18,7 @@
 enum { LIBSVM = 0, GENERAL };
 
 typedef struct {
+    char* fileName;
     unsigned long work_size;
     unsigned short max_iter;
     unsigned long max_inner_iter;
@@ -49,6 +50,8 @@ public:
                            unsigned short m);
     void coordinateDsecent(LBFGS* lR, work_set_struct* work_set);
     void coordinateDsecent(LBFGS* lR, work_set_struct* work_set, double step_size);
+    
+    double suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu);
     
     double computeModelValue(LBFGS* lR, work_set_struct* work_set, double step_size);
     
@@ -85,6 +88,8 @@ public:
     double* w;
     double* L_grad_prev;
     double* L_grad;
+    
+    double dQ;
     
     unsigned long iter;
     

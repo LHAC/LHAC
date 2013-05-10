@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #ifdef __MATLAB_API__
 #include <mat.h>
 #include <mex.h>
@@ -631,29 +632,42 @@ void releaseSolution(solution* sols)
     delete [] sols->fval;
     delete [] sols->normgs;
     delete [] sols->t;
+    delete [] sols->niter;
     delete sols;
     
     return;
 }
 
-void printout(const char* desc, solution* sols)
+void printout(const char* desc, solution* sols, l1log_param* param)
 {
     FILE *fp;
+    time_t current_time;
     
-    fp = fopen( "LHAC_log", "w" );
+    time(&current_time);
+    
+    fp = fopen( "LHAC_log", "a" );
 	if (fp == NULL)
 	{
 		perror ("Error opening file");
 		return;
 	}
-    fprintf(fp, "\n %s \n", desc);
     
-    fprintf(fp, "fval\t time\t normgs\n");
+    fprintf(fp, "====================================================\n");
+    fprintf(fp, "%s     %s", param->fileName, ctime(&current_time));
+    fprintf(fp, "sufficient decrease: \t %d\n", param->sd_flag);
+    fprintf(fp, "gamma scale: \t\t\t %.1f\n", param->shrink);
+    fprintf(fp, "# max iters: \t\t\t %d\n", param->max_iter);
+    fprintf(fp, "====================================================\n");
+    fprintf(fp, "%s \n", desc);
+    
+    fprintf(fp, "#iter \t fval \t time \t normgs\n");
     for (unsigned long i = 0; i < sols->size; i++) {
-        fprintf(fp, "%+.5e\t %.5e\t %.5e\n", sols->fval[i], sols->t[i], sols->normgs[i]);
+        fprintf(fp, "%4d \t %+.5e\t %.5e\t %.5e\n", sols->niter[i], sols->fval[i], sols->t[i], sols->normgs[i]);
     }
     
-    fprintf(fp, "total \t LS \t ratio");
+    fprintf(fp, "\n");
+    
+    fprintf(fp, "totaltime \t LStime \t ratio\n");
     fprintf(fp, "%.5e \t %.5e \t %2.1f%%\n", sols->t[sols->size-1], sols->lsTime, sols->lsTime *100 / sols->t[sols->size-1]);
 //    fprintf(fp, " CD Time = %.5e\n", sols->cdTime);
 //    fprintf(fp, " LS Time = %.5e\n", sols->lsTime);

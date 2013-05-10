@@ -64,6 +64,7 @@ solution* lhac(l1log* mdl)
     sols->fval = new double[max_iter];
     sols->normgs = new double[max_iter];
     sols->t = new double[max_iter];
+    sols->niter = new int[max_iter];
     sols->cdTime = 0;
     sols->lbfgsTime1 = 0;
     sols->lbfgsTime2 = 0;
@@ -97,6 +98,7 @@ solution* lhac(l1log* mdl)
             sols->fval[sols->size] = mdl->f_current;
             sols->normgs[sols->size] = normsg;
             sols->t[sols->size] = elapsedTime;
+            sols->niter[sols->size] = newton_iter;
             (sols->size)++;
         }
 
@@ -120,48 +122,62 @@ solution* lhac(l1log* mdl)
 //        write2mat("Qm.mat", "Qm", Q, mdl->p, 2*(Lm->rows));
 //        write2mat("Qm_bar.mat", "Qm_bar", Q_bar, 2*(Lm->rows), mdl->p);
 
-        double eTime = CFAbsoluteTimeGetCurrent();
+        
         if (sd_flag == 0) {
             /* old sufficient decrease condition */
             mdl->coordinateDsecent(lR, work_set);
+            double eTime = CFAbsoluteTimeGetCurrent();
             mdl->lineSearch();
+            eTime = CFAbsoluteTimeGetCurrent() - eTime;
+            sols->lsTime += eTime;
+
         }
         else {
-            /* new condition */
-            double changeD = 0;
-            double changeF = 0;
             
-            double mu = 1.0;
-            double b1 = 1/(param->bbeta);
-            memcpy(mdl->w_prev, mdl->w, p*sizeof(double));
-            mdl->coordinateDsecent(lR, work_set, mu);
-            double f_trial = mdl->computeObject();
-            double f_mdl = mdl->computeModelValue(lR, work_set, mu);
-            static int lineiter = 0;
-            double rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
-            
-            changeD = norm(mdl->D, mdl->p, 2);
-            changeF = f_trial;
-            
-            while (rho <= 0.5 && lineiter <= 500) {
-                lineiter++;
-                mu = mu*b1;
-                mdl->coordinateDsecent(lR, work_set, mu);
-                f_trial = mdl->computeObject();
-                f_mdl = mdl->computeModelValue(lR, work_set, mu);
-                rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
-                printf("\t \t \t # of line searches = %d; model quality: %f\n", lineiter, rho);
-            }
-            
-//            changeF = (f_trial-changeF)/(f_trial-mdl->f_current);
-//            changeD = norm(mdl->D, mdl->p, 2)/changeD;
-//            printf("change in D = %f; change in f = %f\n", changeD, changeF);
-            mdl->f_current = f_trial;
+            sols->lsTime += mdl->suffcientDecrease(lR, work_set, 1.0);
         }
+            /* new condition */
+//            double changeD = 0;
+//            double changeF = 0;
+            
+//            double mu = 1.0;
+//            double b1 = 2;
+//            memcpy(mdl->w_prev, mdl->w, p*sizeof(double));
+//            mdl->coordinateDsecent(lR, work_set, mu);
+//            
+//            double eTime = CFAbsoluteTimeGetCurrent();
+//            double f_trial = mdl->computeObject();
+//            double f_mdl = mdl->computeModelValue(lR, work_set, mu);
+//            int lineiter = 0;
+////            double rho = (f_trial-mdl->f_current)/mdl->dQ;
+//            double rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
+//            
+////            changeD = norm(mdl->D, mdl->p, 2);
+////            changeF = f_trial;
+//            
+//            printf("diff = %.3e\n", mdl->dQ - f_mdl + mdl->f_current);
+//            printf("\t \t \t # of line searches = %d; model quality: %f\n", lineiter, rho);
+//            while (rho <= 0.5 && lineiter <= 100) {
+//                lineiter++;
+//                mu = mu*b1;
+////                double f2 = mdl->computeModelValue(lR, work_set, mu);
+//                mdl->coordinateDsecent(lR, work_set, mu);
+//                f_trial = mdl->computeObject();
+//                f_mdl = mdl->computeModelValue(lR, work_set, mu);
+//                rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
+////                rho = (f_trial-mdl->f_current)/mdl->dQ;
+//                printf("diff = %.3e\n", mdl->dQ - f_mdl + mdl->f_current);
+//                printf("\t \t \t # of line searches = %d; model quality: %f\n", lineiter, rho);
+//            }
+//            eTime = CFAbsoluteTimeGetCurrent() - eTime;
+//            sols->lsTime += eTime;
+////            changeF = (f_trial-changeF)/(f_trial-mdl->f_current);
+////            changeD = norm(mdl->D, mdl->p, 2)/changeD;
+////            printf("change in D = %f; change in f = %f\n", changeD, changeF);
+//            mdl->f_current = f_trial;
+//        }
 //        eTime = (clock() - eTime)/CLOCKS_PER_SEC;
-        eTime = CFAbsoluteTimeGetCurrent() - eTime;
-        sols->lsTime += eTime;
-        
+               
         memcpy(mdl->L_grad_prev, mdl->L_grad, p*sizeof(double));
         
         double gradientTime = clock();
@@ -179,6 +195,7 @@ solution* lhac(l1log* mdl)
             sols->fval[sols->size] = mdl->f_current;
             sols->normgs[sols->size] = normsg;
             sols->t[sols->size] = elapsedTime;
+            sols->niter[sols->size] = newton_iter;
             (sols->size)++;
             break;
         }
@@ -207,7 +224,7 @@ void libsvmExperiment(command_line_param* cparam)
     param->work_size = 8000;
     param->max_iter = cparam->max_iter;
     param->lmd = cparam->lmd;
-    param->max_inner_iter = 30;
+    param->max_inner_iter = 60;
     param->opt_inner_tol = 5*1e-6;
     param->opt_outer_tol = 1e-6;
     param->max_linesearch_iter = 1000;
@@ -216,6 +233,7 @@ void libsvmExperiment(command_line_param* cparam)
     param->verbose = cparam->verbose;
     param->sd_flag = cparam->sd_flag;
     param->shrink = cparam->shrink;
+    param->fileName = cparam->fileName;
     
     /* elapsed time (not cputime) */
     time_t start;
@@ -240,7 +258,7 @@ void libsvmExperiment(command_line_param* cparam)
         
         sols = lhac(mdl);
         
-        printout("logs = ", sols);
+        printout("logs = ", sols, param);
         
         //    releaseProb(Dset);
         releaseProb(Dset);
@@ -254,7 +272,7 @@ void libsvmExperiment(command_line_param* cparam)
         
         sols = lhac(mdl);
         
-        printout("logs = ", sols);
+        printout("logs = ", sols, param);
         
         //    releaseProb(Dset);
         releaseProb(Dset_sp);
@@ -376,57 +394,57 @@ int main(int argc, const char * argv[])
 
 /**** compare libsvm format with general format
  on randomly generated data sets ****/
-void randomExperiment(command_line_param* cparam)
-{
-    l1log_param* param = new l1log_param;
-    param->l = 10;
-    param->work_size = 10000;
-    param->max_iter = cparam->max_iter;
-    param->lmd = cparam->lmd;
-    param->max_inner_iter = 20;
-    param->opt_inner_tol = 0.05;
-    param->opt_outer_tol = 1e-5;
-    param->max_linesearch_iter = 1000;
-    param->bbeta = 0.5;
-    param->ssigma = 0.001;
-    param->verbose = cparam->verbose;
-    
-    if (cparam->dense) {
-        training_set* Dset = new training_set;
-        generateRandomProb(Dset, cparam->random_p,
-                           cparam->random_N, cparam->nnz_perc);
-        l1log* mdl = new l1log(Dset, param);
-        
-        solution* sols;
-        sols = lhac(mdl);
-        
-        printout("logs = ", sols);
-        
-        releaseSolution(sols);
-        
-        releaseProb(Dset);
-    }
-    else {
-        training_set_sp* Dset_sp = new training_set_sp;
-        training_set* Dset = new training_set;
-        generateRandomProb(Dset_sp, Dset, cparam->random_p,
-                           cparam->random_N, cparam->nnz_perc);
-        l1log* mdl = new l1log(Dset_sp, param);
-        
-        solution* sols;
-        sols = lhac(mdl);
-        
-        printout("logs = ", sols);
-        
-        releaseSolution(sols);
-        releaseProb(Dset);
-        releaseProb(Dset_sp);
-    }
-    
-    
-    delete param;
-    return;
-    
-    
-}
+//void randomExperiment(command_line_param* cparam)
+//{
+//    l1log_param* param = new l1log_param;
+//    param->l = 10;
+//    param->work_size = 10000;
+//    param->max_iter = cparam->max_iter;
+//    param->lmd = cparam->lmd;
+//    param->max_inner_iter = 20;
+//    param->opt_inner_tol = 0.05;
+//    param->opt_outer_tol = 1e-5;
+//    param->max_linesearch_iter = 1000;
+//    param->bbeta = 0.5;
+//    param->ssigma = 0.001;
+//    param->verbose = cparam->verbose;
+//    
+//    if (cparam->dense) {
+//        training_set* Dset = new training_set;
+//        generateRandomProb(Dset, cparam->random_p,
+//                           cparam->random_N, cparam->nnz_perc);
+//        l1log* mdl = new l1log(Dset, param);
+//        
+//        solution* sols;
+//        sols = lhac(mdl);
+//        
+//        printout("logs = ", sols);
+//        
+//        releaseSolution(sols);
+//        
+//        releaseProb(Dset);
+//    }
+//    else {
+//        training_set_sp* Dset_sp = new training_set_sp;
+//        training_set* Dset = new training_set;
+//        generateRandomProb(Dset_sp, Dset, cparam->random_p,
+//                           cparam->random_N, cparam->nnz_perc);
+//        l1log* mdl = new l1log(Dset_sp, param);
+//        
+//        solution* sols;
+//        sols = lhac(mdl);
+//        
+//        printout("logs = ", sols);
+//        
+//        releaseSolution(sols);
+//        releaseProb(Dset);
+//        releaseProb(Dset_sp);
+//    }
+//    
+//    
+//    delete param;
+//    return;
+//    
+//    
+//}
 
