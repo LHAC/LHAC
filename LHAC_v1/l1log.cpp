@@ -709,7 +709,6 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
     /* mdl value change */
     dQ = 0;
     
-    
     unsigned long max_cd_pass = std::min(1 + iter/3, param->max_inner_iter);
 //    unsigned long max_cd_pass = param->max_inner_iter;
     unsigned long* permut = work_set->permut;
@@ -752,16 +751,16 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
                 
                 /* mdl value change */
                 /* gamma(2zd_i + z^2) - 2zQ_i^T d_bar - z^2 Q_i^T \hat Q_i */
-                z_square = z*z;
-                d1 = mu*gama*(z_square + 2*D[idx]*z);
-                d2 = - 2*z*Qd_bar;
-                /* z^2*Q_i^T * \hat Q_i */
-                d3 = z_square*(H_diag[idx_Q]-mu0*gama);
-                d4 = z*L_grad[idx];
-                d3_ = fabs(wpd + z) - fabs(wpd);
-                d5 = lmd*(d3_);
-                redc = 0.5*(d1 + d2 + d3) + d4 + d5;
-                d6 += redc;
+//                z_square = z*z;
+//                d1 = mu*gama*(z_square + 2*D[idx]*z);
+//                d2 = - 2*z*Qd_bar;
+//                /* z^2*Q_i^T * \hat Q_i */
+//                d3 = z_square*(H_diag[idx_Q]-mu0*gama);
+//                d4 = z*L_grad[idx];
+//                d3_ = fabs(wpd + z) - fabs(wpd);
+//                d5 = lmd*(d3_);
+//                redc = 0.5*(d1 + d2 + d3) + d4 + d5;
+//                d6 += redc;
                 
 //                double f_mdl_ = computeModelValue(lR, work_set, mu);
                 D[idx] = D[idx] + z;
@@ -787,15 +786,15 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
                 
                 diffd += fabs(z);
                 normd += fabs(D[idx]);
-                max_redc = std::min(redc, max_redc);
+//                max_redc = std::min(redc, max_redc);
                 
                 
             }
-            printf("max function reduction = %+.3e\n", max_redc);
+//            printf("max function reduction = %+.3e\n", max_redc);
             
-            if (-max_redc <= 1e-6 ) {
-                break;
-            }
+//            if (-max_redc <= 1e-6 ) {
+//                break;
+//            }
             
             if (MSG >= LHAC_MSG_CD) {
                 printf("\t\t Coordinate descent pass %ld:   Change in d = %+.4e   norm(d) = %+.4e   Change in Q = %+.4e\n",
@@ -810,10 +809,10 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
         }
         
         f_trial = computeObject();
-//        f_mdl = computeModelValue(lR, work_set, mu);
-        dQ += d6;        
-        rho_trial = (f_trial-f_current)/dQ;
-//        rho_trial = (f_trial-f_current)/(f_mdl-f_current);
+        f_mdl = computeModelValue(lR, work_set, mu);
+//        dQ += d6;
+//        rho_trial = (f_trial-f_current)/dQ;
+        rho_trial = (f_trial-f_current)/(f_mdl-f_current);
         
 //        printf("gap = %.3e, dQ = %.3e, d6 = %.3e\n", dQ - f_mdl + f_current, dQ, d6);
         printf("\t \t \t # of line searches = %3d; model quality: %+.3f\n", sd_iters, rho_trial);
@@ -826,7 +825,7 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
         else {
             mu = 2*mu;
             /* assuming mu = 2*mu */
-            dQ += 0.5*0.5*mu*gama*cblas_ddot((int)p, D, 1, D, 1);
+//            dQ += 0.5*0.5*mu*gama*cblas_ddot((int)p, D, 1, D, 1);
         }
         
     }

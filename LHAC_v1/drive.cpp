@@ -191,16 +191,17 @@ solution* lhac(l1log* mdl)
         normsg = mdl->computeSubgradient();
         if (normsg <= opt_outer_tol*mdl->normsg0) {
 //            printf("# of line searches = %d.\n", lineiter);
-            elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
-            sols->fval[sols->size] = mdl->f_current;
-            sols->normgs[sols->size] = normsg;
-            sols->t[sols->size] = elapsedTime;
-            sols->niter[sols->size] = newton_iter;
-            (sols->size)++;
             break;
         }
         
     }
+    
+    double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
+    sols->fval[sols->size] = mdl->f_current;
+    sols->normgs[sols->size] = normsg;
+    sols->t[sols->size] = elapsedTime;
+    sols->niter[sols->size] = newton_iter;
+    (sols->size)++;
     
     
     delete mdl;
@@ -224,7 +225,7 @@ void libsvmExperiment(command_line_param* cparam)
     param->work_size = 8000;
     param->max_iter = cparam->max_iter;
     param->lmd = cparam->lmd;
-    param->max_inner_iter = 600;
+    param->max_inner_iter = 30;
     param->opt_inner_tol = 5*1e-6;
     param->opt_outer_tol = 1e-6;
     param->max_linesearch_iter = 1000;
