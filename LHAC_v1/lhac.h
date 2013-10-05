@@ -55,6 +55,15 @@ typedef struct {
     double lbfgsTime1;
     double lbfgsTime2;
     unsigned long size; // max_newton_iter
+    
+    unsigned long ngval;
+    unsigned long nfval;
+    unsigned long nls; // # of line searches
+    double gvalTime;
+    double fvalTime;
+    
+    /* result */
+    int p_sics; //dimension of w
 } solution;
 
 typedef struct {
@@ -110,6 +119,8 @@ typedef struct {
     
     /* gama in lbfgs */
     double shrink = 1; // gama = gama/shrink
+    
+    double rho;
 } command_line_param;
 
 

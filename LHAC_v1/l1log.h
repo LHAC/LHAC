@@ -38,6 +38,8 @@ typedef struct {
     
     /* gama in lbfgs */
     double shrink = 1; // gama = gama/shrink
+    
+    double rho;
 } l1log_param;
 
 
@@ -51,7 +53,7 @@ public:
     void coordinateDsecent(LBFGS* lR, work_set_struct* work_set);
     void coordinateDsecent(LBFGS* lR, work_set_struct* work_set, double step_size);
     
-    double suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu);
+    double suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu, solution* sols);
     
     double computeModelValue(LBFGS* lR, work_set_struct* work_set, double step_size);
     

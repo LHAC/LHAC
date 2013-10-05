@@ -55,7 +55,7 @@ solution* lhac(l1log* mdl)
     double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
     
     l1log_param* param = mdl->param;
-    double sd_flag = param->sd_flag;
+    int sd_flag = param->sd_flag;
     unsigned long l = param->l;
     double opt_outer_tol = param->opt_outer_tol;
     unsigned short max_iter = param->max_iter;
@@ -69,6 +69,11 @@ solution* lhac(l1log* mdl)
     sols->lbfgsTime1 = 0;
     sols->lbfgsTime2 = 0;
     sols->lsTime = 0;
+    sols->ngval = 0;
+    sols->nfval = 0;
+    sols->gvalTime = 0.0;
+    sols->fvalTime = 0.0;
+    sols->nls = 0;
     
     unsigned long p = mdl->p;
     
@@ -108,7 +113,9 @@ solution* lhac(l1log* mdl)
         }
         
 //        lR->computeLowRankApprox();
+        double lbfgs1 = CFAbsoluteTimeGetCurrent();
         lR->computeLowRankApprox_v2(work_set);
+        sols->lbfgsTime1 += CFAbsoluteTimeGetCurrent() - lbfgs1;
         
 //        computeLBFGS(Q, Q_bar, R, Sm, Tm, Lm, Dm, &gama);
         
@@ -134,7 +141,7 @@ solution* lhac(l1log* mdl)
         }
         else {
             
-            sols->lsTime += mdl->suffcientDecrease(lR, work_set, 1.0);
+            mdl->suffcientDecrease(lR, work_set, 1.0, sols);
         }
             /* new condition */
 //            double changeD = 0;
@@ -180,12 +187,14 @@ solution* lhac(l1log* mdl)
                
         memcpy(mdl->L_grad_prev, mdl->L_grad, p*sizeof(double));
         
-        double gradientTime = clock();
+        double gradientTime = CFAbsoluteTimeGetCurrent();
         mdl->computeGradient();
-        gradientTime = (clock() - gradientTime)/CLOCKS_PER_SEC;
+        sols->gvalTime += CFAbsoluteTimeGetCurrent() - gradientTime;
         
         /* update LBFGS */
+        double lbfgs2 = CFAbsoluteTimeGetCurrent();
         lR->updateLBFGS(mdl->w, mdl->w_prev, mdl->L_grad, mdl->L_grad_prev);
+        sols->lbfgsTime2 += CFAbsoluteTimeGetCurrent() - lbfgs2;
         
         
         normsg = mdl->computeSubgradient();
@@ -225,7 +234,7 @@ void libsvmExperiment(command_line_param* cparam)
     param->work_size = 8000;
     param->max_iter = cparam->max_iter;
     param->lmd = cparam->lmd;
-    param->max_inner_iter = 30;
+    param->max_inner_iter = 10;
     param->opt_inner_tol = 5*1e-6;
     param->opt_outer_tol = 1e-6;
     param->max_linesearch_iter = 1000;
@@ -235,6 +244,7 @@ void libsvmExperiment(command_line_param* cparam)
     param->sd_flag = cparam->sd_flag;
     param->shrink = cparam->shrink;
     param->fileName = cparam->fileName;
+    param->rho = cparam->rho;
     
     /* elapsed time (not cputime) */
     time_t start;
@@ -294,7 +304,7 @@ void parse_command_line(int argc, const char * argv[],
     
     // default value
     cparam->dense = 0;
-    cparam->lmd = 0.5;
+    cparam->lmd = 1;
     cparam->max_iter = 400;
     cparam->randomData = 0;
     cparam->random_p = 0;
@@ -303,6 +313,7 @@ void parse_command_line(int argc, const char * argv[],
     cparam->verbose = LHAC_MSG_CD;
     cparam->sd_flag = 1; // default using suffcient decrease
     cparam->shrink = 1; // default no shrink on gama
+    cparam->rho = 0.5;
     
     // parse options
     int i;
@@ -329,18 +340,7 @@ void parse_command_line(int argc, const char * argv[],
                 break;
                 
             case 'r':
-                cparam->randomData = 1;
-                cparam->random_p = atoi(argv[i]);
-                if(++i>=argc) {
-                    printf("wrong input format\n");
-                    exit(1);
-                }
-                cparam->random_N = atoi(argv[i]);
-                if(++i>=argc) {
-                    printf("wrong input format\n");
-                    exit(1);
-                }
-                cparam->nnz_perc = atof(argv[i]);
+                cparam->rho = atof(argv[i]);
                 break;
                 
             case 'v':

@@ -659,11 +659,11 @@ double l1log::computeModelValue(LBFGS* lR, work_set_struct* work_set, double mu)
 /*******************************************************************************
  suffcient decrease
  *******************************************************************************/
-double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0)
+double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0, solution* sols)
 {
     int max_sd_iters = 20;
     double mu = mu0;
-    double rho = 0.5;
+    double rho = param->rho;
     
     double z = 0.0;
     double Hd_j;
@@ -714,8 +714,9 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
     unsigned long* permut = work_set->permut;
     ushort_pair_t* idxs = work_set->idxs;
     unsigned long cd_pass;
+    int sd_iters;
     
-    for (int sd_iters = 0; sd_iters < max_sd_iters; sd_iters++) {
+    for (sd_iters = 0; sd_iters < max_sd_iters; sd_iters++) {
         
         if (sd_iters > 0) {
             max_cd_pass = param->max_inner_iter;
@@ -724,6 +725,10 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
         /* track mdl value decrease by cd */
         d6 = 0;
         
+        double gama_scale = mu*gama;
+        double dH_diag = gama_scale-mu0*gama;
+        
+        double cdtime = CFAbsoluteTimeGetCurrent();
         for (cd_pass = 1; cd_pass <= max_cd_pass; cd_pass++) {
             double diffd = 0;
             double normd = 0;
@@ -734,9 +739,10 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
                 unsigned long idx_Q = permut[ii];
 
                 Qd_bar = cblas_ddot(m, &Q[idx_Q], (int)work_set->numActive, d_bar, 1);
-                Hd_j = mu*gama*D[idx] - Qd_bar;
+                Hd_j = gama_scale*D[idx] - Qd_bar;
                 
-                Hii = H_diag[idx_Q] + (mu-mu0)*gama;
+//                Hii = H_diag[idx_Q] + (mu-mu0)*gama;
+                Hii = H_diag[idx_Q] + dH_diag;
                 G = Hd_j + L_grad[idx];
                 Gp = G + lmd;
                 Gn = G - lmd;
@@ -804,12 +810,16 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
             shuffle( work_set );
         }
         
+        sols->cdTime += CFAbsoluteTimeGetCurrent() - cdtime;
+        
         if (sd_iters == 0) {
             eTime = CFAbsoluteTimeGetCurrent();
         }
         
+        double fvaltime = CFAbsoluteTimeGetCurrent();
         f_trial = computeObject();
         f_mdl = computeModelValue(lR, work_set, mu);
+        sols->fvalTime += CFAbsoluteTimeGetCurrent() - fvaltime;
 //        dQ += d6;
 //        rho_trial = (f_trial-f_current)/dQ;
         rho_trial = (f_trial-f_current)/(f_mdl-f_current);
@@ -822,13 +832,12 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
             f_current = f_trial;
             break;
         }
-        else {
-            mu = 2*mu;
-            /* assuming mu = 2*mu */
-//            dQ += 0.5*0.5*mu*gama*cblas_ddot((int)p, D, 1, D, 1);
-        }
+        mu = 2*mu;
+        /* assuming mu = 2*mu */
+//      dQ += 0.5*0.5*mu*gama*cblas_ddot((int)p, D, 1, D, 1);
         
     }
+    sols->nls += sd_iters;
     
     eTime = CFAbsoluteTimeGetCurrent() - eTime;
     
@@ -1209,7 +1218,7 @@ void l1log::coordinateDescent(double* Q_bar, double* Q,
             break;
         }
         
-        shuffle( work_set );
+//        shuffle( work_set );
     }
     
 //    printout(D, p);
