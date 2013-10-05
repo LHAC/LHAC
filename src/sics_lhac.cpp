@@ -1074,7 +1074,9 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
                    elapsedTime, newton_iter, f_current, normsg, work_set->numActive);
         }
         
+        double lbfgs1 = CFAbsoluteTimeGetCurrent();
         lR->computeLowRankApprox_v2(work_set);
+        sols->lbfgsTime1 += CFAbsoluteTimeGetCurrent() - lbfgs1;
         
         if (sd_flag == 0) {
             coordinateDescent(w, newton_iter, lR, L_grad, work_set, d_bar, H_diag, H_diag_2, D);
@@ -1094,7 +1096,9 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
 //        write2mat("L_grad.mat", "L_grad", L_grad, p_2, 1);
 //        write2mat("L_grad_prev.mat", "L_grad_prev", L_grad_prev, p_2, 1);
         
+        double lbfgs2 = CFAbsoluteTimeGetCurrent();
         lR->updateLBFGS(w, w_prev, L_grad, L_grad_prev);
+        sols->lbfgsTime2 += CFAbsoluteTimeGetCurrent() - lbfgs2;
 
         
         /* track cputime */
