@@ -698,9 +698,10 @@ void printout(const char* desc, solution* sols, param* param)
 	}
     //    fprintf(fp, "gamma_scale \t #iter \t time \t lstime \t sd\n");
     
-    /* dimension || totaltime || cdtime || fvaltime || gvaltime || #iter || #ls || #factors */
+    /* name || dimension || tolerance || totaltime || cdtime || fvaltime || gvaltime || #iter || #ls || #factors */
     fprintf(fp, "%s \t",param->fileName);
     fprintf(fp, "%d \t",sols->p_sics);
+    fprintf(fp, "%.0e \t",param->opt_outer_tol);
     fprintf(fp, "%.5e \t",sols->t[sols->size-1]);
     fprintf(fp, "%.5e \t",sols->cdTime);
     fprintf(fp, "%.5e \t",sols->fvalTime);
