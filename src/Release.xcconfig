@@ -1,0 +1,16 @@
+//
+//  Release.xcconfig
+//  pepper
+//
+//  Created by Xiaocheng Tang on 10/4/13.
+//  Copyright (c) 2013 Xiaocheng Tang. All rights reserved.
+//
+
+
+
+//:configuration = Release
+OTHER_LDFLAGS = -lmex -lmx -lmat -undefined error
+//LD_RUNPATH_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64 ./
+HEADER_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/extern/include
+LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64
+LD_RUNPATH_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64 /Applications/MATLAB_R2010a.app/bin/maci64
