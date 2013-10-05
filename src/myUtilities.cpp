@@ -664,8 +664,8 @@ void printout(const char* desc, solution* sols, param* param)
     
     fprintf(fp, "\n");
     
-    fprintf(fp, "totaltime \t LStime \t ratio \t #factors\n");
-    fprintf(fp, "%.5e \t %.5e \t %2.1f%% \t %ld\n", sols->t[sols->size-1], sols->lsTime, sols->lsTime *100 / sols->t[sols->size-1], sols->record1);
+    fprintf(fp, "totaltime \t cdtime \t ratio \t #factors \t fvaltime \t gvaltime \t #ls\n");
+    fprintf(fp, "%.5e \t %.5e \t %2.1f%% \t %ld \t %.5e \t %.5e \t %ld\n", sols->t[sols->size-1], sols->cdTime, sols->cdTime *100 / sols->t[sols->size-1], sols->record1, sols->fvalTime, sols->gvalTime, sols->nls);
     //    fprintf(fp, " CD Time = %.5e\n", sols->cdTime);
     //    fprintf(fp, " LS Time = %.5e\n", sols->lsTime);
     //    fprintf(fp, " LBFGS Time 1 = %.5e\n", sols->lbfgsTime1);
@@ -688,6 +688,19 @@ void printout(const char* desc, solution* sols, param* param)
     else {
         fprintf(fp, " \t --\n");
     }
+    fclose(fp);
+    
+    fp = fopen("LHAC_timeProfile", "a");
+    if (fp == NULL)
+	{
+		perror ("Error opening file");
+		return;
+	}
+    //    fprintf(fp, "gamma_scale \t #iter \t time \t lstime \t sd\n");
+    
+    /* dimension || totaltime || cdtime || fvaltime || gvaltime || #iter || #ls || #factors */
+    fprintf(fp, "%d \t %.5e \t %.5e \t %+.5e \t %+.5e \t %d \t %ld \t %ld\n",
+            sols->p_sics, sols->t[sols->size-1], sols->cdTime, sols->fvalTime, sols->gvalTime, sols->niter[sols->size-1], sols->nls, sols->record1);
     fclose(fp);
     return;
     

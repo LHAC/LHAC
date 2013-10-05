@@ -59,6 +59,7 @@ typedef struct {
     
     unsigned long ngval;
     unsigned long nfval;
+    unsigned long nls; // # of line searches
     double gvalTime;
     double fvalTime;
     

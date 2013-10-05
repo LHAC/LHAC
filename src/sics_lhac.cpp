@@ -515,7 +515,12 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
     double f_mdl;
     double rho_trial;
     
-    double eTime=0;
+    
+    /* timing performance */
+    double cdtime = 0.0;
+    double fvaltime = 0.0;
+    double gvaltime = 0.0;
+    double eTime = 0;
     
     memcpy(w_prev, w, p_2*sizeof(double));
     
@@ -573,8 +578,9 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
     
     unsigned long max_cd_pass = std::min(1 + iter/3, max_inner_iter);
     unsigned long cd_pass;
+    int sd_iters;
     
-    for (int sd_iters = 0; sd_iters < max_sd_iters; sd_iters++) {
+    for (sd_iters = 0; sd_iters < max_sd_iters; sd_iters++) {
         
         if (sd_iters > 0) {
             max_cd_pass = max_inner_iter;
@@ -584,10 +590,12 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         double dH_diag = gama_scale-mu0*gama;
         double dH_diag2 = 2*dH_diag;
         
+        
         for (cd_pass = 1; cd_pass <= max_cd_pass; cd_pass++) {
             double diffd = 0;
             double normd = 0;
             
+            cdtime = CFAbsoluteTimeGetCurrent();
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
                 idx = idxs[ii].i;
                 jdx = idxs[ii].j;
@@ -645,6 +653,8 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
                 
             }
             
+            sols->cdTime += (CFAbsoluteTimeGetCurrent() - cdtime);
+            
             if (msgFlag >= LHAC_MSG_CD) {
                 printf("\t\t Coordinate descent pass %3ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
                        cd_pass, diffd, normd);
@@ -667,6 +677,9 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
 //                w[ij] = w_prev[ij] + D[ij];
 //            }
 //        }
+        
+        fvaltime = CFAbsoluteTimeGetCurrent();
+        
         double l1normW1 = 0.0;
         double trSW1 = 0.0;
         for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
@@ -692,10 +705,15 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
 //        write2mat("d_bar.mat", "d_bar", d_bar, cblas_N, 1);
 //        write2mat("Dm.mat", "Dm", D, p_2, 1);
         
+        gvaltime = CFAbsoluteTimeGetCurrent();
         int p0 = (int) p_sics;
         int info;
         dpotrf_((char*) "U", &p0, w, &p0, &info);
         (sols->record1)++;
+        sols->gvalTime += CFAbsoluteTimeGetCurrent() - gvaltime;
+        
+        sols->fvalTime += CFAbsoluteTimeGetCurrent() - fvaltime;
+        
         if (info != 0) {
             mu = 2*mu;
             printf("\t \t \t # of line searches = %3d; no PSD!; gama_scale = %f\n", sd_iters, gama_scale);
@@ -720,6 +738,8 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
 //            trSW1 += wnew*S[k];
 //        }
         
+        fvaltime = CFAbsoluteTimeGetCurrent();
+        
         double logdetW1 = 0.0;
         for (unsigned long i = 0, k = 0; i < p_sics; i++, k += (p_sics+1)) {
             logdetW1 += log(w[k]);
@@ -730,20 +750,13 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         
         f_mdl = computeModelValue(D, L_grad, d_bar, w_prev, lR, work_set, mu);
         
+        sols->fvalTime += CFAbsoluteTimeGetCurrent() - fvaltime;
+        
         rho_trial = (f_trial-f_current)/(f_mdl-f_current);
         
         printf("\t \t \t # of line searches = %3d; model quality: %+.3f; Delta = %+.3e\n", sd_iters, rho_trial, rho*(f_mdl - f_current));
         
         if (rho_trial > rho) {
-//            if (sd_iters >= 1) {
-//                mu0 += 0.3;
-//            }
-//            else {
-//                mu0 -= 0.1;
-//                if (mu0 < 1) {
-//                    mu0 = 1;
-//                }
-//            }
             
             printf("\t \t \t function decrease = %+.5e; mu0 = %f\n", f_current - f_trial, mu0);
             f_current = f_trial;
@@ -751,9 +764,12 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
             logdetW = logdetW1;
             trSW = trSW1;
             
+            gvaltime = CFAbsoluteTimeGetCurrent();
             int info;
             int p0 = (int) p_sics;
             dpotri_((char*) "U", &p0, w, &p0, &info);
+            sols->gvalTime += CFAbsoluteTimeGetCurrent() - gvaltime;
+            (sols->record1)++;
             
             // fill in the lower triangle
             for (unsigned long i = 0; i < p_sics; i++) {
@@ -782,7 +798,8 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         mu = 2*mu;
         
     }
-        
+    
+    sols->nls += sd_iters;
     
     eTime = CFAbsoluteTimeGetCurrent() - eTime;
     
@@ -969,6 +986,7 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
     sols->nfval = 0;
     sols->gvalTime = 0.0;
     sols->fvalTime = 0.0;
+    sols->nls = 0;
     
 
     double timeBegin = 0.0;
@@ -1067,7 +1085,7 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
         }
         else {
             memcpy(L_grad_prev, L_grad, p_2*sizeof(double));
-            sols->lsTime += suffcientDecrease(S, w, newton_iter, lR,  L_grad, work_set, d_bar, H_diag,
+            suffcientDecrease(S, w, newton_iter, lR,  L_grad, work_set, d_bar, H_diag,
                               H_diag_2, w_prev, D);
         }
         
