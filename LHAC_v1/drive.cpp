@@ -234,9 +234,9 @@ void libsvmExperiment(command_line_param* cparam)
     param->work_size = 8000;
     param->max_iter = cparam->max_iter;
     param->lmd = cparam->lmd;
-    param->max_inner_iter = 10;
+    param->max_inner_iter = 100;
     param->opt_inner_tol = 5*1e-6;
-    param->opt_outer_tol = 1e-6;
+    param->opt_outer_tol = cparam->opt_outer_tol;
     param->max_linesearch_iter = 1000;
     param->bbeta = 0.5;
     param->ssigma = 0.001;
@@ -312,8 +312,9 @@ void parse_command_line(int argc, const char * argv[],
     cparam->fileName = new char[MAX_LENS];
     cparam->verbose = LHAC_MSG_CD;
     cparam->sd_flag = 1; // default using suffcient decrease
-    cparam->shrink = 1; // default no shrink on gama
+    cparam->shrink = 4; // default no shrink on gama
     cparam->rho = 0.5;
+    cparam->opt_outer_tol = 1e-6;
     
     // parse options
     int i;
@@ -357,6 +358,11 @@ void parse_command_line(int argc, const char * argv[],
                 
             case 'g':
                 cparam->shrink = atof(argv[i]);
+                break;
+                
+            /* solving precision */
+            case 'e':
+                cparam->opt_outer_tol = atof(argv[i]);
                 break;
                 
 			default:

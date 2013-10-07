@@ -113,6 +113,7 @@ typedef struct {
     double nnz_perc;
     int verbose; // LHAC_MSG_NO, etc.
     int alg = ALG_L1LOG; // ALG_L1LOG = 1, ALG_SICS
+    double opt_outer_tol;
     
     /* line search */
     int sd_flag; // 1 = sufficient decrease; 0 = line search
