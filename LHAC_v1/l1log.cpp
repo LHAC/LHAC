@@ -92,6 +92,7 @@ void l1log::initVars()
     d_bar = new double[2*param->l]; // 2*l
     e_ywx = new double[N]; // N
     B = new double[N]; // N
+    L_prob = new double[p];
     
     /* initiate */
     memset(w, 0, p*sizeof(double));
@@ -657,6 +658,61 @@ double l1log::computeModelValue(LBFGS* lR, work_set_struct* work_set, double mu)
     return fval;
 }
 
+bool returnCoordinate(double key, double* kvs, unsigned long range, unsigned long* c) {
+    
+    
+    unsigned long first = 0;
+    unsigned long last = range-1;
+    unsigned long mid = floor((last + first) / 2);
+    
+    /* boundary condition */
+    if (key < kvs[first]) {
+        *c = first;
+        return true;
+    }
+    // key == 1, which is not likely but still possible
+    else if (key == kvs[last]) {
+        *c = last;
+        return true;
+    }
+    
+    while (1) {
+        if (last - first <= 1) {
+            *c = first;
+            return true;
+        }
+        
+        double midKey = kvs[mid];
+        if (midKey == key) {
+            *c = mid;
+            return true;
+        }
+        else if (midKey > key) {
+            last = mid;
+        }
+        else {
+            first = mid;
+        }
+        
+        mid = floor((last + first) / 2);
+        
+    }
+}
+
+unsigned long l1log::randomCoordinateSelector(unsigned long range)
+{
+    /* uniform random number in [0,1]  */
+    double prob = ((double) rand() / (RAND_MAX));
+    unsigned long rii = 0;
+    
+    if (!returnCoordinate(prob, L_prob, range, &rii)) {
+        printf("!!!!!!!!!!!!!!!!!!!!\n");
+    }
+    
+    return rii;
+    
+}
+
 /*******************************************************************************
  suffcient decrease
  *******************************************************************************/
@@ -676,7 +732,7 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
     double Hwd;
     double Qd_bar;
     
-    double d1,d2,d3,d4,d5,d3_,z_square,d6,redc;
+//    double d1,d2,d3,d4,d5,d3_,z_square,d6,redc;
     
     double f_trial;
     double f_mdl;
@@ -707,11 +763,23 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
 //        for (unsigned long j = 0, o = 0; j < m; j++, o += work_set->numActive)
 //            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
 //    }
+    double diag_sum = 0.0;
     for (unsigned long k = 0, i = 0; i < work_set->numActive; i++, k += m) {
         H_diag[i] = mu0*gama;
         for (unsigned long j = 0; j < m; j++)
             H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[k+j];
+        
+        diag_sum += H_diag[i];
     }
+    
+    /* cumulative probability */
+    L_prob[0] = H_diag[0] / diag_sum;
+    for (unsigned long i = 1; i < work_set->numActive; i++) {
+        L_prob[i] = H_diag[i] / diag_sum + L_prob[i-1];
+    }
+    
+//    printout("L_prob", L_prob, work_set->numActive, FULL);
+    
 //    int numA = work_set->numActive;
 //    write2mat("Qm.mat", "Qm", Q, numA, m);
 //    write2mat("Q_barm.mat", "Q_barm", Q_bar, m, numA);
@@ -734,7 +802,7 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
         }
         
         /* track mdl value decrease by cd */
-        d6 = 0;
+//        d6 = 0;
         
         double gama_scale = mu*gama;
         double dH_diag = gama_scale-mu0*gama;
@@ -746,9 +814,10 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
 //            double max_redc = 0;
             
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
-                unsigned long rii = rand()%(work_set->numActive);
+//                unsigned long rii = rand()%(work_set->numActive);
+                unsigned long rii = randomCoordinateSelector(work_set->numActive);
 //                unsigned long rii = ii;
-//                printf("%ld\n", rii);
+//                printf("%f, %f, %f\n", L_prob[rii], L_prob[rii-1], L_prob[rii+1]);
                 unsigned long idx = idxs[rii].j;
                 unsigned long idx_Q = permut[rii];
 

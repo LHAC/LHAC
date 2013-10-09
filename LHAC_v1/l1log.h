@@ -109,6 +109,8 @@ private:
     double* B; // N
     double* Xd; // N
     
+    double* L_prob; // probability of choosing ith coordinate; p
+    
     
     /**** data general format ****/
     double* X;
@@ -119,6 +121,8 @@ private:
     double* y;
     
     int mode; // data format { LIBSVM, GENERAL }
+    
+    unsigned long randomCoordinateSelector(unsigned long range);
     
     void initData(training_set* Dset);
     
