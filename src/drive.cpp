@@ -28,11 +28,11 @@ void sicsExperiment(command_line_param* cparam)
     
     
     double lmdi;
-    _param->l = 20;
+    _param->l = 10;
     _param->work_size = 1000000;
     _param->max_iter = cparam->max_iter;
     lmdi = cparam->lmd;
-    _param->max_inner_iter = 10;
+    _param->max_inner_iter = 100;
     _param->opt_inner_tol = 0.05;
     _param->opt_outer_tol = cparam->opt_outer_tol;
     _param->max_linesearch_iter = 1000;
@@ -75,7 +75,7 @@ void parse_command_line(int argc, const char * argv[],
     cparam->random_N = 0;
     cparam->fileName = new char[MAX_LENS];
     cparam->verbose = LHAC_MSG_CD;
-    cparam->opt_outer_tol = 1e-5;
+    cparam->opt_outer_tol = 1e-6;
     cparam->sd_flag = 1; // default using suffcient decrease
     cparam->shrink = 4; // default gama = gama/4
     cparam->rho = 0.01;

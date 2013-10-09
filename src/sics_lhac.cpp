@@ -590,18 +590,20 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         double dH_diag = gama_scale-mu0*gama;
         double dH_diag2 = 2*dH_diag;
         
-        
+        cdtime = CFAbsoluteTimeGetCurrent();
         for (cd_pass = 1; cd_pass <= max_cd_pass; cd_pass++) {
             double diffd = 0;
             double normd = 0;
             
-            cdtime = CFAbsoluteTimeGetCurrent();
+            
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
-                idx = idxs[ii].i;
-                jdx = idxs[ii].j;
-                ij = idxs_vec_u[permut[ii]];
-                ji = idxs_vec_l[permut[ii]];
-                Q_idx = p_sics + permut[ii];
+                unsigned long rii = rand()%(work_set->numActive);
+//                unsigned long rii = ii;
+                idx = idxs[rii].i;
+                jdx = idxs[rii].j;
+                ij = idxs_vec_u[permut[rii]];
+                ji = idxs_vec_l[permut[rii]];
+                Q_idx = p_sics + permut[rii];
 //                printf("i = %ld, j = %ld, ij = %ld, Q_idx = %ld\n", idx, jdx, ij, Q_idx);
                 
                 if (idx == jdx) {
@@ -653,7 +655,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
                 
             }
             
-            sols->cdTime += (CFAbsoluteTimeGetCurrent() - cdtime);
             
             if (msgFlag >= LHAC_MSG_CD) {
                 printf("\t\t Coordinate descent pass %3ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
@@ -664,6 +665,7 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
             
 //            shuffle( work_set );
         }
+        sols->cdTime += (CFAbsoluteTimeGetCurrent() - cdtime);
         
 //        int* info = NULL;
 //        f_trial = computeObject(S, D, L_grad, w_prev, w, info);
@@ -1055,7 +1057,7 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
     
     unsigned short newton_iter;
     double normsg;
-    double et;
+//    double et;
     for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
         computeWorkSet(w, L_grad, work_set, &normsg);
         

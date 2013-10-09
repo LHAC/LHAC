@@ -690,7 +690,7 @@ void printout(const char* desc, solution* sols, param* param)
     }
     fclose(fp);
     
-    fp = fopen("LHAC_timeProfile", "a");
+    fp = fopen("LHAC_timeProfile.csv", "a");
     if (fp == NULL)
 	{
 		perror ("Error opening file");
@@ -699,17 +699,17 @@ void printout(const char* desc, solution* sols, param* param)
     //    fprintf(fp, "gamma_scale \t #iter \t time \t lstime \t sd\n");
     
     /* name || dimension || tolerance || totaltime || cdtime || fvaltime || gvaltime || #iter || #ls || #factors */
-    fprintf(fp, "%s \t",param->fileName);
-    fprintf(fp, "%d \t",sols->p_sics);
-    fprintf(fp, "%.0e \t",param->opt_outer_tol);
-    fprintf(fp, "%.5e \t",sols->t[sols->size-1]);
-    fprintf(fp, "%.5e \t",sols->cdTime);
-    fprintf(fp, "%.5e \t",sols->fvalTime);
-    fprintf(fp, "%.5e \t",sols->gvalTime);
-    fprintf(fp, "%.5e \t",sols->lbfgsTime1);
-    fprintf(fp, "%.5e \t",sols->lbfgsTime2);
-    fprintf(fp, "%d \t",sols->niter[sols->size-1]);
-    fprintf(fp, "%ld \t",sols->nls);
+    fprintf(fp, "%s, \t",param->fileName);
+    fprintf(fp, "%d, \t",sols->p_sics);
+    fprintf(fp, "%.0e, \t",param->opt_outer_tol);
+    fprintf(fp, "%.5e, \t",sols->t[sols->size-1]);
+    fprintf(fp, "%.5e, \t",sols->cdTime);
+    fprintf(fp, "%.5e, \t",sols->fvalTime);
+    fprintf(fp, "%.5e, \t",sols->gvalTime);
+    fprintf(fp, "%.5e, \t",sols->lbfgsTime1);
+    fprintf(fp, "%.5e, \t",sols->lbfgsTime2);
+    fprintf(fp, "%d, \t",sols->niter[sols->size-1]);
+    fprintf(fp, "%ld, \t",sols->nls);
     fprintf(fp, "%ld \t",sols->record1);
     fprintf(fp, "\n");
     fclose(fp);
