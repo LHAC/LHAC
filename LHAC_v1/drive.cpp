@@ -143,47 +143,6 @@ solution* lhac(l1log* mdl)
             
             mdl->suffcientDecrease(lR, work_set, 1.0, sols);
         }
-            /* new condition */
-//            double changeD = 0;
-//            double changeF = 0;
-            
-//            double mu = 1.0;
-//            double b1 = 2;
-//            memcpy(mdl->w_prev, mdl->w, p*sizeof(double));
-//            mdl->coordinateDsecent(lR, work_set, mu);
-//            
-//            double eTime = CFAbsoluteTimeGetCurrent();
-//            double f_trial = mdl->computeObject();
-//            double f_mdl = mdl->computeModelValue(lR, work_set, mu);
-//            int lineiter = 0;
-////            double rho = (f_trial-mdl->f_current)/mdl->dQ;
-//            double rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
-//            
-////            changeD = norm(mdl->D, mdl->p, 2);
-////            changeF = f_trial;
-//            
-//            printf("diff = %.3e\n", mdl->dQ - f_mdl + mdl->f_current);
-//            printf("\t \t \t # of line searches = %d; model quality: %f\n", lineiter, rho);
-//            while (rho <= 0.5 && lineiter <= 100) {
-//                lineiter++;
-//                mu = mu*b1;
-////                double f2 = mdl->computeModelValue(lR, work_set, mu);
-//                mdl->coordinateDsecent(lR, work_set, mu);
-//                f_trial = mdl->computeObject();
-//                f_mdl = mdl->computeModelValue(lR, work_set, mu);
-//                rho = (f_trial-mdl->f_current)/(f_mdl-mdl->f_current);
-////                rho = (f_trial-mdl->f_current)/mdl->dQ;
-//                printf("diff = %.3e\n", mdl->dQ - f_mdl + mdl->f_current);
-//                printf("\t \t \t # of line searches = %d; model quality: %f\n", lineiter, rho);
-//            }
-//            eTime = CFAbsoluteTimeGetCurrent() - eTime;
-//            sols->lsTime += eTime;
-////            changeF = (f_trial-changeF)/(f_trial-mdl->f_current);
-////            changeD = norm(mdl->D, mdl->p, 2)/changeD;
-////            printf("change in D = %f; change in f = %f\n", changeD, changeF);
-//            mdl->f_current = f_trial;
-//        }
-//        eTime = (clock() - eTime)/CLOCKS_PER_SEC;
                
         memcpy(mdl->L_grad_prev, mdl->L_grad, p*sizeof(double));
         

@@ -735,8 +735,11 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
             double max_redc = 0;
             
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
-                unsigned long idx = idxs[ii].j;
-                unsigned long idx_Q = permut[ii];
+                unsigned long rii = rand()%(work_set->numActive);
+//                unsigned long rii = ii;
+//                printf("%ld\n", rii);
+                unsigned long idx = idxs[rii].j;
+                unsigned long idx_Q = permut[rii];
 
                 Qd_bar = cblas_ddot(m, &Q[idx_Q], (int)work_set->numActive, d_bar, 1);
                 Hd_j = gama_scale*D[idx] - Qd_bar;
@@ -807,7 +810,7 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
                        cd_pass, diffd, normd, dQ);
             }
             
-            shuffle( work_set );
+//            shuffle( work_set );
         }
         
         sols->cdTime += CFAbsoluteTimeGetCurrent() - cdtime;
