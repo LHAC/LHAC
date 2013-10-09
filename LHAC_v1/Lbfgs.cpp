@@ -199,21 +199,42 @@ void LBFGS::computeQR_v2(work_set_struct* work_set)
     double** T = Tm->data;
     double* cl;
     unsigned long num = 0;
+//    for (unsigned long i = 0; i < _cols; i++) {
+//        cl = S[i];
+//        for (unsigned long jj = 0; jj < numActive; jj++) {
+//            Q[num] = gama*cl[idxs[jj].j];
+//            num++;
+//        }
+//    }
+//    
+//    for (unsigned long i = 0; i < _cols; i++) {
+//        cl = T[i];
+//        for (unsigned long jj = 0; jj < numActive; jj++) {
+//            Q[num] = cl[idxs[jj].j];
+//            num++;
+//        }
+//    }
+    
+//    write2mat("Qm_col.mat", "Qm", Q, numActive, 2*_cols);
+    
+    
+    /* row major */
     for (unsigned long i = 0; i < _cols; i++) {
         cl = S[i];
-        for (unsigned long jj = 0; jj < numActive; jj++) {
-            Q[num] = gama*cl[idxs[jj].j];
-            num++;
+        for (unsigned long jj = 0, k = 0; jj < numActive; jj++, k += 2*_cols) {
+            Q[i+k] = gama*cl[idxs[jj].j];
         }
     }
     
     for (unsigned long i = 0; i < _cols; i++) {
         cl = T[i];
-        for (unsigned long jj = 0; jj < numActive; jj++) {
-            Q[num] = cl[idxs[jj].j];
-            num++;
+        for (unsigned long jj = 0, k = 0; jj < numActive; jj++, k += 2*_cols) {
+            Q[i+k+_cols] = cl[idxs[jj].j];
         }
     }
+    
+//    write2mat("Qm_row.mat", "Qm", Q, 2*_cols, numActive);
+    
     
 //    write2mat("Sm.mat", "Sm", Sm);
 //    write2mat("Tm.mat", "Tm", Tm);
@@ -287,7 +308,9 @@ void LBFGS::computeLowRankApprox_v2(work_set_struct *work_set)
     
     
     int cblas_N = (int) work_set->numActive;
-    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, cblas_N, 0.0, Q_bar, _2cols);
+//    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, cblas_N, 0.0, Q_bar, _2cols);
+    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, _2cols, 0.0, Q_bar, _2cols);
+//    write2mat("Qm.mat", "Qm", Q, _2cols, cblas_N);
 //    write2mat("Qm.mat", "Qm", Q, cblas_N, _2cols);
 //    write2mat("Rm.mat", "Rm", R, _2cols, _2cols);
 //    write2mat("Q_barm.mat", "Q_barm", Q_bar, _2cols, cblas_N);
@@ -360,32 +383,6 @@ void LBFGS::updateLBFGS(double* w, double* w_prev, double* L_grad, double* L_gra
     return;
 }
 
-void LBFGS::computeHDiag(double *H_diag)
-{
-    for (unsigned long k = 0, i = 0; i < p; i++, k += m) {
-        H_diag[i] = gama;
-        for (unsigned long j = 0, o = 0; j < m; j++, o += p)
-            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
-    }
-
-    return;
-}
-
-double LBFGS::computeHdj(double Di, double *d_bar, unsigned long idx)
-{
-    double Hd_j;
-    Hd_j = gama*Di - cblas_ddot(m, &Q[idx], (int)p, d_bar, 1);
-    
-    return Hd_j;
-}
-
-void LBFGS::updateDbar(double *d_bar, unsigned long idx, double z)
-{
-    for (unsigned long k = idx*m, j = 0; j < m; j++)
-        d_bar[j] = d_bar[j] + z*Q_bar[k+j];
-    
-    return;
-}
 
 LBFGS::~LBFGS()
 {

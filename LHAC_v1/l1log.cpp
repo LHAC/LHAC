@@ -625,7 +625,8 @@ double l1log::computeModelValue(LBFGS* lR, work_set_struct* work_set, double mu)
     int cblas_M = (int) work_set->numActive;
     int cblas_N = (int) m;
     int cblas_lda = cblas_M;
-    cblas_dgemv(CblasColMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_lda, d_bar, 1, 0.0, buffer, 1);
+//    cblas_dgemv(CblasColMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_lda, d_bar, 1, 0.0, buffer, 1);
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_N, d_bar, 1, 0.0, buffer, 1);
 //    write2mat("Qm.mat", "Qm", Q, (unsigned long) cblas_M, (unsigned long) cblas_N);
 //    write2mat("Qm_bar.mat", "Qm_bar", Q_bar, cblas_N, cblas_M);
 //    write2mat("d_bar.mat", "d_bar", d_bar, cblas_N, 1);
@@ -692,8 +693,8 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
     double lmd = param->lmd;
     unsigned long l = param->l;
     
-    const double* Q = lR->Q;
-    const double* Q_bar = lR->Q_bar;
+    double* Q = lR->Q;
+    double* Q_bar = lR->Q_bar;
     const unsigned short m = lR->m;
     const double gama = lR->gama;
     
@@ -701,11 +702,21 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
     memset(d_bar, 0, 2*l*sizeof(double));
     
     // Hessian diagonal: H_diag = gama - sum(Q'.*Q_bar);
+//    for (unsigned long k = 0, i = 0; i < work_set->numActive; i++, k += m) {
+//        H_diag[i] = mu0*gama;
+//        for (unsigned long j = 0, o = 0; j < m; j++, o += work_set->numActive)
+//            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
+//    }
     for (unsigned long k = 0, i = 0; i < work_set->numActive; i++, k += m) {
         H_diag[i] = mu0*gama;
-        for (unsigned long j = 0, o = 0; j < m; j++, o += work_set->numActive)
-            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
+        for (unsigned long j = 0; j < m; j++)
+            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[k+j];
     }
+//    int numA = work_set->numActive;
+//    write2mat("Qm.mat", "Qm", Q, numA, m);
+//    write2mat("Q_barm.mat", "Q_barm", Q_bar, m, numA);
+//    write2mat("H_diag.mat", "H_diag", H_diag, work_set->numActive, 1);
+
     /* mdl value change */
     dQ = 0;
     
@@ -732,7 +743,7 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
         for (cd_pass = 1; cd_pass <= max_cd_pass; cd_pass++) {
             double diffd = 0;
             double normd = 0;
-            double max_redc = 0;
+//            double max_redc = 0;
             
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
                 unsigned long rii = rand()%(work_set->numActive);
@@ -741,7 +752,8 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
                 unsigned long idx = idxs[rii].j;
                 unsigned long idx_Q = permut[rii];
 
-                Qd_bar = cblas_ddot(m, &Q[idx_Q], (int)work_set->numActive, d_bar, 1);
+//                Qd_bar = cblas_ddot(m, &Q[idx_Q], (int)work_set->numActive, d_bar, 1);
+                Qd_bar = cblas_ddot(m, &Q[idx_Q*m], 1, d_bar, 1);
                 Hd_j = gama_scale*D[idx] - Qd_bar;
                 
 //                Hii = H_diag[idx_Q] + (mu-mu0)*gama;
