@@ -32,7 +32,7 @@ void sicsExperiment(command_line_param* cparam)
     _param->work_size = 1000000;
     _param->max_iter = cparam->max_iter;
     lmdi = cparam->lmd;
-    _param->max_inner_iter = 100;
+    _param->max_inner_iter = 50;
     _param->opt_inner_tol = 0.05;
     _param->opt_outer_tol = cparam->opt_outer_tol;
     _param->max_linesearch_iter = 1000;

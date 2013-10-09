@@ -218,33 +218,63 @@ void LBFGS::computeQR_v2(work_set_struct* work_set)
     double** T = Tm->data;
     double* cl;
     unsigned long num = 0;
+//    for (unsigned long i = 0; i < _cols; i++) {
+//        cl = S[i];
+//        for (unsigned long j = 0; j < p_sics; j++) {
+//            Q[num] = gama*cl[j];
+//            num++;
+//        }
+//        
+//        for (unsigned long j = 0; j < numActive; j++) {
+//            unsigned long ij = idxs_vec_u[j];
+//            Q[num] = gama*cl[ij];
+//            num++;
+//        }
+//    }
+//    
+//    for (unsigned long i = 0; i < _cols; i++) {
+//        cl = T[i];
+//        for (unsigned long j = 0; j < p_sics; j++) {
+//            Q[num] = cl[j];
+//            num++;
+//        }
+//        
+//        for (unsigned long j = 0; j < numActive; j++) {
+//            unsigned long ij = idxs_vec_u[j];
+//            Q[num] = cl[ij];
+//            num++;
+//        }
+//    }
+    
     for (unsigned long i = 0; i < _cols; i++) {
         cl = S[i];
-        for (unsigned long j = 0; j < p_sics; j++) {
-            Q[num] = gama*cl[j];
-            num++;
+        unsigned long k = 0;
+        for (unsigned long j = 0; j < p_sics; j++, k += 2*_cols) {
+            Q[i+k] = gama*cl[j];
         }
         
-        for (unsigned long j = 0; j < numActive; j++) {
+        for (unsigned long j = 0; j < numActive; j++, k += 2*_cols) {
             unsigned long ij = idxs_vec_u[j];
-            Q[num] = gama*cl[ij];
-            num++;
+            Q[i+k] = gama*cl[ij];
         }
     }
     
     for (unsigned long i = 0; i < _cols; i++) {
         cl = T[i];
-        for (unsigned long j = 0; j < p_sics; j++) {
-            Q[num] = cl[j];
-            num++;
+        unsigned long k = 0;
+        for (unsigned long j = 0; j < p_sics; j++, k += 2*_cols) {
+            Q[i+k+_cols] = cl[j];
         }
         
-        for (unsigned long j = 0; j < numActive; j++) {
+        for (unsigned long j = 0; j < numActive; j++, k += 2*_cols) {
             unsigned long ij = idxs_vec_u[j];
-            Q[num] = cl[ij];
-            num++;
+            Q[i+k+_cols] = cl[ij];
         }
     }
+    
+    
+    
+    
     et = (clock() - et)/CLOCKS_PER_SEC;
     tQ += et;
     
@@ -338,7 +368,8 @@ void LBFGS::computeLowRankApprox_v2(work_set_struct* work_set)
     dgetri_(&_2cols, R, &_2cols, ipiv, work, &lwork, &info);
     /* R now store R-1 */
     int cblas_N = (int) work_set->numActive + p_sics;
-    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, cblas_N, 0.0, Q_bar, _2cols);
+//    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, cblas_N, 0.0, Q_bar, _2cols);
+    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, _2cols, 0.0, Q_bar, _2cols);
     
     et = (clock() - et)/CLOCKS_PER_SEC;
     tQ_bar += et;

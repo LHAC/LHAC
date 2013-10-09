@@ -438,7 +438,8 @@ static inline double computeModelValue(double* D, double* L_grad, double* d_bar,
     int cblas_M = (int) work_set->numActive + (int) p_sics;
     int cblas_N = (int) m;
     int cblas_lda = cblas_M;
-    cblas_dgemv(CblasColMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_lda, d_bar, 1, 0.0, buffer, 1);
+//    cblas_dgemv(CblasColMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_lda, d_bar, 1, 0.0, buffer, 1);
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_N, d_bar, 1, 0.0, buffer, 1);
 //    write2mat("Qm.mat", "Qm", Q, (unsigned long) cblas_M, (unsigned long) cblas_N);
 //    write2mat("Qm_bar.mat", "Qm_bar", Q_bar, cblas_N, cblas_M);
 //    write2mat("d_bar.mat", "d_bar", d_bar, cblas_N, 1);
@@ -541,10 +542,16 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
     unsigned long _colsQ = p_sics + work_set->numActive;
     
     
+//    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += m) {
+//        H_diag[i] = mu0*gama;
+//        for (unsigned long j = 0, o = 0; j < m; j++, o += _colsQ)
+//            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
+//    }
+    
     for (unsigned long k = 0, i = 0; i < p_sics; i++, k += m) {
         H_diag[i] = mu0*gama;
-        for (unsigned long j = 0, o = 0; j < m; j++, o += _colsQ)
-            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
+        for (unsigned long j = 0; j < m; j++)
+            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[k+j];
     }
     
 //    int cblas_M = (int) work_set->numActive + (int) p_sics;
@@ -570,10 +577,16 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
     unsigned long ji;
     unsigned long Q_idx;
     
+//    for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
+//        idx = idxs[ii].i;
+//        jdx = idxs[ii].j;
+//        H_diag_2[ii] =  cblas_ddot(m, &Q[idx], (int)_colsQ, &Q_bar[jdx*m], 1);
+//    }
+    
     for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
         idx = idxs[ii].i;
         jdx = idxs[ii].j;
-        H_diag_2[ii] =  cblas_ddot(m, &Q[idx], (int)_colsQ, &Q_bar[jdx*m], 1);
+        H_diag_2[ii] =  cblas_ddot(m, &Q[idx*m], 1, &Q_bar[jdx*m], 1);
     }
     
     unsigned long max_cd_pass = std::min(1 + iter/3, max_inner_iter);
@@ -597,8 +610,8 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
             
             
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
-                unsigned long rii = rand()%(work_set->numActive);
-//                unsigned long rii = ii;
+//                unsigned long rii = rand()%(work_set->numActive);
+                unsigned long rii = ii;
                 idx = idxs[rii].i;
                 jdx = idxs[rii].j;
                 ij = idxs_vec_u[permut[rii]];
@@ -607,14 +620,16 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
 //                printf("i = %ld, j = %ld, ij = %ld, Q_idx = %ld\n", idx, jdx, ij, Q_idx);
                 
                 if (idx == jdx) {
-                    Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx], (int)_colsQ, d_bar, 1);
+//                    Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx], (int)_colsQ, d_bar, 1);
+                    Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx*m], 1, d_bar, 1);
                     G = Hd_j + L_grad[ij];
                     Gp = G + lmd[ij];
                     Gn = G - lmd[ij];
                     Hii = H_diag[idx] + dH_diag;
                 }
                 else {
-                    Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx], (int)_colsQ, d_bar, 1);
+//                    Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx], (int)_colsQ, d_bar, 1);
+                    Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx*m], 1, d_bar, 1);
 //                Hd_i = gama*D[ji] - cblas_ddot(m, &Q[ji], (int)p_2, d_bar, 1);
                     Hd_i = Hd_j;
                     G = Hd_i + Hd_j + L_grad[ij] + L_grad[ji];
