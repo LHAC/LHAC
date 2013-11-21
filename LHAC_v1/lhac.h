@@ -10,8 +10,9 @@
 #define __LHAC_v1__lhac__
 
 #include <time.h>
-#include <vecLib/clapack.h>
-#include <vecLib/cblas.h>
+//#include <vecLib/clapack.h>
+#include <Accelerate/Accelerate.h>
+//#include <vecLib/cblas.h>
 #include <math.h>
 
 #define MAX_LENS 1024

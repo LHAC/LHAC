@@ -10,7 +10,6 @@
 #include "lhac.h"
 #include "myUtilities.h"
 
-#include <vecLib/clapack.h>
 #include <CoreFoundation/CoreFoundation.h>
 
 #include <stdlib.h>

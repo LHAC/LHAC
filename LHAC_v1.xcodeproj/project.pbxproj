@@ -8,11 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		D443207216C84F5400112D18 /* myUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D443207016C84F5400112D18 /* myUtilities.cpp */; };
+		D468136E183DB92200C17532 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D468136D183DB92200C17532 /* Accelerate.framework */; };
 		D480ECF116B58AD500BECB33 /* l1log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D480ECEF16B58AD500BECB33 /* l1log.cpp */; };
 		D491142017360E0E00F75EAD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D491141F17360E0E00F75EAD /* CoreFoundation.framework */; };
 		D4B48E2116C1EA3F00107AB3 /* lhac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4B48E2016C1EA3F00107AB3 /* lhac.cpp */; };
 		D4FBD18316AD90C7006E7958 /* LHAC_v1.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = D4FBD18216AD90C7006E7958 /* LHAC_v1.1 */; };
-		D4FBD18A16AD9104006E7958 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4FBD18916AD9104006E7958 /* Accelerate.framework */; };
 		D4FE841C16B97155004371C4 /* Lbfgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4FE841A16B97155004371C4 /* Lbfgs.cpp */; };
 		D4FE841F16B99683004371C4 /* drive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4FE841D16B99683004371C4 /* drive.cpp */; };
 /* End PBXBuildFile section */
@@ -33,13 +33,13 @@
 /* Begin PBXFileReference section */
 		D443207016C84F5400112D18 /* myUtilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = myUtilities.cpp; sourceTree = "<group>"; };
 		D443207116C84F5400112D18 /* myUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = myUtilities.h; sourceTree = "<group>"; };
+		D468136D183DB92200C17532 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		D480ECEF16B58AD500BECB33 /* l1log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l1log.cpp; sourceTree = "<group>"; };
 		D480ECF016B58AD500BECB33 /* l1log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = l1log.h; sourceTree = "<group>"; };
 		D491141F17360E0E00F75EAD /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		D4B48E2016C1EA3F00107AB3 /* lhac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lhac.cpp; sourceTree = "<group>"; };
 		D4FBD17C16AD90C7006E7958 /* LHAC_v1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LHAC_v1; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4FBD18216AD90C7006E7958 /* LHAC_v1.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = LHAC_v1.1; sourceTree = "<group>"; };
-		D4FBD18916AD9104006E7958 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		D4FE841A16B97155004371C4 /* Lbfgs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lbfgs.cpp; sourceTree = "<group>"; };
 		D4FE841B16B97155004371C4 /* Lbfgs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lbfgs.h; sourceTree = "<group>"; };
 		D4FE841D16B99683004371C4 /* drive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = drive.cpp; sourceTree = "<group>"; };
@@ -51,8 +51,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D468136E183DB92200C17532 /* Accelerate.framework in Frameworks */,
 				D491142017360E0E00F75EAD /* CoreFoundation.framework in Frameworks */,
-				D4FBD18A16AD9104006E7958 /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,8 +62,8 @@
 		D4FBD17116AD90C6006E7958 = {
 			isa = PBXGroup;
 			children = (
+				D468136D183DB92200C17532 /* Accelerate.framework */,
 				D491141F17360E0E00F75EAD /* CoreFoundation.framework */,
-				D4FBD18916AD9104006E7958 /* Accelerate.framework */,
 				D4FBD17F16AD90C7006E7958 /* LHAC_v1 */,
 				D4FBD17D16AD90C7006E7958 /* Products */,
 			);
