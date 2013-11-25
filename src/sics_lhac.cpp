@@ -539,7 +539,7 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
     unsigned long* idxs_vec_u = work_set->idxs_vec_u;
     unsigned long* permut = work_set->permut;
     
-    unsigned long _colsQ = p_sics + work_set->numActive;
+//    unsigned long _colsQ = p_sics + work_set->numActive;
     
     
 //    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += m) {
