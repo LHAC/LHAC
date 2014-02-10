@@ -68,6 +68,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     char filename[30] = {"default"};
     // max iterations
     int max_iter = 500;
+    // sufficient decrease (default) or backtrack
+    int sd_flag = 1;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);
@@ -88,6 +90,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (tf) {
         max_iter = mxGetScalar(tf);
     }
+    tf = mxGetField(prhs[argIdx], 0, "l");
+    if (tf) {
+        sd_flag = mxGetScalar(tf);
+    }
     
     
     
@@ -104,7 +110,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     _param->bbeta = 0.5;
     _param->ssigma = 0.001;
     _param->verbose = verbose;
-    _param->sd_flag = 1;
+    _param->sd_flag = sd_flag;
     _param->shrink = shrink;
     _param->fileName = filename;
     _param->rho = 0.01;

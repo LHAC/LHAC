@@ -564,7 +564,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
     
     double z = 0.0;
     double Hd_j;
-    double Hd_i;
     double Hii;
     double G;
     double Gp;
@@ -608,7 +607,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
             double diffd = 0;
             double normd = 0;
             
-            
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
 //                unsigned long rii = rand()%(work_set->numActive);
                 unsigned long rii = ii;
@@ -617,31 +615,23 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
                 ij = idxs_vec_u[permut[rii]];
                 ji = idxs_vec_l[permut[rii]];
                 Q_idx = p_sics + permut[rii];
-//                printf("i = %ld, j = %ld, ij = %ld, Q_idx = %ld\n", idx, jdx, ij, Q_idx);
+                unsigned long Q_idx_m = Q_idx*m;
                 
+                Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx_m], 1, d_bar, 1);
                 if (idx == jdx) {
-//                    Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx], (int)_colsQ, d_bar, 1);
-                    Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx*m], 1, d_bar, 1);
                     G = Hd_j + L_grad[ij];
                     Gp = G + lmd[ij];
                     Gn = G - lmd[ij];
                     Hii = H_diag[idx] + dH_diag;
                 }
                 else {
-//                    Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx], (int)_colsQ, d_bar, 1);
-                    Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx*m], 1, d_bar, 1);
-//                Hd_i = gama*D[ji] - cblas_ddot(m, &Q[ji], (int)p_2, d_bar, 1);
-                    Hd_i = Hd_j;
-                    G = Hd_i + Hd_j + L_grad[ij] + L_grad[ji];
+                    G = 2*Hd_j + L_grad[ij] + L_grad[ji];
                     Gp = G + 2*lmd[ij];
                     Gn = G - 2*lmd[ij];
-//                Hii = H_diag[idx] + H_diag[jdx] - 2*cblas_ddot(m, &Q[idx], (int)p_2, &Q_bar[jdx*m], 1);
-//                Hii = cblas_ddot(m, &Q[idx], (int)_colsQ, &Q_bar[jdx*m], 1);
                     Hii = H_diag_2[permut[ii]];
                     Hii = Hii*(-2);
                     Hii += H_diag[idx] + H_diag[jdx] + dH_diag2;
                 }
-                
                 
                 wpd = w_prev[ij] + D[ij];
                 Hwd = Hii * wpd;
@@ -653,14 +643,14 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
                 
                 if (idx == jdx) {
                     D[ij] = D[ij] + z;
-                    for (unsigned long k = Q_idx*m, j = 0; j < m; j++, k++)
+                    for (unsigned long k = Q_idx_m, j = 0; j < m; j++, k++)
                         d_bar[j] = d_bar[j] + z*Q_bar[k];
                     normd += fabs(D[ij]);
                 }
                 else {
                     D[ij] = D[ij] + z;
                     D[ji] = D[ji] + z;
-                    for (unsigned long k1 = Q_idx*m, j = 0; j < m; j++, k1++) {
+                    for (unsigned long k1 = Q_idx_m, j = 0; j < m; j++, k1++) {
                         d_bar[j] = d_bar[j] + 2*z*Q_bar[k1];
                     }
                     normd += 2*fabs(D[ij]);
@@ -678,7 +668,7 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
 //                printf("\t\t f_mdl = %.5e\n", f ,_mdl);
             }
             
-            shuffle( work_set );
+//            shuffle( work_set );
 
         }
         sols->cdTime += (CFAbsoluteTimeGetCurrent() - cdtime);
@@ -719,9 +709,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         if (sd_iters == 0) {
             eTime = CFAbsoluteTimeGetCurrent();
         }
-        
-//        write2mat("d_bar.mat", "d_bar", d_bar, cblas_N, 1);
-//        write2mat("Dm.mat", "Dm", D, p_2, 1);
         
         gvaltime = CFAbsoluteTimeGetCurrent();
         int p0 = (int) p_sics;
@@ -902,17 +889,17 @@ static inline void coordinateDescent(double* w, unsigned long iter, LBFGS* lR,  
             ij = idxs_vec_u[permut[ii]];
             ji = idxs_vec_l[permut[ii]];
             Q_idx = p_sics + permut[ii];
+            unsigned long Q_idx_m = Q_idx*m;
             
+            
+            Hd_j = gama*D[ij] - cblas_ddot(m, &Q[Q_idx_m], 1, d_bar, 1);
             if (idx == jdx) {
-                Hd_j = gama*D[ij] - cblas_ddot(m, &Q[Q_idx], (int)_colsQ, d_bar, 1);
                 G = Hd_j + L_grad[ij];
                 Gp = G + lmd[ij];
                 Gn = G - lmd[ij];
                 Hii = H_diag[idx];
             }
             else {
-                Hd_j = gama*D[ij] - cblas_ddot(m, &Q[Q_idx], (int)_colsQ, d_bar, 1);
-//                Hd_i = gama*D[ji] - cblas_ddot(m, &Q[ji], (int)p_2, d_bar, 1);
                 Hd_i = Hd_j;
                 G = Hd_i + Hd_j + L_grad[ij] + L_grad[ji];
                 Gp = G + 2*lmd[ij];
@@ -936,14 +923,14 @@ static inline void coordinateDescent(double* w, unsigned long iter, LBFGS* lR,  
             
             if (idx == jdx) {
                 D[ij] = D[ij] + z;
-                for (unsigned long k = Q_idx*m, j = 0; j < m; j++, k++)
+                for (unsigned long k = Q_idx_m, j = 0; j < m; j++, k++)
                     d_bar[j] = d_bar[j] + z*Q_bar[k];
                 normd += fabs(D[ij]);
             }
             else {
                 D[ij] = D[ij] + z;
                 D[ji] = D[ji] + z;
-                for (unsigned long k1 = Q_idx*m, j = 0; j < m; j++, k1++) {
+                for (unsigned long k1 = Q_idx_m, j = 0; j < m; j++, k1++) {
 //                    d_bar[j] = d_bar[j] + z*(Q_bar[k1] + Q_bar[k2]);
                     d_bar[j] = d_bar[j] + 2*z*Q_bar[k1];
                 }
@@ -962,7 +949,7 @@ static inline void coordinateDescent(double* w, unsigned long iter, LBFGS* lR,  
             break;
         }
         
-        shuffle( work_set );
+//        shuffle( work_set );
     }
     
     //    printout(D, p);
