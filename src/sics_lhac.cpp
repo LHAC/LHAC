@@ -64,9 +64,9 @@ static inline void shuffle( work_set_struct* work_set )
         idxs[j].vlt = vlt;
         
         /* update permutation */
-        k1 = permut[i];
+        unsigned long tmp = permut[i];
         permut[i] = permut[j];
-        permut[j] = k1;
+        permut[j] = tmp;
     }
     
     return;
@@ -675,10 +675,11 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
                 printf("\t\t Coordinate descent pass %3ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
                        cd_pass, diffd, normd);
 //                f_mdl = computeModelValue(D, L_grad, d_bar, w_prev, lR, work_set, mu);
-//                printf("\t\t f_mdl = %.5e\n", f_mdl);
+//                printf("\t\t f_mdl = %.5e\n", f ,_mdl);
             }
             
             shuffle( work_set );
+
         }
         sols->cdTime += (CFAbsoluteTimeGetCurrent() - cdtime);
         
