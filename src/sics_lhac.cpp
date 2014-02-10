@@ -678,7 +678,7 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
 //                printf("\t\t f_mdl = %.5e\n", f_mdl);
             }
             
-//            shuffle( work_set );
+            shuffle( work_set );
         }
         sols->cdTime += (CFAbsoluteTimeGetCurrent() - cdtime);
         
@@ -1076,16 +1076,8 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
     for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
         computeWorkSet(w, L_grad, work_set, &normsg);
         
-        /* elapsed time */
+
         double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
-        if (newton_iter == 1 || newton_iter % 10 == 0 ) {
-            sols->fval[sols->size] = f_current;
-            sols->normgs[sols->size] = normsg;
-            sols->t[sols->size] = elapsedTime;
-            sols->niter[sols->size] = newton_iter;
-            (sols->size)++;
-        }
-        
         if (msgFlag >= LHAC_MSG_NEWTON) {
             printf("%.4e  iter %2d:   obj.f = %+.5e    obj.normsg = %+.4e   |work_set| = %ld\n",
                    elapsedTime, newton_iter, f_current, normsg, work_set->numActive);
@@ -1112,6 +1104,16 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
 //        write2mat("w_prev.mat", "w_prev", w_prev, p_2, 1);
 //        write2mat("L_grad.mat", "L_grad", L_grad, p_2, 1);
 //        write2mat("L_grad_prev.mat", "L_grad_prev", L_grad_prev, p_2, 1);
+        
+        /* elapsed time */
+        elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
+        if (newton_iter == 1 || newton_iter % 10 == 0 ) {
+            sols->fval[sols->size] = f_current;
+            sols->normgs[sols->size] = normsg;
+            sols->t[sols->size] = elapsedTime;
+            sols->niter[sols->size] = newton_iter;
+            (sols->size)++;
+        }
         
         double lbfgs2 = CFAbsoluteTimeGetCurrent();
         lR->updateLBFGS(w, w_prev, L_grad, L_grad_prev);

@@ -659,7 +659,7 @@ void printout(const char* desc, solution* sols, param* param)
     
     fprintf(fp, "#iter \t fval \t time \t normgs\n");
     for (unsigned long i = 0; i < sols->size; i++) {
-        fprintf(fp, "%4d \t %+.5e\t %.5e\t %.5e\n", sols->niter[i], sols->fval[i], sols->t[i], sols->normgs[i]);
+        fprintf(fp, "%4d \t %+.8e\t %.5e\t %.5e\n", sols->niter[i], sols->fval[i], sols->t[i], sols->normgs[i]);
     }
     
     fprintf(fp, "\n");
