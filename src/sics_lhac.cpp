@@ -506,8 +506,9 @@ static inline double computeModelValue(double* D, double* L_grad, double* d_bar,
 /*******************************************************************************
  suffcient decrease
  *******************************************************************************/
-static inline double suffcientDecrease(double* S, double* w, unsigned long iter, LBFGS* lR,  double* L_grad,
-                                       work_set_struct* work_set, double* d_bar, double* H_diag,
+static inline double suffcientDecrease(double* S, double* w, unsigned long iter, LBFGS* lR,
+                                       double* L_grad, work_set_struct* work_set,
+                                       double* d_bar, double* H_diag,
                                        double* H_diag_2, double* w_prev, double* D)
 {
     int max_sd_iters = 30;
@@ -830,32 +831,17 @@ static inline void coordinateDescent(double* w, unsigned long iter, LBFGS* lR,  
     unsigned long* idxs_vec_l = work_set->idxs_vec_l;
     unsigned long* idxs_vec_u = work_set->idxs_vec_u;
     unsigned long* permut = work_set->permut;
-    
-    unsigned long _colsQ = p_sics + work_set->numActive;
-    
-    // Hessian diagonal: H_diag = gama - sum(Q'.*Q_bar);
-    
-//    for (unsigned long k = 0, i = 0; i < p_2; i++, k += m) {
-//        H_diag[i] = gama;
-//        for (unsigned long j = 0, o = 0; j < m; j++, o += p_2)
-//            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
-//    }
 
+    
     for (unsigned long k = 0, i = 0; i < p_sics; i++, k += m) {
         H_diag[i] = gama;
-        for (unsigned long j = 0, o = 0; j < m; j++, o += _colsQ)
-            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
+        for (unsigned long j = 0; j < m; j++)
+            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[k+j];
     }
     
     
-//    write2mat("H_diag.mat", "H_diag", H_diag, p_2, 1);
-//    write2mat("Qm.mat", "Qm", Q, p_2, m);
-//    write2mat("Qm_bar.mat", "Qm_bar", Q_bar, m, p_2);
-    //    lR->computeHDiag(H_diag);
-    
     double z = 0.0;
     double Hd_j;
-    double Hd_i;
     double Hii;
     double G;
     double Gp;
@@ -871,14 +857,12 @@ static inline void coordinateDescent(double* w, unsigned long iter, LBFGS* lR,  
     for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
         idx = idxs[ii].i;
         jdx = idxs[ii].j;
-        H_diag_2[ii] =  cblas_ddot(m, &Q[idx], (int)_colsQ, &Q_bar[jdx*m], 1);
+        H_diag_2[ii] =  cblas_ddot(m, &Q[idx*m], 1, &Q_bar[jdx*m], 1);
     }
     
     unsigned long max_inneriter;
     max_inneriter = std::min(1 + iter/3, max_inner_iter);
-    //    if (max_inneriter > (param->max_inner_iter)) {
-    //        max_inneriter = param->max_inner_iter;
-    //    }
+
     for (unsigned long inneriter = 1; inneriter <= max_inneriter; inneriter++) {
         double diffd = 0;
         double normd = 0;
@@ -900,18 +884,14 @@ static inline void coordinateDescent(double* w, unsigned long iter, LBFGS* lR,  
                 Hii = H_diag[idx];
             }
             else {
-                Hd_i = Hd_j;
-                G = Hd_i + Hd_j + L_grad[ij] + L_grad[ji];
+                G = 2*Hd_j + L_grad[ij] + L_grad[ji];
                 Gp = G + 2*lmd[ij];
                 Gn = G - 2*lmd[ij];
-//                Hii = H_diag[idx] + H_diag[jdx] - 2*cblas_ddot(m, &Q[idx], (int)p_2, &Q_bar[jdx*m], 1);
-//                Hii = cblas_ddot(m, &Q[idx], (int)_colsQ, &Q_bar[jdx*m], 1);
                 Hii = H_diag_2[permut[ii]];
                 Hii = Hii*(-2);
                 Hii += H_diag[idx] + H_diag[jdx];
             }
             
-//            printout("d_bar = ", d_bar, m, FULL);
             
             wpd = w[ij] + D[ij];
             Hwd = Hii * wpd;
@@ -931,7 +911,6 @@ static inline void coordinateDescent(double* w, unsigned long iter, LBFGS* lR,  
                 D[ij] = D[ij] + z;
                 D[ji] = D[ji] + z;
                 for (unsigned long k1 = Q_idx_m, j = 0; j < m; j++, k1++) {
-//                    d_bar[j] = d_bar[j] + z*(Q_bar[k1] + Q_bar[k2]);
                     d_bar[j] = d_bar[j] + 2*z*Q_bar[k1];
                 }
                 normd += 2*fabs(D[ij]);
