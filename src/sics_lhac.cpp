@@ -506,6 +506,309 @@ static inline double computeModelValue(double* D, double* L_grad, double* d_bar,
 /*******************************************************************************
  suffcient decrease
  *******************************************************************************/
+static inline double suffcientDecrease_v2(double* S, double* w, unsigned long iter, LBFGS* lR,
+                                       double* L_grad, work_set_struct* work_set,
+                                       double* d_bar, double* H_diag,
+                                       double* H_diag_2, double* w_prev, double* D)
+{
+    int max_sd_iters = 30;
+    double mu = mu0;
+    double f_trial;
+    double f_mdl;
+    double rho_trial;
+    
+    
+    /* timing performance */
+    double cdtime = 0.0;
+    double fvaltime = 0.0;
+    double gvaltime = 0.0;
+    double eTime = 0;
+    
+    memcpy(w_prev, w, p_2*sizeof(double));
+    
+    memset(D, 0, p_2*sizeof(double));
+    memset(d_bar, 0, 2*l*sizeof(double));
+    
+    
+    double* Q = lR->Q;
+    double* Q_bar = lR->Q_bar;
+    unsigned short m = lR->m;
+    const double gama = lR->gama;
+    
+    ushort_pair_t* idxs = work_set->idxs;
+    unsigned long* idxs_vec_l = work_set->idxs_vec_l;
+    unsigned long* idxs_vec_u = work_set->idxs_vec_u;
+    unsigned long* permut = work_set->permut;
+    
+    //    unsigned long _colsQ = p_sics + work_set->numActive;
+    
+    
+    //    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += m) {
+    //        H_diag[i] = mu0*gama;
+    //        for (unsigned long j = 0, o = 0; j < m; j++, o += _colsQ)
+    //            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
+    //    }
+    
+    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += m) {
+        H_diag[i] = mu0*gama;
+        for (unsigned long j = 0; j < m; j++)
+            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[k+j];
+    }
+    
+    //    int cblas_M = (int) work_set->numActive + (int) p_sics;
+    //    int cblas_N = (int) m;
+    //    int cblas_lda = cblas_M;
+    //    write2mat("Qm.mat", "Qm", Q, (unsigned long) cblas_M, (unsigned long) cblas_N);
+    //    write2mat("Qm_bar.mat", "Qm_bar", Q_bar, cblas_N, cblas_M);
+    //    write2mat("w.mat", "w", w, p_2, 1);
+    //    write2mat("L_grad.mat", "L_grad", L_grad, p_2, 1);
+    
+    double z = 0.0;
+    double Hd_j;
+    double Hii;
+    double G;
+    double Gp;
+    double Gn;
+    double wpd;
+    double Hwd;
+    unsigned long idx;
+    unsigned long jdx;
+    unsigned long ij;
+    unsigned long ji;
+    unsigned long Q_idx;
+    
+    //    for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
+    //        idx = idxs[ii].i;
+    //        jdx = idxs[ii].j;
+    //        H_diag_2[ii] =  cblas_ddot(m, &Q[idx], (int)_colsQ, &Q_bar[jdx*m], 1);
+    //    }
+    
+    for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
+        idx = idxs[ii].i;
+        jdx = idxs[ii].j;
+        H_diag_2[ii] =  cblas_ddot(m, &Q[idx*m], 1, &Q_bar[jdx*m], 1);
+    }
+    
+//    unsigned long max_cd_steps = iter > 50 ? iter : 50;
+    unsigned long max_cd_steps = work_set->numActive;
+    int sd_iters;
+    
+    for (sd_iters = 0; sd_iters < max_sd_iters; sd_iters++) {
+        
+        double gama_scale = mu*gama;
+        double dH_diag = gama_scale-mu0*gama;
+        double dH_diag2 = 2*dH_diag;
+        
+        cdtime = CFAbsoluteTimeGetCurrent();
+        double diffd = 0;
+        double normd = 0;
+        
+        for (unsigned long ii = 0; ii < max_cd_steps; ii++) {
+//            unsigned long rii = rand()%(work_set->numActive);
+//            unsigned long rii = ii%(work_set->numActive);
+            unsigned long rii = ii;
+            idx = idxs[rii].i;
+            jdx = idxs[rii].j;
+            ij = idxs_vec_u[permut[rii]];
+            ji = idxs_vec_l[permut[rii]];
+            Q_idx = p_sics + permut[rii];
+            unsigned long Q_idx_m = Q_idx*m;
+            
+            Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx_m], 1, d_bar, 1);
+            if (idx == jdx) {
+                G = Hd_j + L_grad[ij];
+                Gp = G + lmd[ij];
+                Gn = G - lmd[ij];
+                Hii = H_diag[idx] + dH_diag;
+            }
+            else {
+                G = 2*Hd_j + L_grad[ij] + L_grad[ji];
+                Gp = G + 2*lmd[ij];
+                Gn = G - 2*lmd[ij];
+                Hii = H_diag_2[permut[ii]];
+                Hii = Hii*(-2);
+                Hii += H_diag[idx] + H_diag[jdx] + dH_diag2;
+            }
+            
+            wpd = w_prev[ij] + D[ij];
+            Hwd = Hii * wpd;
+            z = -wpd;
+            if (Gp <= Hwd)
+                z = -Gp/Hii;
+            if (Gn >= Hwd)
+                z = -Gn/Hii;
+            
+            if (idx == jdx) {
+                D[ij] = D[ij] + z;
+                for (unsigned long k = Q_idx_m, j = 0; j < m; j++, k++)
+                    d_bar[j] = d_bar[j] + z*Q_bar[k];
+                normd += fabs(D[ij]);
+            }
+            else {
+                D[ij] = D[ij] + z;
+                D[ji] = D[ji] + z;
+                for (unsigned long k1 = Q_idx_m, j = 0; j < m; j++, k1++) {
+                    d_bar[j] = d_bar[j] + 2*z*Q_bar[k1];
+                }
+                normd += 2*fabs(D[ij]);
+            }
+            
+            diffd += fabs(z);
+            
+        }
+        
+        
+        if (msgFlag >= LHAC_MSG_CD) {
+            printf("\t\t Coordinate descent steps %3ld:   Change in d = %+.4e   norm(d) = %+.4e\n"
+                   , max_cd_steps, diffd, normd);
+        }
+        
+        //            shuffle( work_set );
+        
+        sols->cdTime += (CFAbsoluteTimeGetCurrent() - cdtime);
+        
+        //        int* info = NULL;
+        //        f_trial = computeObject(S, D, L_grad, w_prev, w, info);
+        //        if (info != 0) {
+        //            mu = 2*mu;
+        //            continue;
+        //        }
+        //        for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
+        //            for (unsigned long j = 0; j <= i; j++) {
+        //                unsigned long ij = k + j;
+        //                w[ij] = w_prev[ij] + D[ij];
+        //            }
+        //        }
+        
+        fvaltime = CFAbsoluteTimeGetCurrent();
+        
+        double l1normW1 = 0.0;
+        double trSW1 = 0.0;
+        for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
+            for (unsigned long j = 0; j < i; j++) {
+                unsigned long ij = k + j;
+                w[ij] = w_prev[ij] + D[ij];
+                l1normW1 += fabs(w[ij])*lmd[ij];
+                trSW1 += w[ij]*S[ij];
+            }
+        }
+        l1normW1 *= 2.0;
+        trSW1 *= 2.0;
+        for (unsigned long i = 0, k = 0; i < p_sics; i++, k += (p_sics+1)) {
+            w[k] = w_prev[k] + D[k];
+            l1normW1 += fabs(w[k])*lmd[k];
+            trSW1 += w[k]*S[k];
+        }
+        
+        if (sd_iters == 0) {
+            eTime = CFAbsoluteTimeGetCurrent();
+        }
+        
+        gvaltime = CFAbsoluteTimeGetCurrent();
+        int p0 = (int) p_sics;
+        int info;
+        dpotrf_((char*) "U", &p0, w, &p0, &info);
+        (sols->record1)++;
+        sols->gvalTime += CFAbsoluteTimeGetCurrent() - gvaltime;
+        
+        sols->fvalTime += CFAbsoluteTimeGetCurrent() - fvaltime;
+        
+        if (info != 0) {
+            mu = 2*mu;
+            printf("\t \t \t # of line searches = %3d; no PSD!; gama_scale = %f\n", sd_iters, gama_scale);
+            continue;
+        }
+        
+        //        double l1normW1 = 0.0;
+        //        double trSW1 = 0.0;
+        //        for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
+        //            for (unsigned long j = 0; j < i; j++) {
+        //                unsigned long ij = k + j;
+        //                double wnew = w_prev[ij] + D[ij];
+        //                l1normW1 += fabs(wnew)*lmd[ij];
+        //                trSW1 += wnew*S[ij];
+        //            }
+        //        }
+        //        l1normW1 *= 2.0;
+        //        trSW1 *= 2.0;
+        //        for (unsigned long i = 0, k = 0; i < p_sics; i++, k += (p_sics+1)) {
+        //            double wnew = w_prev[k] + D[k];
+        //            l1normW1 += fabs(wnew)*lmd[k];
+        //            trSW1 += wnew*S[k];
+        //        }
+        
+        fvaltime = CFAbsoluteTimeGetCurrent();
+        
+        double logdetW1 = 0.0;
+        for (unsigned long i = 0, k = 0; i < p_sics; i++, k += (p_sics+1)) {
+            logdetW1 += log(w[k]);
+        }
+        logdetW1 *= 2.0;
+        
+        f_trial = ((trSW1 + l1normW1) - logdetW1);
+        
+        f_mdl = computeModelValue(D, L_grad, d_bar, w_prev, lR, work_set, mu);
+        
+        sols->fvalTime += CFAbsoluteTimeGetCurrent() - fvaltime;
+        
+        rho_trial = (f_trial-f_current)/(f_mdl-f_current);
+        
+        printf("\t \t \t # of line searches = %3d; model quality: %+.3f; Delta = %+.3e\n", sd_iters, rho_trial, rho*(f_mdl - f_current));
+        
+        if (rho_trial > rho) {
+            
+            printf("\t \t \t function decrease = %+.5e; mu0 = %f\n", f_current - f_trial, mu0);
+            f_current = f_trial;
+            l1normW = l1normW1;
+            logdetW = logdetW1;
+            trSW = trSW1;
+            
+            gvaltime = CFAbsoluteTimeGetCurrent();
+            int info;
+            int p0 = (int) p_sics;
+            dpotri_((char*) "U", &p0, w, &p0, &info);
+            sols->gvalTime += CFAbsoluteTimeGetCurrent() - gvaltime;
+            (sols->record1)++;
+            
+            // fill in the lower triangle
+            for (unsigned long i = 0; i < p_sics; i++) {
+                for (unsigned long j = 0; j <= i; j++) {
+                    double tmp = w[i*p_sics+j];
+                    w[j*p_sics+i] = tmp;
+                }
+            }
+            
+            // w stored X-1
+            // now write it back to X
+            for (unsigned long i = 0; i < p_sics; i++) {
+                for (unsigned long j = 0; j <= i; j++) {
+                    unsigned long ij = i*p_sics + j;
+                    unsigned long ji = j*p_sics + i;
+                    L_grad[ij] = S[ij] - w[ij];
+                    L_grad[ji] = L_grad[ij];
+                    w[ij] = w_prev[ij] + D[ij];
+                    w[ji] = w[ij];
+                }
+            }
+            
+            break;
+        }
+        
+        mu = 2*mu;
+        
+    }
+    
+    sols->nls += sd_iters;
+    
+    eTime = CFAbsoluteTimeGetCurrent() - eTime;
+    
+    return eTime;
+    
+}
+
+/*******************************************************************************
+ suffcient decrease
+ *******************************************************************************/
 static inline double suffcientDecrease(double* S, double* w, unsigned long iter, LBFGS* lR,
                                        double* L_grad, work_set_struct* work_set,
                                        double* d_bar, double* H_diag,
@@ -1063,7 +1366,7 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
         }
         else {
             memcpy(L_grad_prev, L_grad, p_2*sizeof(double));
-            suffcientDecrease(S, w, newton_iter, lR,  L_grad, work_set, d_bar, H_diag,
+            suffcientDecrease_v2(S, w, newton_iter, lR,  L_grad, work_set, d_bar, H_diag,
                               H_diag_2, w_prev, D);
         }
         
