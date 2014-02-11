@@ -43,6 +43,7 @@ void sicsExperiment(command_line_param* cparam)
     _param->shrink = cparam->shrink;
     _param->fileName = cparam->fileName;
     _param->rho = cparam->rho;
+    _param->cd_rate = 15;
     
     double* lmd_vec = new double[p*p];
     for (unsigned long i = 0; i < p*p; i++) {

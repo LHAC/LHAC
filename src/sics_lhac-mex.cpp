@@ -70,6 +70,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int max_iter = 500;
     // sufficient decrease (default) or backtrack
     int sd_flag = 1;
+    // max_cdpass = 1 + iter / cdrate
+    unsigned long cd_rate = 15;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);
@@ -94,7 +96,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (tf) {
         sd_flag = mxGetScalar(tf);
     }
-    
+    tf = mxGetField(prhs[argIdx], 0, "r");
+    if (tf) {
+        cd_rate = mxGetScalar(tf);
+    }
     
     
     param* _param = new param;
@@ -115,6 +120,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     _param->fileName = filename;
     _param->rho = 0.01;
     _param->lmd = Lambda;
+    _param->cd_rate = cd_rate;
     
     solution* sols;
     sols = sics_lhac(S, p, _param);

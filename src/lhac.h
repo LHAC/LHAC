@@ -107,6 +107,10 @@ typedef struct {
     
     /* rho in sd condition */
     double rho;
+    
+    /* max_cdpass = 1 + iter / cdrate */
+    /* best empirical value = 15  */
+    unsigned long cd_rate;
 } param;
 
 typedef struct {

@@ -17,6 +17,7 @@ unsigned long work_size;
 unsigned short max_iter;
 unsigned long max_inner_iter;
 double* lmd;
+unsigned long cd_rate;
 
 double opt_inner_tol;
 double opt_outer_tol;
@@ -892,15 +893,16 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         H_diag_2[ii] =  cblas_ddot(m, &Q[idx*m], 1, &Q_bar[jdx*m], 1);
     }
     
-    unsigned long max_cd_pass = std::min(1 + iter/3, max_inner_iter);
+//    unsigned long max_cd_pass = std::min(1 + iter/3, max_inner_iter);
+    unsigned long max_cd_pass = 1 + iter/cd_rate;
     unsigned long cd_pass;
     int sd_iters;
     
     for (sd_iters = 0; sd_iters < max_sd_iters; sd_iters++) {
         
-        if (sd_iters > 0) {
-            max_cd_pass = max_inner_iter;
-        }
+//        if (sd_iters > 0) {
+//            max_cd_pass = max_inner_iter;
+//        }
         
         double gama_scale = mu*gama;
         double dH_diag = gama_scale-mu0*gama;
@@ -1253,6 +1255,7 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
     max_inner_iter = prm->max_inner_iter;
     sd_flag = prm->sd_flag;
     rho = prm->rho;
+    cd_rate = prm->cd_rate;
     
     p_sics = _p;
     p_2 = p_sics*p_sics;
@@ -1366,7 +1369,7 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
         }
         else {
             memcpy(L_grad_prev, L_grad, p_2*sizeof(double));
-            suffcientDecrease_v2(S, w, newton_iter, lR,  L_grad, work_set, d_bar, H_diag,
+            suffcientDecrease(S, w, newton_iter, lR,  L_grad, work_set, d_bar, H_diag,
                               H_diag_2, w_prev, D);
         }
         
