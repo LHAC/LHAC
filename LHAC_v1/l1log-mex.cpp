@@ -6,31 +6,15 @@
 #include "myUtilities.h"
 #include "lhac.h"
 
-solution* libsvmExperiment(command_line_param* cparam)
+solution* libsvmExperiment(l1log_param* param)
 {
     // sparse format
     training_set_sp* Dset_sp = new training_set_sp;
-    readLibsvm(cparam->fileName, Dset_sp);
+    readLibsvm(param->fileName, Dset_sp);
     
     /* statistics of the problem */
     printf("p = %ld, N = %ld, nnz = %ld\n", Dset_sp->p, Dset_sp->N, Dset_sp->nnz);
     
-    l1log_param* param = new l1log_param;
-    param->l = 10;
-    param->work_size = 8000;
-    param->max_iter = cparam->max_iter;
-    param->lmd = cparam->lmd;
-    param->max_inner_iter = 100;
-    param->opt_inner_tol = 5*1e-6;
-    param->opt_outer_tol = cparam->opt_outer_tol;
-    param->max_linesearch_iter = 1000;
-    param->bbeta = 0.5;
-    param->ssigma = 0.001;
-    param->verbose = cparam->verbose;
-    param->sd_flag = cparam->sd_flag;
-    param->shrink = cparam->shrink;
-    param->fileName = cparam->fileName;
-    param->rho = cparam->rho;
     
     /* elapsed time (not cputime) */
     time_t start;
@@ -130,23 +114,41 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         cd_rate = mxGetScalar(tf);
     }
     
-    command_line_param* cparam = new command_line_param;
-    cparam->dense = 1;
-    cparam->randomData = 0;
-    cparam->random_p = 0;
-    cparam->random_N = 0;
-    cparam->max_iter = max_iter;
-    cparam->lmd = lambda;
-    cparam->opt_outer_tol = opt_outer_tol;
-    cparam->verbose = verbose;
-    cparam->sd_flag = sd_flag;
-    cparam->shrink = shrink;
-    cparam->fileName = filename;
-    cparam->rho = 0.01;
+//    command_line_param* cparam = new command_line_param;
+//    cparam->dense = 1;
+//    cparam->randomData = 0;
+//    cparam->random_p = 0;
+//    cparam->random_N = 0;
+//    cparam->max_iter = max_iter;
+//    cparam->lmd = lambda;
+//    cparam->opt_outer_tol = opt_outer_tol;
+//    cparam->verbose = verbose;
+//    cparam->sd_flag = sd_flag;
+//    cparam->shrink = shrink;
+//    cparam->fileName = filename;
+//    cparam->rho = 0.01;
+    
+    l1log_param* param = new l1log_param;
+    param->l = 10;
+    param->work_size = 8000;
+    param->max_iter = max_iter;
+    param->lmd = lambda;
+    param->max_inner_iter = 100;
+    param->opt_inner_tol = 5*1e-6;
+    param->opt_outer_tol = opt_outer_tol;
+    param->max_linesearch_iter = 1000;
+    param->bbeta = 0.5;
+    param->ssigma = 0.001;
+    param->verbose = verbose;
+    param->sd_flag = sd_flag;
+    param->shrink = shrink;
+    param->fileName = filename;
+    param->rho = 0.01;
+    param->cd_rate = cd_rate;
     
     solution* sols = NULL;
     
-    sols = libsvmExperiment(cparam);
+    sols = libsvmExperiment(param);
     
     //    printout("logs = ", sols, cparam);
     

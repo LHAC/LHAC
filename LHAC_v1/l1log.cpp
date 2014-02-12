@@ -786,7 +786,8 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
     /* mdl value change */
     dQ = 0;
     
-    unsigned long max_cd_pass = std::min(1 + iter/3, param->max_inner_iter);
+//    unsigned long max_cd_pass = std::min(1 + iter/3, param->max_inner_iter);
+    unsigned long max_cd_pass = 1 + iter / param->cd_rate;
 //    unsigned long max_cd_pass = param->max_inner_iter;
     unsigned long* permut = work_set->permut;
     ushort_pair_t* idxs = work_set->idxs;
@@ -795,9 +796,9 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
     
     for (sd_iters = 0; sd_iters < max_sd_iters; sd_iters++) {
         
-        if (sd_iters > 0) {
-            max_cd_pass = param->max_inner_iter;
-        }
+//        if (sd_iters > 0) {
+//            max_cd_pass = param->max_inner_iter;
+//        }
         
         /* track mdl value decrease by cd */
 //        d6 = 0;
@@ -813,8 +814,8 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
             
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
 //                unsigned long rii = rand()%(work_set->numActive);
-                unsigned long rii = randomCoordinateSelector(work_set->numActive);
-//                unsigned long rii = ii;
+//                unsigned long rii = randomCoordinateSelector(work_set->numActive);
+                unsigned long rii = ii;
 //                printf("%f, %f, %f\n", L_prob[rii], L_prob[rii-1], L_prob[rii+1]);
                 unsigned long idx = idxs[rii].j;
                 unsigned long idx_Q = permut[rii];

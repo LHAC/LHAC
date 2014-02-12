@@ -142,6 +142,8 @@ typedef struct {
     double shrink = 1; // gama = gama/shrink
     
     double rho;
+    
+    unsigned long cd_rate;
 } l1log_param;
 
 
