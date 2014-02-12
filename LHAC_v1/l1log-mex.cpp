@@ -6,8 +6,9 @@
 #include "myUtilities.h"
 #include "lhac.h"
 
-void libsvmExperiment(command_line_param* cparam, solution* sols)
+solution* libsvmExperiment(command_line_param* cparam)
 {
+    // sparse format
     training_set_sp* Dset_sp = new training_set_sp;
     readLibsvm(cparam->fileName, Dset_sp);
     
@@ -37,20 +38,23 @@ void libsvmExperiment(command_line_param* cparam, solution* sols)
     time(&start);
     double elapsedtime = 0;
     
-    
-    l1log* mdl = new l1log(Dset_sp, param);
-    
-    sols = lhac(mdl);
-    
-    
+    training_set* Dset = new training_set;
+    transformToDenseFormat(Dset, Dset_sp);
     releaseProb(Dset_sp);
+    
+    l1log* mdl = new l1log(Dset, param);
+    
+    solution* sols = lhac(mdl);
+    
+    
+    releaseProb(Dset);
     
     time(&end);
     elapsedtime = difftime(end, start);
     printf("%.f seconds\n", elapsedtime);
     
     delete param;
-    return;
+    return sols;
 }
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -127,7 +131,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     
     command_line_param* cparam = new command_line_param;
-    cparam->dense = 0;
+    cparam->dense = 1;
     cparam->randomData = 0;
     cparam->random_p = 0;
     cparam->random_N = 0;
@@ -142,7 +146,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     solution* sols = NULL;
     
-    libsvmExperiment(cparam, sols);
+    sols = libsvmExperiment(cparam);
     
     //    printout("logs = ", sols, cparam);
     
