@@ -11,6 +11,17 @@
 		D468136E183DB92200C17532 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D468136D183DB92200C17532 /* Accelerate.framework */; };
 		D480ECF116B58AD500BECB33 /* l1log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D480ECEF16B58AD500BECB33 /* l1log.cpp */; };
 		D491142017360E0E00F75EAD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D491141F17360E0E00F75EAD /* CoreFoundation.framework */; };
+		D49D5B6F18AB136E00D832AD /* l1log-mex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D49D5B6E18AB136E00D832AD /* l1log-mex.cpp */; };
+		D49D5B7818AB24EB00D832AD /* l1log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D480ECEF16B58AD500BECB33 /* l1log.cpp */; };
+		D49D5B7918AB24EB00D832AD /* l1log-mex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D49D5B6E18AB136E00D832AD /* l1log-mex.cpp */; };
+		D49D5B7B18AB24EB00D832AD /* lhac.h in Sources */ = {isa = PBXBuildFile; fileRef = D4FE842116BB6BD8004371C4 /* lhac.h */; };
+		D49D5B7C18AB24EB00D832AD /* lhac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4B48E2016C1EA3F00107AB3 /* lhac.cpp */; };
+		D49D5B7D18AB24EB00D832AD /* myUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D443207016C84F5400112D18 /* myUtilities.cpp */; };
+		D49D5B7E18AB24EB00D832AD /* myUtilities.h in Sources */ = {isa = PBXBuildFile; fileRef = D443207116C84F5400112D18 /* myUtilities.h */; };
+		D49D5B7F18AB24EB00D832AD /* Lbfgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4FE841A16B97155004371C4 /* Lbfgs.cpp */; };
+		D49D5B8018AB24EB00D832AD /* Lbfgs.h in Sources */ = {isa = PBXBuildFile; fileRef = D4FE841B16B97155004371C4 /* Lbfgs.h */; };
+		D49D5B8118AB24F100D832AD /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D468136D183DB92200C17532 /* Accelerate.framework */; };
+		D49D5B8218AB24F600D832AD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D491141F17360E0E00F75EAD /* CoreFoundation.framework */; };
 		D4B48E2116C1EA3F00107AB3 /* lhac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4B48E2016C1EA3F00107AB3 /* lhac.cpp */; };
 		D4FBD18316AD90C7006E7958 /* LHAC_v1.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = D4FBD18216AD90C7006E7958 /* LHAC_v1.1 */; };
 		D4FE841C16B97155004371C4 /* Lbfgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4FE841A16B97155004371C4 /* Lbfgs.cpp */; };
@@ -35,8 +46,9 @@
 		D443207116C84F5400112D18 /* myUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = myUtilities.h; sourceTree = "<group>"; };
 		D468136D183DB92200C17532 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		D480ECEF16B58AD500BECB33 /* l1log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l1log.cpp; sourceTree = "<group>"; };
-		D480ECF016B58AD500BECB33 /* l1log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = l1log.h; sourceTree = "<group>"; };
 		D491141F17360E0E00F75EAD /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		D49D5B6E18AB136E00D832AD /* l1log-mex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "l1log-mex.cpp"; sourceTree = "<group>"; };
+		D49D5B7418AB248F00D832AD /* l1log-mex.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "l1log-mex.mexmaci64"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4B48E2016C1EA3F00107AB3 /* lhac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lhac.cpp; sourceTree = "<group>"; };
 		D4FBD17C16AD90C7006E7958 /* LHAC_v1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LHAC_v1; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4FBD18216AD90C7006E7958 /* LHAC_v1.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = LHAC_v1.1; sourceTree = "<group>"; };
@@ -47,6 +59,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		D49D5B7118AB248F00D832AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D49D5B8218AB24F600D832AD /* CoreFoundation.framework in Frameworks */,
+				D49D5B8118AB24F100D832AD /* Accelerate.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D4FBD17916AD90C7006E7958 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -73,6 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				D4FBD17C16AD90C7006E7958 /* LHAC_v1 */,
+				D49D5B7418AB248F00D832AD /* l1log-mex.mexmaci64 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -82,7 +104,7 @@
 			children = (
 				D4FE841D16B99683004371C4 /* drive.cpp */,
 				D480ECEF16B58AD500BECB33 /* l1log.cpp */,
-				D480ECF016B58AD500BECB33 /* l1log.h */,
+				D49D5B6E18AB136E00D832AD /* l1log-mex.cpp */,
 				D4FE842116BB6BD8004371C4 /* lhac.h */,
 				D4B48E2016C1EA3F00107AB3 /* lhac.cpp */,
 				D443207016C84F5400112D18 /* myUtilities.cpp */,
@@ -96,7 +118,34 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		D49D5B7218AB248F00D832AD /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		D49D5B7318AB248F00D832AD /* l1log-mex */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D49D5B7518AB248F00D832AD /* Build configuration list for PBXNativeTarget "l1log-mex" */;
+			buildPhases = (
+				D49D5B7018AB248F00D832AD /* Sources */,
+				D49D5B7118AB248F00D832AD /* Frameworks */,
+				D49D5B7218AB248F00D832AD /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "l1log-mex";
+			productName = "l1log-mex";
+			productReference = D49D5B7418AB248F00D832AD /* l1log-mex.mexmaci64 */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 		D4FBD17B16AD90C7006E7958 /* LHAC_v1 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D4FBD18616AD90C7006E7958 /* Build configuration list for PBXNativeTarget "LHAC_v1" */;
@@ -136,11 +185,27 @@
 			projectRoot = "";
 			targets = (
 				D4FBD17B16AD90C7006E7958 /* LHAC_v1 */,
+				D49D5B7318AB248F00D832AD /* l1log-mex */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		D49D5B7018AB248F00D832AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D49D5B7818AB24EB00D832AD /* l1log.cpp in Sources */,
+				D49D5B7918AB24EB00D832AD /* l1log-mex.cpp in Sources */,
+				D49D5B7B18AB24EB00D832AD /* lhac.h in Sources */,
+				D49D5B7C18AB24EB00D832AD /* lhac.cpp in Sources */,
+				D49D5B7D18AB24EB00D832AD /* myUtilities.cpp in Sources */,
+				D49D5B7E18AB24EB00D832AD /* myUtilities.h in Sources */,
+				D49D5B7F18AB24EB00D832AD /* Lbfgs.cpp in Sources */,
+				D49D5B8018AB24EB00D832AD /* Lbfgs.h in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D4FBD17816AD90C7006E7958 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -149,6 +214,7 @@
 				D4FE841C16B97155004371C4 /* Lbfgs.cpp in Sources */,
 				D4FE841F16B99683004371C4 /* drive.cpp in Sources */,
 				D4B48E2116C1EA3F00107AB3 /* lhac.cpp in Sources */,
+				D49D5B6F18AB136E00D832AD /* l1log-mex.cpp in Sources */,
 				D443207216C84F5400112D18 /* myUtilities.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -156,6 +222,49 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		D49D5B7618AB248F00D832AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				EXECUTABLE_EXTENSION = mexmaci64;
+				EXECUTABLE_PREFIX = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D49D5B7718AB248F00D832AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				ENABLE_NS_ASSERTIONS = NO;
+				EXECUTABLE_EXTENSION = mexmaci64;
+				EXECUTABLE_PREFIX = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		D4FBD18416AD90C7006E7958 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -260,6 +369,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		D49D5B7518AB248F00D832AD /* Build configuration list for PBXNativeTarget "l1log-mex" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D49D5B7618AB248F00D832AD /* Debug */,
+				D49D5B7718AB248F00D832AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		D4FBD17616AD90C6006E7958 /* Build configuration list for PBXProject "LHAC_v1" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

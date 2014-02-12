@@ -11,7 +11,6 @@
 
 #include "lhac.h"
 #include "Lbfgs.h"
-#include "l1log.h"
 
 
 enum { ROW_MAJOR, COL_MAJOR };

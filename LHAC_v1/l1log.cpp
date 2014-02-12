@@ -6,7 +6,6 @@
 //  Copyright (c) 2013 Xiaocheng Tang. All rights reserved.
 //
 
-#include "l1log.h"
 #include "lhac.h"
 #include "myUtilities.h"
 

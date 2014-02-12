@@ -9,9 +9,23 @@
 #ifndef __LHAC_v1__Lbfgs__
 #define __LHAC_v1__Lbfgs__
 
-#include "lhac.h"
 
 #define MAX_SY_PAIRS 100
+
+typedef struct {
+    unsigned long i;
+    unsigned long j;
+    double vlt;
+} ushort_pair_t;
+
+typedef struct {
+    ushort_pair_t* idxs; //p*(p+1)/2
+    unsigned long* permut; //p
+    unsigned long* idxs_vec_l; // vectorized lower
+    unsigned long* idxs_vec_u; // vectorized upper
+    unsigned long numActive;
+    unsigned long _p_sics_;
+} work_set_struct;
 
 
 class LMatrix {
