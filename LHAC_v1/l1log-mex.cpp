@@ -15,7 +15,6 @@ solution* libsvmExperiment(l1log_param* param)
     /* statistics of the problem */
     printf("p = %ld, N = %ld, nnz = %ld\n", Dset_sp->p, Dset_sp->N, Dset_sp->nnz);
     
-    
     /* elapsed time (not cputime) */
     time_t start;
     time_t end;
@@ -29,7 +28,6 @@ solution* libsvmExperiment(l1log_param* param)
     l1log* mdl = new l1log(Dset, param);
     
     solution* sols = lhac(mdl);
-    
     
     releaseProb(Dset);
     
@@ -88,7 +86,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // sufficient decrease (default) or backtrack
     int sd_flag = 1;
     // max_cdpass = 1 + iter / cdrate
-    unsigned long cd_rate = 15;
+    unsigned long cd_rate = 6;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);
@@ -114,19 +112,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         cd_rate = mxGetScalar(tf);
     }
     
-//    command_line_param* cparam = new command_line_param;
-//    cparam->dense = 1;
-//    cparam->randomData = 0;
-//    cparam->random_p = 0;
-//    cparam->random_N = 0;
-//    cparam->max_iter = max_iter;
-//    cparam->lmd = lambda;
-//    cparam->opt_outer_tol = opt_outer_tol;
-//    cparam->verbose = verbose;
-//    cparam->sd_flag = sd_flag;
-//    cparam->shrink = shrink;
-//    cparam->fileName = filename;
-//    cparam->rho = 0.01;
     
     l1log_param* param = new l1log_param;
     param->l = 10;

@@ -60,6 +60,7 @@ void libsvmExperiment(command_line_param* cparam)
     param->shrink = cparam->shrink;
     param->fileName = cparam->fileName;
     param->rho = cparam->rho;
+    param->cd_rate = 5;
     
     /* elapsed time (not cputime) */
     time_t start;
@@ -118,7 +119,7 @@ void parse_command_line(int argc, const char * argv[],
 {
     
     // default value
-    cparam->dense = 0;
+    cparam->dense = 1;
     cparam->lmd = 1;
     cparam->max_iter = 400;
     cparam->randomData = 0;

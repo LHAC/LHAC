@@ -150,12 +150,7 @@ typedef struct {
 class l1log
 {
 public:
-    // H_diag, d_bar and D be allocated and initialized before function call
-    void coordinateDescent(double* Q_bar, double* Q,
-                           double gama, work_set_struct* work_set,
-                           unsigned short m);
     void coordinateDsecent(LBFGS* lR, work_set_struct* work_set);
-    void coordinateDsecent(LBFGS* lR, work_set_struct* work_set, double step_size);
     
     double suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu, solution* sols);
     
