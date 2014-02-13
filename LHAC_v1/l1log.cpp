@@ -894,7 +894,7 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)
     for (unsigned long k = 0, i = 0; i < work_set->numActive; i++, k += m) {
         H_diag[i] = gama;
         for (unsigned long j = 0, o = 0; j < m; j++, o += work_set->numActive)
-            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
+            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[k+j];
     }
     
     double z = 0.0;
@@ -906,13 +906,13 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)
     double wpd;
     double Hwd;
     
-    unsigned long max_inneriter;
-    max_inneriter = std::min(1 + iter/3, param->max_inner_iter);
+//    max_inneriter = std::min(1 + iter/3, param->max_inner_iter);
+    unsigned long max_cd_pass = 1 + iter / param->cd_rate;
     //    if (max_inneriter > (param->max_inner_iter)) {
     //        max_inneriter = param->max_inner_iter;
     //    }
     unsigned long* permut = work_set->permut;
-    for (unsigned long inneriter = 1; inneriter <= max_inneriter; inneriter++) {
+    for (unsigned long inneriter = 1; inneriter <= max_cd_pass; inneriter++) {
         double diffd = 0;
         double normd = 0;
         
@@ -922,11 +922,13 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)
         for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
             unsigned long idx = idxs[ii].j;
             unsigned long idx_Q = permut[ii];
+            unsigned long Q_idx_m = idx_Q*m;
 //            unsigned long idx_Q = idx;
             
             //            printout("d_bar = ", d_bar, m, FULL);
 //            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[idx], (int)p, d_bar, 1);
-            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[idx_Q], (int)work_set->numActive, d_bar, 1);
+//            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[idx_Q], (int)work_set->numActive, d_bar, 1);
+            Hd_j = gama*D[idx] - cblas_ddot(m, &Q[Q_idx_m], 1, d_bar, 1);
 //            Hd_j = lR->computeHdj(D[idx], d_bar, idx);
             //            Hd_j = gama*D[idx];
             //            for (unsigned long k = 0, j = 0; j < m; j++, k+=p)
@@ -948,7 +950,7 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)
             D[idx] = D[idx] + z;
             
 //            lR->updateDbar(d_bar, idx, z);
-            for (unsigned long k = idx_Q*m, j = 0; j < m; j++)
+            for (unsigned long k = Q_idx_m, j = 0; j < m; j++)
 //            for (unsigned long k = idx*m, j = 0; j < m; j++)
                 d_bar[j] = d_bar[j] + z*Q_bar[k+j];
             
@@ -976,7 +978,7 @@ void l1log::coordinateDsecent(LBFGS* lR, work_set_struct* work_set)
             break;
         }
         
-        shuffle( work_set );
+//        shuffle( work_set );
     }
     
     //    printout(D, p);
