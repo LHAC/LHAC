@@ -88,10 +88,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // max_cdpass = 1 + iter / cdrate
     unsigned long cd_rate = 6;
     // for greedy active set
-    // set to a large number so that all is selected (default)
-    unsigned long work_size = 10000;
-    // active set strategy -- greedy (default)
-    unsigned long active_set = 1;
+    unsigned long work_size = 300;
+    // active set strategy -- standard (default)
+    unsigned long active_set = STD;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);

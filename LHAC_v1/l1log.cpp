@@ -283,7 +283,7 @@ void l1log::computeWorkSet( work_set_struct* &work_set )
             break;
             
         default:
-            greedySelector(work_set);
+            stdSelector(work_set);
             break;
     }
     
@@ -346,14 +346,19 @@ void l1log::greedySelector( work_set_struct* &work_set )
     
     qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
 
+    unsigned long nnz = 0;
+    
     numActive = (numActive<work_size)?numActive:work_size;
     for (unsigned long j = 0; j < p; j++) {
         if (w[j] != 0) {
             idxs[numActive].i = j;
             idxs[numActive].j = j;
             numActive++;
+            nnz++;
         }
     }
+    
+//    printf("nnz = %ld\n", nnz);
 
     work_set->numActive = numActive;
     

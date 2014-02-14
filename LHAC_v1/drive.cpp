@@ -46,7 +46,7 @@ void libsvmExperiment(command_line_param* cparam)
     
     l1log_param* param = new l1log_param;
     param->l = 10;
-    param->work_size = 100;
+    param->work_size = 3000;
     param->max_iter = cparam->max_iter;
     param->lmd = cparam->lmd;
     param->max_inner_iter = 100;
@@ -61,6 +61,8 @@ void libsvmExperiment(command_line_param* cparam)
     param->fileName = cparam->fileName;
     param->rho = cparam->rho;
     param->cd_rate = 5;
+    param->active_set = STD;
+//    param->active_set = GREEDY;
     
     /* elapsed time (not cputime) */
     time_t start;
