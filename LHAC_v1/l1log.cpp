@@ -273,36 +273,35 @@ l1log::~l1log()
 
 void l1log::computeWorkSet( work_set_struct* &work_set )
 {
+    switch (param->active_set) {
+        case GREEDY:
+            greedySelector(work_set);
+            break;
+            
+        case STD:
+            stdSelector(work_set);
+            break;
+            
+        default:
+            greedySelector(work_set);
+            break;
+    }
+    
+    
+    /* reset permutation */
+    for (unsigned long j = 0; j < work_set->numActive; j++) {
+        work_set->permut[j] = j;
+    }
+    return;
+}
+
+void l1log::stdSelector( work_set_struct* &work_set )
+{
     ushort_pair_t* &idxs = work_set->idxs;
     unsigned long numActive = 0;
     
     double lmd = param->lmd;
-    unsigned long work_size = param->work_size;
-    
-    /*** select rule 1 ***/
-//    for (unsigned long j = 0; j < p; j++) {
-//        double g = L_grad[j];
-//        if (w[j] == 0.0 && (fabs(g) > lmd)) {
-//            idxs[numActive].i = (unsigned short) j;
-//            idxs[numActive].j = (unsigned short) j;
-//            g = fabs(g) - lmd;
-//            idxs[numActive].vlt = fabs(g);
-//            numActive++;
-//        }
-//    }
-//    qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
-//    
-//    numActive = (numActive<work_size)?numActive:work_size;
-//    for (unsigned long j = 0; j < p; j++) {
-//        if (w[j] != 0) {
-//            idxs[numActive].i = j;
-//            idxs[numActive].j = j;
-//            numActive++;
-//        }
-//    }
-//    
-//    work_set->numActive = numActive;
-    
+//    unsigned long work_size = param->work_size;
     
     /*** select rule 2 ***/
     for (unsigned long j = 0; j < p; j++) {
@@ -310,35 +309,57 @@ void l1log::computeWorkSet( work_set_struct* &work_set )
         if (w[j] != 0.0 || (fabs(g) > lmd)) {
             idxs[numActive].i = (unsigned short) j;
             idxs[numActive].j = (unsigned short) j;
+//            g = fabs(g) - lmd;
+//            idxs[numActive].vlt = fabs(g);
+            numActive++;
+        }
+    }
+//    qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
+//    numActive = (numActive<work_size)?numActive:work_size;
+    
+    work_set->numActive = numActive;
+    
+    return;
+}
+
+void l1log::greedySelector( work_set_struct* &work_set )
+{
+    ushort_pair_t* &idxs = work_set->idxs;
+    unsigned long numActive = 0;
+    
+    double lmd = param->lmd;
+    unsigned long work_size = param->work_size;
+    
+    /*** select rule 1 ***/
+    for (unsigned long j = 0; j < p; j++) {
+        double g = L_grad[j];
+        if (w[j] == 0.0 && (fabs(g) > lmd)) {
+            idxs[numActive].i = (unsigned short) j;
+            idxs[numActive].j = (unsigned short) j;
             g = fabs(g) - lmd;
             idxs[numActive].vlt = fabs(g);
             numActive++;
         }
     }
+    
+//    printf("numActive = %ld\n", numActive);
+    
     qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
-    
-    numActive = (numActive<work_size)?numActive:work_size;
-    
-    work_set->numActive = numActive;
 
-    
-    
-    
-    /*** select rule 3 ***/
-//    for (unsigned long j = 0; j < p; j++) {
-//        idxs[numActive].i = (unsigned short) j;
-//        idxs[numActive].j = (unsigned short) j;
-//        numActive++;
-//    }
-//    
-//    work_set->numActive = numActive;
-    
-    /* reset permutation */
-    for (unsigned long j = 0; j < numActive; j++) {
-        work_set->permut[j] = j;
+    numActive = (numActive<work_size)?numActive:work_size;
+    for (unsigned long j = 0; j < p; j++) {
+        if (w[j] != 0) {
+            idxs[numActive].i = j;
+            idxs[numActive].j = j;
+            numActive++;
+        }
     }
+
+    work_set->numActive = numActive;
+    
     return;
 }
+
 
 double l1log::computeSubgradient()
 {

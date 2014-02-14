@@ -46,7 +46,7 @@ void libsvmExperiment(command_line_param* cparam)
     
     l1log_param* param = new l1log_param;
     param->l = 10;
-    param->work_size = 8000;
+    param->work_size = 100;
     param->max_iter = cparam->max_iter;
     param->lmd = cparam->lmd;
     param->max_inner_iter = 100;

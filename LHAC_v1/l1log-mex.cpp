@@ -87,6 +87,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int sd_flag = 1;
     // max_cdpass = 1 + iter / cdrate
     unsigned long cd_rate = 6;
+    // for greedy active set
+    // set to a large number so that all is selected (default)
+    unsigned long work_size = 10000;
+    // active set strategy -- greedy (default)
+    unsigned long active_set = 1;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);
@@ -111,11 +116,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (tf) {
         cd_rate = mxGetScalar(tf);
     }
+    tf = mxGetField(prhs[argIdx], 0, "w");
+    if (tf) {
+        work_size = mxGetScalar(tf);
+    }
+    tf = mxGetField(prhs[argIdx], 0, "a");
+    if (tf) {
+        active_set = mxGetScalar(tf);
+    }
     
     
     l1log_param* param = new l1log_param;
     param->l = 10;
-    param->work_size = 8000;
+    param->work_size = work_size;
     param->max_iter = max_iter;
     param->lmd = lambda;
     param->max_inner_iter = 100;
@@ -130,6 +143,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     param->fileName = filename;
     param->rho = 0.01;
     param->cd_rate = cd_rate;
+    param->active_set = active_set;
     
     solution* sols = NULL;
     

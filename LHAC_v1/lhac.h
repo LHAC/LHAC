@@ -31,6 +31,8 @@ enum { LHAC_MSG_NO=0, LHAC_MSG_MIN, LHAC_MSG_NEWTON, LHAC_MSG_CD, LHAC_MSG_LINE,
 
 enum{ ALG_L1LOG = 1, ALG_SICS };
 
+enum{  GREEDY= 1, STD };
+
 typedef struct {
     int index; // starting from 1 (not 0), ending with -1
     double value;
@@ -144,6 +146,9 @@ typedef struct {
     double rho;
     
     unsigned long cd_rate;
+    
+    // active set stragety
+    unsigned long active_set;
 } l1log_param;
 
 
@@ -220,6 +225,10 @@ private:
     double* y;
     
     int mode; // data format { LIBSVM, GENERAL }
+    
+    void greedySelector( work_set_struct* &work_set );
+    
+    void stdSelector( work_set_struct* &work_set );
     
     unsigned long randomCoordinateSelector(unsigned long range);
     
