@@ -82,7 +82,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // shrink -> gama = gama / shrink
     double shrink = 6;
     // max iterations
-    int max_iter = 500;
+    int max_iter = 5000;
     // sufficient decrease (default) or backtrack
     int sd_flag = 1;
     // max_cdpass = 1 + iter / cdrate

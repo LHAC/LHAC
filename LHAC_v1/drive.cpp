@@ -46,7 +46,7 @@ void libsvmExperiment(command_line_param* cparam)
     
     l1log_param* param = new l1log_param;
     param->l = 10;
-    param->work_size = 3000;
+    param->work_size = 1;
     param->max_iter = cparam->max_iter;
     param->lmd = cparam->lmd;
     param->max_inner_iter = 100;
@@ -132,7 +132,7 @@ void parse_command_line(int argc, const char * argv[],
     cparam->sd_flag = 1; // default using suffcient decrease
     cparam->shrink = 4; // default no shrink on gama
     cparam->rho = 0.5;
-    cparam->opt_outer_tol = 1e-6;
+    cparam->opt_outer_tol = 1e-7;
     
     // parse options
     int i;

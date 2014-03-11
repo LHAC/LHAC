@@ -322,6 +322,51 @@ void l1log::stdSelector( work_set_struct* &work_set )
     return;
 }
 
+//void l1log::greedySelector( work_set_struct* &work_set )
+//{
+//    ushort_pair_t* &idxs = work_set->idxs;
+//    unsigned long numActive = 0;
+//    
+//    double lmd = param->lmd;
+//    unsigned long work_size = param->work_size;
+//    
+//    /*** select rule 1 ***/
+//    for (unsigned long j = 0; j < p; j++) {
+//        double g = L_grad[j];
+//        if (w[j] == 0.0 && (fabs(g) > lmd)) {
+//            idxs[numActive].i = (unsigned short) j;
+//            idxs[numActive].j = (unsigned short) j;
+//            g = fabs(g) - lmd;
+//            idxs[numActive].vlt = fabs(g);
+//            numActive++;
+//        }
+//    }
+//    
+//
+//    
+//    qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
+//
+//    unsigned long nnz = 0;
+//    
+////    numActive = (numActive<work_size)?numActive:work_size;
+//    numActive = (numActive<work_size)?numActive:numActive / work_size;
+////    printf("numActive = %ld\n", numActive);
+//    for (unsigned long j = 0; j < p; j++) {
+//        if (w[j] != 0) {
+//            idxs[numActive].i = j;
+//            idxs[numActive].j = j;
+//            numActive++;
+//            nnz++;
+//        }
+//    }
+//    
+////    printf("nnz = %ld\n", nnz);
+//
+//    work_set->numActive = numActive;
+//    
+//    return;
+//}
+
 void l1log::greedySelector( work_set_struct* &work_set )
 {
     ushort_pair_t* &idxs = work_set->idxs;
@@ -330,41 +375,37 @@ void l1log::greedySelector( work_set_struct* &work_set )
     double lmd = param->lmd;
     unsigned long work_size = param->work_size;
     
-    /*** select rule 1 ***/
+    unsigned long zeroActive = 0;
+    
     for (unsigned long j = 0; j < p; j++) {
         double g = L_grad[j];
-        if (w[j] == 0.0 && (fabs(g) > lmd)) {
+        if (w[j] != 0.0 || (fabs(g) > lmd)) {
             idxs[numActive].i = (unsigned short) j;
             idxs[numActive].j = (unsigned short) j;
             g = fabs(g) - lmd;
             idxs[numActive].vlt = fabs(g);
             numActive++;
+            
+            if (w[j] == 0.0) {
+                zeroActive++;
+            }
         }
     }
     
-//    printf("numActive = %ld\n", numActive);
     
     qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
-
-    unsigned long nnz = 0;
     
-    numActive = (numActive<work_size)?numActive:work_size;
-    for (unsigned long j = 0; j < p; j++) {
-        if (w[j] != 0) {
-            idxs[numActive].i = j;
-            idxs[numActive].j = j;
-            numActive++;
-            nnz++;
-        }
-    }
+    //    numActive = (numActive<work_size)?numActive:work_size;
     
-//    printf("nnz = %ld\n", nnz);
-
+    // zerosActive small means found the nonzeros subspace
+    numActive = (zeroActive<10)?numActive:numActive / work_size;
+    printf("zero active = %ld\n", zeroActive);
+    printf("num active = %ld\n", numActive);
+    
     work_set->numActive = numActive;
     
     return;
 }
-
 
 double l1log::computeSubgradient()
 {
