@@ -154,6 +154,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double* normdf =NULL;
     double* cputime = NULL;
     uint32_t* iter = NULL;
+    unsigned long* numActive = NULL;
     
     int nlhIdx = 0;
     
@@ -181,6 +182,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         plhs[nlhIdx] = mxCreateDoubleMatrix(optsize, 1, mxREAL);
         normdf = mxGetPr(plhs[nlhIdx]);
         memcpy(normdf, sols->normgs, optsize*sizeof(double));
+        nlhIdx++;
+    }
+    if (nlhs > nlhIdx) {
+        mwSize dims[] = {optsize};
+        plhs[nlhIdx] = mxCreateNumericArray(1, dims, mxUINT64_CLASS, mxREAL);
+        numActive = (unsigned long *) mxGetData(plhs[nlhIdx]);
+        memcpy(numActive, sols->numActive, optsize*sizeof(unsigned long));
         nlhIdx++;
     }
     

@@ -59,6 +59,7 @@ typedef struct {
     double* fval;
     double* normgs;
     int* niter;
+    unsigned long* numActive;
     double cdTime;
     double lsTime;
     double lbfgsTime1;

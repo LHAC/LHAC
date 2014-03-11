@@ -26,6 +26,7 @@ solution* lhac(l1log* mdl)
     sols->normgs = new double[max_iter];
     sols->t = new double[max_iter];
     sols->niter = new int[max_iter];
+    sols->numActive = new unsigned long[max_iter];
     sols->cdTime = 0;
     sols->lbfgsTime1 = 0;
     sols->lbfgsTime2 = 0;
@@ -83,6 +84,7 @@ solution* lhac(l1log* mdl)
             sols->normgs[sols->size] = normsg;
             sols->t[sols->size] = elapsedTime;
             sols->niter[sols->size] = newton_iter;
+            sols->numActive[sols->size] = work_set->numActive;
             (sols->size)++;
         }
         if (mdl->MSG >= LHAC_MSG_NEWTON) {
