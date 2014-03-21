@@ -29,7 +29,7 @@ void sicsExperiment(command_line_param* cparam)
     
     double lmdi;
     _param->l = 10;
-    _param->work_size = 1000000;
+    _param->work_size = 100;
     _param->max_iter = cparam->max_iter;
     lmdi = cparam->lmd;
     _param->max_inner_iter = 50;

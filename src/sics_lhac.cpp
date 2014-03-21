@@ -73,65 +73,62 @@ static inline void shuffle( work_set_struct* work_set )
     return;
 }
 
-//int cmp_by_vlt(const void *a, const void *b)
-//{
-//    const ushort_pair_t *ia = (ushort_pair_t *)a;
-//    const ushort_pair_t *ib = (ushort_pair_t *)b;
-//    
-//    if (ib->vlt - ia->vlt > 0) {
-//        return 1;
-//    }
-//    else if (ib->vlt - ia->vlt < 0){
-//        return -1;
-//    }
-//    else
-//        return 0;
-//    
-//    //    return (int)(ib->vlt - ia->vlt);
-//}
-
-static inline void computeWorkSet( double* w, double* L_grad, work_set_struct* work_set, double* normsg )
+static inline void greedySelector( double* w, double* L_grad, work_set_struct* work_set, double* normsg )
 {
     ushort_pair_t* idxs = work_set->idxs;
-    unsigned long* idxs_vec_l = work_set->idxs_vec_l;
-    unsigned long* idxs_vec_u = work_set->idxs_vec_u;
-    unsigned long* permut = work_set->permut;
     unsigned long numActive = 0;
     
     double _normsg = 0.0;
-//    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += p_sics) {
-//        for (unsigned long j = 0; j <= i; j++) {
-//            double g = L_grad[k+j];
-//            if (w[k+j] == 0.0 && (fabs(g) > lmd[k+j])) {
-//                idxs[numActive].i = (unsigned short) i;
-//                idxs[numActive].j = (unsigned short) j;
-//                g = fabs(g) - lmd[k+j];
-//                idxs[numActive].vlt = fabs(g);
-//                numActive++;
-//                _normsg += fabs(g);
-//            }
-//            
-//            if (w[k+j] != 0.0) {
-//                if (w[k+j] > 0)
-//                    g += lmd[k+j];
-//                else
-//                    g -= lmd[k+j];
-//            }
-//            _normsg += fabs(g);
-//        }
-//    }
-//    qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
-//    
-//    numActive = (numActive<work_size)?numActive:work_size;
-//    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += p_sics) {
-//        for (unsigned long j = 0; j <= i; j++) {
-//            if (w[k+j] != 0) {
-//                idxs[numActive].i = (unsigned short) i;
-//                idxs[numActive].j = (unsigned short) j;
-//                numActive++;
-//            }
-//        }
-//    }
+    
+    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += p_sics) {
+        for (unsigned long j = 0; j <= i; j++) {
+            double g = L_grad[k+j];
+            if (w[k+j] == 0.0 && (fabs(g) > lmd[k+j])) {
+                idxs[numActive].i = (unsigned short) i;
+                idxs[numActive].j = (unsigned short) j;
+                g = fabs(g) - lmd[k+j];
+                idxs[numActive].vlt = fabs(g);
+                numActive++;
+                _normsg += fabs(g);
+            }
+
+            if (w[k+j] != 0.0) {
+                if (w[k+j] > 0)
+                    g += lmd[k+j];
+                else
+                    g -= lmd[k+j];
+                _normsg += fabs(g);
+            }
+            
+        }
+    }
+    qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
+
+    numActive = (numActive<work_size)?numActive:work_size;
+    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += p_sics) {
+        for (unsigned long j = 0; j <= i; j++) {
+            if (w[k+j] != 0) {
+                idxs[numActive].i = (unsigned short) i;
+                idxs[numActive].j = (unsigned short) j;
+                numActive++;
+            }
+        }
+    }
+    
+    *normsg = _normsg;
+    
+    work_set->numActive = numActive;
+    
+    return;
+}
+
+static inline void stdSelector( double* w, double* L_grad, work_set_struct* work_set, double* normsg )
+{
+    ushort_pair_t* idxs = work_set->idxs;
+    unsigned long numActive = 0;
+    
+    double _normsg = 0.0;
+    
     
     for (unsigned long k = 0, i = 0; i < p_sics; i++, k += p_sics) {
         for (unsigned long j = 0; j <= i; j++) {
@@ -152,30 +149,32 @@ static inline void computeWorkSet( double* w, double* L_grad, work_set_struct* w
         }
     }
     
-//    qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
-    
-    
-    /* debug */
-//    numActive = 0;
-//    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += p_sics) {
-//        for (unsigned long j = 0; j <= i; j++) {
-//            idxs[numActive].i = (unsigned short) i;
-//            idxs[numActive].j = (unsigned short) j;
-//            numActive++;
-//        }
-//    }
+    *normsg = _normsg;
     
     work_set->numActive = numActive;
     
-    for (unsigned long ii = 0; ii < numActive; ii++) {
+    return;
+}
+
+static inline void computeWorkSet( double* w, double* L_grad, work_set_struct* work_set, double* normsg )
+{
+    stdSelector(w, L_grad, work_set, normsg);
+//    printf("normsg = %f\n", *normsg);
+//    greedySelector(w, L_grad, work_set, normsg);
+//    printf("normsg = %f\n", *normsg);
+    
+    ushort_pair_t* idxs = work_set->idxs;
+    unsigned long* idxs_vec_l = work_set->idxs_vec_l;
+    unsigned long* idxs_vec_u = work_set->idxs_vec_u;
+    unsigned long* permut = work_set->permut;
+    
+    for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
         unsigned long idx = idxs[ii].i;
         unsigned long jdx = idxs[ii].j;
         idxs_vec_u[ii] = jdx*p_sics + idx;
         idxs_vec_l[ii] = idx*p_sics + jdx;
         permut[ii] = ii;
     }
-    
-    *normsg = _normsg;
     
     return;
 }
@@ -1266,6 +1265,7 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
     sols->normgs = new double[max_iter];
     sols->t = new double[max_iter];
     sols->niter = new int[max_iter];
+    sols->numActive = new unsigned long[max_iter];
     sols->cdTime = 0;
     sols->lbfgsTime1 = 0;
     sols->lbfgsTime2 = 0;
@@ -1385,6 +1385,7 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
             sols->normgs[sols->size] = normsg;
             sols->t[sols->size] = elapsedTime;
             sols->niter[sols->size] = newton_iter;
+            sols->numActive[sols->size] = work_set->numActive;
             (sols->size)++;
         }
         
@@ -1424,6 +1425,7 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
     sols->normgs[sols->size] = normsg;
     sols->t[sols->size] = elapsedTime;
     sols->niter[sols->size] = newton_iter;
+    sols->numActive[sols->size] = work_set->numActive;
     (sols->size)++;
     
     sols->w = w;
