@@ -7,12 +7,10 @@
 //
 
 #include "Lbfgs.h"
+#include "liblapack.h"
 
 #include <string.h>
 #include <stdio.h>
-//#include <vecLib/clapack.h>
-//#include <vecLib/cblas.h>
-#include <Accelerate/Accelerate.h>
 
 #include "myUtilities.h"
 

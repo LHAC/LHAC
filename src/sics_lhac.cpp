@@ -8,6 +8,7 @@
 
 #include "sics_lhac.h"
 #include "myUtilities.h"
+#include "liblapack.h"
 #include <CoreFoundation/CoreFoundation.h>
 
 #include <time.h>
@@ -539,15 +540,7 @@ static inline double suffcientDecrease_v2(double* S, double* w, unsigned long it
     unsigned long* idxs_vec_l = work_set->idxs_vec_l;
     unsigned long* idxs_vec_u = work_set->idxs_vec_u;
     unsigned long* permut = work_set->permut;
-    
-    //    unsigned long _colsQ = p_sics + work_set->numActive;
-    
-    
-    //    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += m) {
-    //        H_diag[i] = mu0*gama;
-    //        for (unsigned long j = 0, o = 0; j < m; j++, o += _colsQ)
-    //            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
-    //    }
+
     
     for (unsigned long k = 0, i = 0; i < p_sics; i++, k += m) {
         H_diag[i] = mu0*gama;
@@ -555,13 +548,6 @@ static inline double suffcientDecrease_v2(double* S, double* w, unsigned long it
             H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[k+j];
     }
     
-    //    int cblas_M = (int) work_set->numActive + (int) p_sics;
-    //    int cblas_N = (int) m;
-    //    int cblas_lda = cblas_M;
-    //    write2mat("Qm.mat", "Qm", Q, (unsigned long) cblas_M, (unsigned long) cblas_N);
-    //    write2mat("Qm_bar.mat", "Qm_bar", Q_bar, cblas_N, cblas_M);
-    //    write2mat("w.mat", "w", w, p_2, 1);
-    //    write2mat("L_grad.mat", "L_grad", L_grad, p_2, 1);
     
     double z = 0.0;
     double Hd_j;
@@ -576,12 +562,6 @@ static inline double suffcientDecrease_v2(double* S, double* w, unsigned long it
     unsigned long ij;
     unsigned long ji;
     unsigned long Q_idx;
-    
-    //    for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
-    //        idx = idxs[ii].i;
-    //        jdx = idxs[ii].j;
-    //        H_diag_2[ii] =  cblas_ddot(m, &Q[idx], (int)_colsQ, &Q_bar[jdx*m], 1);
-    //    }
     
     for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
         idx = idxs[ii].i;
@@ -667,18 +647,6 @@ static inline double suffcientDecrease_v2(double* S, double* w, unsigned long it
         
         sols->cdTime += (CFAbsoluteTimeGetCurrent() - cdtime);
         
-        //        int* info = NULL;
-        //        f_trial = computeObject(S, D, L_grad, w_prev, w, info);
-        //        if (info != 0) {
-        //            mu = 2*mu;
-        //            continue;
-        //        }
-        //        for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
-        //            for (unsigned long j = 0; j <= i; j++) {
-        //                unsigned long ij = k + j;
-        //                w[ij] = w_prev[ij] + D[ij];
-        //            }
-        //        }
         
         fvaltime = CFAbsoluteTimeGetCurrent();
         
@@ -718,24 +686,6 @@ static inline double suffcientDecrease_v2(double* S, double* w, unsigned long it
             printf("\t \t \t # of line searches = %3d; no PSD!; gama_scale = %f\n", sd_iters, gama_scale);
             continue;
         }
-        
-        //        double l1normW1 = 0.0;
-        //        double trSW1 = 0.0;
-        //        for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
-        //            for (unsigned long j = 0; j < i; j++) {
-        //                unsigned long ij = k + j;
-        //                double wnew = w_prev[ij] + D[ij];
-        //                l1normW1 += fabs(wnew)*lmd[ij];
-        //                trSW1 += wnew*S[ij];
-        //            }
-        //        }
-        //        l1normW1 *= 2.0;
-        //        trSW1 *= 2.0;
-        //        for (unsigned long i = 0, k = 0; i < p_sics; i++, k += (p_sics+1)) {
-        //            double wnew = w_prev[k] + D[k];
-        //            l1normW1 += fabs(wnew)*lmd[k];
-        //            trSW1 += wnew*S[k];
-        //        }
         
         fvaltime = CFAbsoluteTimeGetCurrent();
         
@@ -843,14 +793,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
     unsigned long* idxs_vec_u = work_set->idxs_vec_u;
     unsigned long* permut = work_set->permut;
     
-//    unsigned long _colsQ = p_sics + work_set->numActive;
-    
-    
-//    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += m) {
-//        H_diag[i] = mu0*gama;
-//        for (unsigned long j = 0, o = 0; j < m; j++, o += _colsQ)
-//            H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[o+i];
-//    }
     
     for (unsigned long k = 0, i = 0; i < p_sics; i++, k += m) {
         H_diag[i] = mu0*gama;
@@ -858,13 +800,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
             H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[k+j];
     }
     
-//    int cblas_M = (int) work_set->numActive + (int) p_sics;
-//    int cblas_N = (int) m;
-//    int cblas_lda = cblas_M;
-//    write2mat("Qm.mat", "Qm", Q, (unsigned long) cblas_M, (unsigned long) cblas_N);
-//    write2mat("Qm_bar.mat", "Qm_bar", Q_bar, cblas_N, cblas_M);
-//    write2mat("w.mat", "w", w, p_2, 1);
-//    write2mat("L_grad.mat", "L_grad", L_grad, p_2, 1);
     
     double z = 0.0;
     double Hd_j;
@@ -880,12 +815,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
     unsigned long ji;
     unsigned long Q_idx;
     
-//    for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
-//        idx = idxs[ii].i;
-//        jdx = idxs[ii].j;
-//        H_diag_2[ii] =  cblas_ddot(m, &Q[idx], (int)_colsQ, &Q_bar[jdx*m], 1);
-//    }
-    
     for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
         idx = idxs[ii].i;
         jdx = idxs[ii].j;
@@ -898,10 +827,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
     int sd_iters;
     
     for (sd_iters = 0; sd_iters < max_sd_iters; sd_iters++) {
-        
-//        if (sd_iters > 0) {
-//            max_cd_pass = max_inner_iter;
-//        }
         
         double gama_scale = mu*gama;
         double dH_diag = gama_scale-mu0*gama;
@@ -969,27 +894,12 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
             if (msgFlag >= LHAC_MSG_CD) {
                 printf("\t\t Coordinate descent pass %3ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
                        cd_pass, diffd, normd);
-//                f_mdl = computeModelValue(D, L_grad, d_bar, w_prev, lR, work_set, mu);
-//                printf("\t\t f_mdl = %.5e\n", f ,_mdl);
             }
             
 //            shuffle( work_set );
 
         }
         sols->cdTime += (CFAbsoluteTimeGetCurrent() - cdtime);
-        
-//        int* info = NULL;
-//        f_trial = computeObject(S, D, L_grad, w_prev, w, info);
-//        if (info != 0) {
-//            mu = 2*mu;
-//            continue;
-//        }
-//        for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
-//            for (unsigned long j = 0; j <= i; j++) {
-//                unsigned long ij = k + j;
-//                w[ij] = w_prev[ij] + D[ij];
-//            }
-//        }
         
         fvaltime = CFAbsoluteTimeGetCurrent();
         
