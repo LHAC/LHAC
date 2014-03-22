@@ -395,9 +395,11 @@ static inline double computeObject(const double* S, double* D, double* L_grad, d
         }
     }
     
-    int p0 = (int) p_sics;
+//    int p0 = (int) p_sics;
 //    ptrdiff_t p0 = p_sics;
-    dpotrf_((char*) "U", &p0, w, &p0, info);
+//    dpotrf_((char*) "U", &p0, w, &p0, info);
+    
+    lcdpotrf_(w, p_sics, info);
     if (*info != 0) {
         return 0;
     }
@@ -687,9 +689,11 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         }
         
         gvaltime = CFAbsoluteTimeGetCurrent();
-        int p0 = (int) p_sics;
+//        int p0 = (int) p_sics;
+//        int info;
+//        dpotrf_((char*) "U", &p0, w, &p0, &info);
         int info;
-        dpotrf_((char*) "U", &p0, w, &p0, &info);
+        lcdpotrf_(w, p_sics, &info);
         (sols->record1)++;
         sols->gvalTime += CFAbsoluteTimeGetCurrent() - gvaltime;
         
@@ -746,9 +750,11 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
             trSW = trSW1;
             
             gvaltime = CFAbsoluteTimeGetCurrent();
+//            int info;
+//            int p0 = (int) p_sics;
+//            dpotri_((char*) "U", &p0, w, &p0, &info);
             int info;
-            int p0 = (int) p_sics;
-            dpotri_((char*) "U", &p0, w, &p0, &info);
+            lcdpotri_(w, p_sics, &info);
             sols->gvalTime += CFAbsoluteTimeGetCurrent() - gvaltime;
             (sols->record1)++;
             
