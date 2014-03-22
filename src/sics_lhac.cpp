@@ -7,10 +7,10 @@
 //
 
 #include "sics_lhac.h"
-#include "myUtilities.h"
 #include "liblapack.h"
 #include "timing.h"
-
+#include "lhac.h"
+#include "Lbfgs.h"
 
 
 unsigned long work_size;
@@ -45,6 +45,24 @@ double rho;
 double mu0=1.0;
 
 solution* sols;
+
+int cmp_by_vlt(const void *a, const void *b)
+{
+    const ushort_pair_t *ia = (ushort_pair_t *)a;
+    const ushort_pair_t *ib = (ushort_pair_t *)b;
+    
+    if (ib->vlt - ia->vlt > 0) {
+        return 1;
+    }
+    else if (ib->vlt - ia->vlt < 0){
+        return -1;
+    }
+    else
+        return 0;
+    
+    //    return (int)(ib->vlt - ia->vlt);
+}
+
 
 static inline void shuffle( work_set_struct* work_set )
 {

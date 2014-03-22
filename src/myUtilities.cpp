@@ -610,17 +610,6 @@ void writeToFile(training_set* Dset)
     return;
 }
 
-void releaseSolution(solution* sols)
-{
-    delete [] sols->fval;
-    delete [] sols->normgs;
-    delete [] sols->t;
-    delete [] sols->niter;
-    delete [] sols->w;
-    delete sols;
-    
-    return;
-}
 
 void printout(const char* desc, solution* sols, param* param)
 {
@@ -755,22 +744,6 @@ void transformToDenseFormat(training_set* Dset, training_set_sp* Dset_sp)
     return;
 }
 
-int cmp_by_vlt(const void *a, const void *b)
-{
-    const ushort_pair_t *ia = (ushort_pair_t *)a;
-    const ushort_pair_t *ib = (ushort_pair_t *)b;
-    
-    if (ib->vlt - ia->vlt > 0) {
-        return 1;
-    }
-    else if (ib->vlt - ia->vlt < 0){
-        return -1;
-    }
-    else
-        return 0;
-    
-    //    return (int)(ib->vlt - ia->vlt);
-}
 
 void readTextFile(const char* filename, double* &S, unsigned long* _p)
 {

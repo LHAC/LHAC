@@ -22,26 +22,26 @@ enum { LHAC_MSG_NO=0, LHAC_MSG_MIN, LHAC_MSG_NEWTON, LHAC_MSG_CD, LHAC_MSG_LINE,
 
 enum{ ALG_L1LOG = 1, ALG_SICS };
 
-typedef struct {
-    int index; // starting from 1 (not 0), ending with -1
-    double value;
-} feature_node;
-
-typedef struct {
-    feature_node** X;
-    double* y;
-    unsigned long p;
-    unsigned long N;
-    unsigned long nnz; // number of nonzeros
-    feature_node* x_space;
-} training_set_sp;
-
-typedef struct {
-    double* X;
-    double* y;
-    unsigned long p;
-    unsigned long N;
-} training_set;
+//typedef struct {
+//    int index; // starting from 1 (not 0), ending with -1
+//    double value;
+//} feature_node;
+//
+//typedef struct {
+//    feature_node** X;
+//    double* y;
+//    unsigned long p;
+//    unsigned long N;
+//    unsigned long nnz; // number of nonzeros
+//    feature_node* x_space;
+//} training_set_sp;
+//
+//typedef struct {
+//    double* X;
+//    double* y;
+//    unsigned long p;
+//    unsigned long N;
+//} training_set;
 
 typedef struct {
     double* t;
@@ -66,6 +66,18 @@ typedef struct {
     double* w;
     int p_sics; //dimension of w
 } solution;
+
+inline void releaseSolution(solution* sols)
+{
+    delete [] sols->fval;
+    delete [] sols->normgs;
+    delete [] sols->t;
+    delete [] sols->niter;
+    delete [] sols->w;
+    delete sols;
+    
+    return;
+}
 
 typedef struct {
     unsigned long i;

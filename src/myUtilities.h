@@ -50,13 +50,12 @@ void writeToFile(training_set* Dset);
 
 void readLibsvm(const char *filename, training_set_sp* Dset_col);
 
-void releaseSolution(solution* sols);
 
 void transformToSparseFormat(training_set* Dset, training_set_sp* Dset_sp);
 
 void transformToDenseFormat(training_set* Dset, training_set_sp* Dset_sp);
 
-int cmp_by_vlt(const void *a, const void *b);
+
 
 void readTextFile(const char* filename, double* &S, unsigned long* _p);
 

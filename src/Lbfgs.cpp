@@ -12,7 +12,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "myUtilities.h"
 
 LMatrix::LMatrix(unsigned long s1, unsigned long s2)
 {

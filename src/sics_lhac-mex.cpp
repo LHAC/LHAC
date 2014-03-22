@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "sics_lhac.h"
-#include "myUtilities.h"
+
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
