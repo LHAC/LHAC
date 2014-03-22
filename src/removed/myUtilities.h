@@ -29,31 +29,11 @@ void printout(const char* desc, LMatrix* x);
 
 void printout(const char* desc, LMatrix* x, int mode);
 
-void printout(const char* desc, training_set_sp* Dset, int mode);
-
 void printout(const char* desc, solution* sols, param* param);
 
 
 double norm(double* x, unsigned long s1);
 
-void generateRandomProb(training_set* Dset,
-                        unsigned long p, unsigned long N, double nnz_percent);
-
-void generateRandomProb(training_set_sp* Dset_sp, training_set* Dset,
-                        unsigned long p, unsigned long N, double nnz_percent);
-
-void releaseProb(training_set* Dset);
-
-void releaseProb(training_set_sp* Dset);
-
-void writeToFile(training_set* Dset);
-
-void readLibsvm(const char *filename, training_set_sp* Dset_col);
-
-
-void transformToSparseFormat(training_set* Dset, training_set_sp* Dset_sp);
-
-void transformToDenseFormat(training_set* Dset, training_set_sp* Dset_sp);
 
 
 
@@ -67,7 +47,6 @@ void write2mat(const char* fileName, const char* name,
 
 void write2mat(const char* fileName, const char* name, LMatrix* x);
 
-void readMatFiles(const char* fileName, training_set* Dset);
 #endif
 
 

@@ -6,10 +6,14 @@
 //  Copyright (c) 2013 Xiaocheng Tang. All rights reserved.
 //
 
+#include <math.h>
+#include <string.h>
+#include <stdlib.h>
+#include <algorithm>
+
 #include "sics_lhac.h"
 #include "liblapack.h"
 #include "timing.h"
-#include "lhac.h"
 #include "Lbfgs.h"
 
 
@@ -46,22 +50,6 @@ double mu0=1.0;
 
 solution* sols;
 
-int cmp_by_vlt(const void *a, const void *b)
-{
-    const ushort_pair_t *ia = (ushort_pair_t *)a;
-    const ushort_pair_t *ib = (ushort_pair_t *)b;
-    
-    if (ib->vlt - ia->vlt > 0) {
-        return 1;
-    }
-    else if (ib->vlt - ia->vlt < 0){
-        return -1;
-    }
-    else
-        return 0;
-    
-    //    return (int)(ib->vlt - ia->vlt);
-}
 
 
 static inline void shuffle( work_set_struct* work_set )
@@ -321,9 +309,13 @@ static inline void lineSearch(const double* S, double* D, double* L_grad, double
 //            }
 //        }
 //        write2mat("w1.mat", "w1", w, p_2, 1);
+//        int info = 0;
+//        int p0 = (int) p_sics;
+//        dpotrf_((char*) "U", &p0, w, &p0, &info);
+        
         int info = 0;
-        int p0 = (int) p_sics;
-        dpotrf_((char*) "U", &p0, w, &p0, &info);
+        lcdpotrf_(w, p_sics, &info);
+        
         (sols->record1)++;
         if (info != 0) {
             a *= bbeta;
@@ -350,9 +342,12 @@ static inline void lineSearch(const double* S, double* D, double* L_grad, double
 //    ptrdiff_t p0 = p_sics;
 //    dpotri_((char*) "U", (int *)&p0, w, (int *)&p0, (int *)&info);
     
-    int info;
-    int p0 = (int) p_sics;
-    dpotri_((char*) "U", &p0, w, &p0, &info);
+//    int info;
+//    int p0 = (int) p_sics;
+//    dpotri_((char*) "U", &p0, w, &p0, &info);
+    
+    int info = 0;
+    lcdpotri_(w, p_sics, &info);
     
     // fill in the lower triangle
     for (unsigned long i = 0; i < p_sics; i++) {
@@ -401,6 +396,7 @@ static inline double computeObject(const double* S, double* D, double* L_grad, d
     }
     
     int p0 = (int) p_sics;
+//    ptrdiff_t p0 = p_sics;
     dpotrf_((char*) "U", &p0, w, &p0, info);
     if (*info != 0) {
         return 0;

@@ -9,39 +9,14 @@
 #ifndef __LHAC_v1__lhac__
 #define __LHAC_v1__lhac__
 
-#include <time.h>
-#include <math.h>
 
 #define MAX_LENS 1024
 
 #define __MATLAB_API__
 
-enum { FULL, COL_VIEW, ROW_VIEW };
 
 enum { LHAC_MSG_NO=0, LHAC_MSG_MIN, LHAC_MSG_NEWTON, LHAC_MSG_CD, LHAC_MSG_LINE, LHAC_MSG_MAX };
 
-enum{ ALG_L1LOG = 1, ALG_SICS };
-
-//typedef struct {
-//    int index; // starting from 1 (not 0), ending with -1
-//    double value;
-//} feature_node;
-//
-//typedef struct {
-//    feature_node** X;
-//    double* y;
-//    unsigned long p;
-//    unsigned long N;
-//    unsigned long nnz; // number of nonzeros
-//    feature_node* x_space;
-//} training_set_sp;
-//
-//typedef struct {
-//    double* X;
-//    double* y;
-//    unsigned long p;
-//    unsigned long N;
-//} training_set;
 
 typedef struct {
     double* t;
@@ -84,6 +59,23 @@ typedef struct {
     unsigned long j;
     double vlt;
 } ushort_pair_t;
+
+inline int cmp_by_vlt(const void *a, const void *b)
+{
+    const ushort_pair_t *ia = (ushort_pair_t *)a;
+    const ushort_pair_t *ib = (ushort_pair_t *)b;
+    
+    if (ib->vlt - ia->vlt > 0) {
+        return 1;
+    }
+    else if (ib->vlt - ia->vlt < 0){
+        return -1;
+    }
+    else
+        return 0;
+    
+    //    return (int)(ib->vlt - ia->vlt);
+}
 
 typedef struct {
     ushort_pair_t* idxs; //p*(p+1)/2

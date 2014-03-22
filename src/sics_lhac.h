@@ -9,7 +9,7 @@
 #ifndef __LHAC_v1__sics_lhac__
 #define __LHAC_v1__sics_lhac__
 
-#include <iostream>
+
 #include "lhac.h"
 
 

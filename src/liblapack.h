@@ -11,6 +11,26 @@
 
 #ifdef __APPLE__
 #include <Accelerate/Accelerate.h>
+
+inline void lcdpotrf_(double* w, unsigned long n, int* _info) {
+    __CLPK_integer info = 0;
+    __CLPK_integer p0 = n;
+    dpotrf_((char*) "U", &p0, w, &p0, &info);
+    
+    *_info = info;
+}
+
+inline void lcdpotri_(double* w, unsigned long n, int* _info) {
+    __CLPK_integer info = 0;
+    __CLPK_integer p0 = n;
+    dpotri_((char*) "U", &p0, w, &p0, &info);
+    
+    *_info = info;
+}
+
+
+
+
 #else
 #include "lapack.h"
 #include "blas.h"
