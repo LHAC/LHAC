@@ -11,10 +11,11 @@
 #include <stdlib.h>
 #include <algorithm>
 
-#include "sics_lhac.h"
+
 #include "liblapack.h"
 #include "timing.h"
 #include "Lbfgs.h"
+#include "sics_lhac.h"
 
 
 unsigned long work_size;

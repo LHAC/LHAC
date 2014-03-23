@@ -13,6 +13,7 @@
 #define MAX_LENS 1024
 
 #if defined(LANG_M) || defined(MATLAB_MEX_FILE)
+#include <mex.h>
 #define MSG mexPrintf
 #endif
 
@@ -21,6 +22,7 @@
 #endif
 
 #define __MATLAB_API__
+
 
 
 enum { LHAC_MSG_NO=0, LHAC_MSG_MIN, LHAC_MSG_NEWTON, LHAC_MSG_CD, LHAC_MSG_LINE, LHAC_MSG_MAX };

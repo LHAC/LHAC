@@ -151,7 +151,7 @@ LBFGS::LBFGS(unsigned long _p, unsigned short _l, double _s)
     
     buff = new double[p];
     
-    lwork = MAX_SY_PAIRS*MAX_SY_PAIRS;
+//    lwork = MAX_SY_PAIRS*MAX_SY_PAIRS;
 }
 
 void LBFGS::initData(double *w, double *w_prev, double *L_grad, double *L_grad_prev)
@@ -361,9 +361,13 @@ void LBFGS::computeLowRankApprox_v2(work_set_struct* work_set)
     /* solve R*Q_bar = Q' for Q_bar */
     double et = clock();
     
-    int info;
-    dgetrf_(&_2cols, &_2cols, R, &_2cols, ipiv, &info);
-    dgetri_(&_2cols, R, &_2cols, ipiv, work, &lwork, &info);
+//    int info;
+//    dgetrf_(&_2cols, &_2cols, R, &_2cols, ipiv, &info);
+//    dgetri_(&_2cols, R, &_2cols, ipiv, work, &lwork, &info);
+//    lcdgetrf_(R, _2cols, &info);
+//    lcdgetri_(R, _2cols, &info);
+    inverse(R, _2cols);
+    
     /* R now store R-1 */
     int cblas_N = (int) work_set->numActive + p_sics;
 //    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, cblas_N, 0.0, Q_bar, _2cols);

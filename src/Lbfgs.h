@@ -11,8 +11,6 @@
 
 #include "lhac.h"
 
-#define MAX_SY_PAIRS 100
-
 
 class LMatrix {
 public:
@@ -91,12 +89,6 @@ private:
     unsigned long p; // no. of rows in Q
     unsigned short l; // lbfgs param
     
-    
-    
-    /* for lapack */
-    int ipiv[MAX_SY_PAIRS+1];
-    int lwork;
-    double work[MAX_SY_PAIRS*MAX_SY_PAIRS];
     
     void computeQR();
     void computeQR_v2(work_set_struct* work_set);
