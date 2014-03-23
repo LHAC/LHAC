@@ -165,7 +165,7 @@ void LBFGS::initData(double *w, double *w_prev, double *L_grad, double *L_grad_p
     //    printout("Sm = ", Sm);
     
     double sTs;
-    sTs = cblas_ddot((int)p, buff, 1, buff, 1);
+    sTs = lcddot((int)p, buff, 1, buff, 1);
     STS->init(&sTs, 1, 1);
     
 //    write2mat("STS.mat", "STS", STS);
@@ -201,7 +201,7 @@ void LBFGS::computeQR_v2(work_set_struct* work_set)
     Tend = Tm->data[_cols-1];
     
     double vv = 0.0;
-    vv = cblas_ddot(_rows, Tend, 1, Tend, 1);
+    vv = lcddot(_rows, Tend, 1, Tend, 1);
     gama = vv / Dm[_cols-1] / shrink;
 //    gama = Dm[_cols-1] / vv;
     

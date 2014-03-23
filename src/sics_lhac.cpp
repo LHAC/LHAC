@@ -297,7 +297,7 @@ static inline void lineSearch(const double* S, double* D, double* L_grad, double
         }
         if (a == 1) {
             Delta = gradD + l1normW1 - l1normW;
-            printf("\t \t Delta = %+.3e\n", Delta);
+            MSG("\t \t Delta = %+.3e\n", Delta);
         }
 //        ptrdiff_t info = 0;
 //        ptrdiff_t p0 = p_sics;
@@ -319,7 +319,7 @@ static inline void lineSearch(const double* S, double* D, double* L_grad, double
         (sols->record1)++;
         if (info != 0) {
             a *= bbeta;
-            printf(" a = %f\n", a);
+            MSG(" a = %f\n", a);
             continue;
         }
         double logdetW1 = 0.0;
@@ -380,7 +380,7 @@ static inline void lineSearch(const double* S, double* D, double* L_grad, double
 //    write2mat("w.mat", "w", w, p_2, 1);
 //    write2mat("w_prev.mat", "w_prev", w_prev, p_2, 1);
 //    write2mat("L_grad.mat", "L_grad", L_grad, p_2, 1);
-//    printf(" f_current = %f\n", f_current);
+//    MSG(" f_current = %f\n", f_current);
     
     return;
 }
@@ -487,7 +487,7 @@ static inline double computeModelValue(double* D, double* L_grad, double* d_bar,
     vp2 *= 2.0;
     vp = vp1 + vp2;
     
-    order2 = mu*gama*cblas_ddot((int)p_2, D, 1, D, 1)-vp;
+    order2 = mu*gama*lcddot((int)p_2, D, 1, D, 1)-vp;
     order2 = order2*0.5;
     
 //    for (unsigned long i = 0; i < p_2; i++) {
@@ -512,7 +512,7 @@ static inline double computeModelValue(double* D, double* L_grad, double* d_bar,
 //        order1 += L_grad[k]*D[k];
     }
     
-    order1 = cblas_ddot((int)p_2, D, 1, L_grad, 1);
+    order1 = lcddot((int)p_2, D, 1, L_grad, 1);
     
     fval = trSW - logdetW + order1 + order2 + l1norm;
     
@@ -581,7 +581,7 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
     for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
         idx = idxs[ii].i;
         jdx = idxs[ii].j;
-        H_diag_2[ii] =  cblas_ddot(m, &Q[idx*m], 1, &Q_bar[jdx*m], 1);
+        H_diag_2[ii] =  lcddot(m, &Q[idx*m], 1, &Q_bar[jdx*m], 1);
     }
     
 //    unsigned long max_cd_pass = std::min(1 + iter/3, max_inner_iter);
@@ -610,7 +610,7 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
                 Q_idx = p_sics + permut[rii];
                 unsigned long Q_idx_m = Q_idx*m;
                 
-                Hd_j = gama_scale*D[ij] - cblas_ddot(m, &Q[Q_idx_m], 1, d_bar, 1);
+                Hd_j = gama_scale*D[ij] - lcddot(m, &Q[Q_idx_m], 1, d_bar, 1);
                 if (idx == jdx) {
                     G = Hd_j + L_grad[ij];
                     Gp = G + lmd[ij];
@@ -655,7 +655,7 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
             
             
             if (msgFlag >= LHAC_MSG_CD) {
-                printf("\t\t Coordinate descent pass %3ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
+                MSG("\t\t Coordinate descent pass %3ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
                        cd_pass, diffd, normd);
             }
             
@@ -701,7 +701,7 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         
         if (info != 0) {
             mu = 2*mu;
-            printf("\t \t \t # of line searches = %3d; no PSD!; gama_scale = %f\n", sd_iters, gama_scale);
+            MSG("\t \t \t # of line searches = %3d; no PSD!; gama_scale = %f\n", sd_iters, gama_scale);
             continue;
         }
         
@@ -739,11 +739,11 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         
         rho_trial = (f_trial-f_current)/(f_mdl-f_current);
         
-        printf("\t \t \t # of line searches = %3d; model quality: %+.3f; Delta = %+.3e\n", sd_iters, rho_trial, rho*(f_mdl - f_current));
+        MSG("\t \t \t # of line searches = %3d; model quality: %+.3f; Delta = %+.3e\n", sd_iters, rho_trial, rho*(f_mdl - f_current));
         
         if (rho_trial > rho) {
             
-            printf("\t \t \t function decrease = %+.5e; mu0 = %f\n", f_current - f_trial, mu0);
+            MSG("\t \t \t function decrease = %+.5e; mu0 = %f\n", f_current - f_trial, mu0);
             f_current = f_trial;
             l1normW = l1normW1;
             logdetW = logdetW1;
@@ -838,7 +838,7 @@ static inline void coordinateDescent(double* w, unsigned long iter, LBFGS* lR,  
     for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
         idx = idxs[ii].i;
         jdx = idxs[ii].j;
-        H_diag_2[ii] =  cblas_ddot(m, &Q[idx*m], 1, &Q_bar[jdx*m], 1);
+        H_diag_2[ii] =  lcddot(m, &Q[idx*m], 1, &Q_bar[jdx*m], 1);
     }
     
     unsigned long max_inneriter;
@@ -856,8 +856,7 @@ static inline void coordinateDescent(double* w, unsigned long iter, LBFGS* lR,  
             Q_idx = p_sics + permut[ii];
             unsigned long Q_idx_m = Q_idx*m;
             
-            
-            Hd_j = gama*D[ij] - cblas_ddot(m, &Q[Q_idx_m], 1, d_bar, 1);
+            Hd_j = gama*D[ij] - lcddot(m, &Q[Q_idx_m], 1, d_bar, 1);
             if (idx == jdx) {
                 G = Hd_j + L_grad[ij];
                 Gp = G + lmd[ij];
@@ -901,7 +900,7 @@ static inline void coordinateDescent(double* w, unsigned long iter, LBFGS* lR,  
         }
         
         if (msgFlag >= LHAC_MSG_CD) {
-            printf("\t\t Coordinate descent pass %ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
+            MSG("\t\t Coordinate descent pass %ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
                    inneriter, diffd, normd);
         }
         
@@ -1029,7 +1028,7 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
 
         double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
         if (msgFlag >= LHAC_MSG_NEWTON) {
-            printf("%.4e  iter %2d:   obj.f = %+.5e    obj.normsg = %+.4e   |work_set| = %ld\n",
+            MSG("%.4e  iter %2d:   obj.f = %+.5e    obj.normsg = %+.4e   |work_set| = %ld\n",
                    elapsedTime, newton_iter, f_current, normsg, work_set->numActive);
         }
         

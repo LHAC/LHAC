@@ -12,6 +12,14 @@
 
 #define MAX_LENS 1024
 
+#if defined(LANG_M) || defined(MATLAB_MEX_FILE)
+#define MSG mexPrintf
+#endif
+
+#ifndef MSG
+#define MSG printf
+#endif
+
 #define __MATLAB_API__
 
 
