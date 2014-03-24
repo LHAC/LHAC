@@ -10,9 +10,9 @@
 //:configuration = Debug
 OTHER_LDFLAGS = -lmex -lmx -lmat -undefined error
 //LD_RUNPATH_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64 ./
-HEADER_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/extern/include
-LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64
-LD_RUNPATH_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64 /Applications/MATLAB_R2010a.app/bin/maci64
+HEADER_SEARCH_PATHS = /Applications/MATLAB_R2013a.app/extern/include
+LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2013a.app/bin/maci64
+LD_RUNPATH_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64 /Applications/MATLAB_R2013a.app/bin/maci64
 
 
 

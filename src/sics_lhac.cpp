@@ -454,9 +454,17 @@ static inline double computeModelValue(double* D, double* L_grad, double* d_bar,
     
     int cblas_M = (int) work_set->numActive + (int) p_sics;
     int cblas_N = (int) m;
-    int cblas_lda = cblas_M;
+//    int cblas_lda = cblas_M;
 //    cblas_dgemv(CblasColMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_lda, d_bar, 1, 0.0, buffer, 1);
+    
+#ifdef __ACCELERATE__
     cblas_dgemv(CblasRowMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_N, d_bar, 1, 0.0, buffer, 1);
+#elif defined(blas_h)
+    dgemv((char*) "T");
+#endif
+
+
+//    lcdgemv(Q, d_bar, buffer, cblas_M, cblas_N);
 //    write2mat("Qm.mat", "Qm", Q, (unsigned long) cblas_M, (unsigned long) cblas_N);
 //    write2mat("Qm_bar.mat", "Qm_bar", Q_bar, cblas_N, cblas_M);
 //    write2mat("d_bar.mat", "d_bar", d_bar, cblas_N, 1);

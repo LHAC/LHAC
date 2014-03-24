@@ -11,6 +11,8 @@
 
 #define MAX_SY_PAIRS 100
 
+enum LC_MAT_ORDER {LCRowMajor=1000, LCColMajor};
+enum LC_MAT_TRANSPOSE {LCNoTrans=1100, LCTrans};
 
 #ifdef __APPLE__
 #include <Accelerate/Accelerate.h>
@@ -51,8 +53,32 @@ inline int inverse(double*w, int _n) {
 
 inline double lcddot(int n, double* dx, int incx, double* dy, int incy) {
     return cblas_ddot(n, dx, incx, dy, incy);
+
 }
 
+inline void lcdgemv(const enum LC_MAT_ORDER Order,
+                    const enum LC_MAT_TRANSPOSE TransA,
+                    char* trans, double* A,
+                    double* b, double* c,
+                    int m, int n)
+{
+    switch (Order) {
+        case LCRowMajor:
+            switch (TransA) {
+                case LCTrans:
+                    cblas_dgemv(CblasRowMajor, CblasNoTrans, m, n, 1.0, A, n, b, 1, 0.0, c, 1);
+                    break;
+                    
+                default:
+                    break;
+            }
+            break;
+            
+        default:
+            break;
+    }
+    
+}
 
 
 
@@ -97,6 +123,11 @@ inline double lcddot(int n, double* dx, int incx, double* dy, int incy) {
     ptrdiff_t _incx = (ptrdiff_t) incx;
     ptrdiff_t _incy = (ptrdiff_t) incy;
     return ddot(&_n, dx, &_incx, dy, &_incy);
+}
+
+inline void lcdgemv(double* A, double* b, double* c, int m, int n) {
+    
+    dgemv(CblasRowMajor, CblasNoTrans, m, n, 1.0, A, n, b, 1, 0.0, c, 1);
 }
 
 
