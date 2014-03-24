@@ -9,6 +9,7 @@
 #include "Lbfgs.h"
 #include "liblapack.h"
 
+#include <math.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -209,7 +210,7 @@ void LBFGS::computeQR_v2(work_set_struct* work_set)
     unsigned long* idxs_vec_u = work_set->idxs_vec_u;
     
     double et;
-    et = clock();
+//    et = clock();
     /* Q */
     //    printout("Sm =", Sm);
     double** S = Sm->data;
@@ -273,14 +274,14 @@ void LBFGS::computeQR_v2(work_set_struct* work_set)
     
     
     
-    et = (clock() - et)/CLOCKS_PER_SEC;
-    tQ += et;
+//    et = (clock() - et)/CLOCKS_PER_SEC;
+//    tQ += et;
     
     //    write2mat("Sm.mat", "Sm", Sm);
     //    write2mat("STS.mat", "STS", STS);
     
     
-    et = clock();
+//    et = clock();
     /* R */
     double* cl1;
     //    double* cl2;
@@ -341,8 +342,8 @@ void LBFGS::computeQR_v2(work_set_struct* work_set)
     for (unsigned short i = _cols, k = _cols*_2cols, j = 0; i < _2cols; i++, k += _2cols, j++) {
         R[k+i] = -Dm[j];
     }
-    et = (clock() - et)/CLOCKS_PER_SEC;
-    tR += et;
+//    et = (clock() - et)/CLOCKS_PER_SEC;
+//    tR += et;
     
     return;
     
@@ -359,7 +360,7 @@ void LBFGS::computeLowRankApprox_v2(work_set_struct* work_set)
     computeQR_v2(work_set);
     
     /* solve R*Q_bar = Q' for Q_bar */
-    double et = clock();
+//    double et = clock();
     
 //    int info;
 //    dgetrf_(&_2cols, &_2cols, R, &_2cols, ipiv, &info);
@@ -373,8 +374,8 @@ void LBFGS::computeLowRankApprox_v2(work_set_struct* work_set)
 //    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, cblas_N, 0.0, Q_bar, _2cols);
     cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, _2cols, 0.0, Q_bar, _2cols);
     
-    et = (clock() - et)/CLOCKS_PER_SEC;
-    tQ_bar += et;
+//    et = (clock() - et)/CLOCKS_PER_SEC;
+//    tQ_bar += et;
     
     m = _2cols;
     return;
@@ -406,7 +407,8 @@ void LBFGS::updateLBFGS(double* w, double* w_prev, double* L_grad, double* L_gra
     double* cl1 = Sm->data[Sm->cols-1];
     int cblas_N = (int) Tm->rows;
     int cblas_M = (int) Tm->cols;
-    cblas_dgemv(CblasRowMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Tm->data_space, cblas_N, cl1, 1, 0.0, buff, 1);
+//    cblas_dgemv(CblasRowMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Tm->data_space, cblas_N, cl1, 1, 0.0, buff, 1);
+    lcdgemv(CblasRowMajor, CblasNoTrans, Tm->data_space, cl1, buff, cblas_M, cblas_N);
     
     if (Sm->cols >= l) {
 //        write2mat("Sm.mat", "Sm", Sm);
@@ -432,7 +434,8 @@ void LBFGS::updateLBFGS(double* w, double* w_prev, double* L_grad, double* L_gra
         }
         
         /* permuting buff */
-        cblas_dgemv(CblasColMajor, CblasNoTrans, (int)l, (int)l, 1.0, permut_mx, (int)l, buff, 1, 0.0, buff2, 1);
+//        cblas_dgemv(CblasColMajor, CblasNoTrans, (int)l, (int)l, 1.0, permut_mx, (int)l, buff, 1, 0.0, buff2, 1);
+        lcdgemv(CblasColMajor, CblasNoTrans, permut_mx, buff, buff2, (int)l, (int)l);
         
 //        write2mat("permut_mx.mat", "permut_mx", permut_mx, l, l);
 //        write2mat("buff_permut.mat", "buff_permut", buff2, cblas_M, 1);
@@ -454,11 +457,13 @@ void LBFGS::updateLBFGS(double* w, double* w_prev, double* L_grad, double* L_gra
     cl1 = Sm->data[Sm->cols-1];
     cblas_N = (int) Sm->rows;
     cblas_M = (int) Sm->cols;
-    cblas_dgemv(CblasRowMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Sm->data_space, cblas_N, cl1, 1, 0.0, buff, 1);
+//    cblas_dgemv(CblasRowMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Sm->data_space, cblas_N, cl1, 1, 0.0, buff, 1);
+    lcdgemv(CblasRowMajor, CblasNoTrans, Sm->data_space, cl1, buff, cblas_M, cblas_N);
     
     if (Sm->cols >= l) {
         /* permuting buff */
-        cblas_dgemv(CblasColMajor, CblasNoTrans, (int)l, (int)l, 1.0, permut_mx, (int)l, buff, 1, 0.0, buff2, 1);
+//        cblas_dgemv(CblasColMajor, CblasNoTrans, (int)l, (int)l, 1.0, permut_mx, (int)l, buff, 1, 0.0, buff2, 1);
+        lcdgemv(CblasColMajor, CblasNoTrans, permut_mx, buff, buff2, (int)l, (int)l);
         
         memset(permut_mx, 0, l*l*sizeof(double));        
         

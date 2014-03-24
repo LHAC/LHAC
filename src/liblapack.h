@@ -14,6 +14,7 @@
 enum LC_MAT_ORDER {LCRowMajor=1000, LCColMajor};
 enum LC_MAT_TRANSPOSE {LCNoTrans=1100, LCTrans};
 
+
 #ifdef __APPLE__
 #include <Accelerate/Accelerate.h>
 
@@ -56,35 +57,29 @@ inline double lcddot(int n, double* dx, int incx, double* dy, int incy) {
 
 }
 
-inline void lcdgemv(const enum LC_MAT_ORDER Order,
-                    const enum LC_MAT_TRANSPOSE TransA,
-                    char* trans, double* A,
+
+inline void lcdgemv(const enum CBLAS_ORDER Order,
+                    const enum CBLAS_TRANSPOSE TransA,
+                    double* A,
                     double* b, double* c,
                     int m, int n)
 {
-    switch (Order) {
-        case LCRowMajor:
-            switch (TransA) {
-                case LCTrans:
-                    cblas_dgemv(CblasRowMajor, CblasNoTrans, m, n, 1.0, A, n, b, 1, 0.0, c, 1);
-                    break;
-                    
-                default:
-                    break;
-            }
-            break;
-            
-        default:
-            break;
-    }
-    
+    cblas_dgemv(Order, TransA, m, n, 1.0, A, n, b, 1, 0.0, c, 1);
 }
+
+
+
+
 
 
 
 #else
 #include "lapack.h"
 #include "blas.h"
+
+enum CBLAS_ORDER {CblasRowMajor=101, CblasColMajor=102 };
+enum CBLAS_TRANSPOSE {CblasNoTrans=111, CblasTrans=112, CblasConjTrans=113,
+	AtlasConj=114};
 
 #define cblas_dgemv dgemv_
 #define cblas_dgemm dgemm_
@@ -125,9 +120,48 @@ inline double lcddot(int n, double* dx, int incx, double* dy, int incy) {
     return ddot(&_n, dx, &_incx, dy, &_incy);
 }
 
-inline void lcdgemv(double* A, double* b, double* c, int m, int n) {
-    
-    dgemv(CblasRowMajor, CblasNoTrans, m, n, 1.0, A, n, b, 1, 0.0, c, 1);
+inline void lcdgemv(const enum CBLAS_ORDER Order,
+                    const enum CBLAS_TRANSPOSE TransA,
+                    double* A,
+                    double* b, double* c,
+                    int m, int n)
+{
+    switch (Order) {
+        case CblasRowMajor:
+            switch (TransA) {
+                case CblasNoTrans:
+                    ptrdiff_t blas_m = (ptrdiff_t) n;
+                    ptrdiff_t blas_n = (ptrdiff_t) m;
+                    double one = 1.0;
+                    double zero = 0.0;
+                    ptrdiff_t one_int = 1;
+                    dgemv_((char*) "T", &blas_m, &blas_n, &one, A, &blas_m, b, &one_int, &zero, c, &one_int);
+                    break;
+                    
+                default:
+                    break;
+            }
+            break;
+            
+        case CblasColMajor:
+            switch (TransA) {
+                case CblasNoTrans:
+                    ptrdiff_t blas_m = (ptrdiff_t) m;
+                    ptrdiff_t blas_n = (ptrdiff_t) n;
+                    double one = 1.0;
+                    double zero = 0.0;
+                    ptrdiff_t one_int = 1;
+                    dgemv_((char*) "N", &blas_m, &blas_n, &one, A, &blas_m, b, &one_int, &zero, c, &one_int);
+                    break;
+                    
+                default:
+                    break;
+            }
+            break;
+            
+        default:
+            break;
+    }
 }
 
 
