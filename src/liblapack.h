@@ -11,8 +11,6 @@
 
 #define MAX_SY_PAIRS 100
 
-enum LC_MAT_ORDER {LCRowMajor=1000, LCColMajor};
-enum LC_MAT_TRANSPOSE {LCNoTrans=1100, LCTrans};
 
 
 #ifdef __APPLE__
@@ -67,6 +65,10 @@ inline void lcdgemv(const enum CBLAS_ORDER Order,
     cblas_dgemv(Order, TransA, m, n, 1.0, A, n, b, 1, 0.0, c, 1);
 }
 
+inline void lcdgemm(double* A, double* B, double* C, int mA, int nB) {
+    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, mA, nB, mA, 1.0, A, mA, B, mA, 0.0, C, mA);
+}
+
 
 
 
@@ -81,8 +83,6 @@ enum CBLAS_ORDER {CblasRowMajor=101, CblasColMajor=102 };
 enum CBLAS_TRANSPOSE {CblasNoTrans=111, CblasTrans=112, CblasConjTrans=113,
 	AtlasConj=114};
 
-#define cblas_dgemv dgemv_
-#define cblas_dgemm dgemm_
 
 inline void lcdpotrf_(double* w, unsigned long n, int* _info) {
     ptrdiff_t info = 0;
@@ -126,15 +126,17 @@ inline void lcdgemv(const enum CBLAS_ORDER Order,
                     double* b, double* c,
                     int m, int n)
 {
+    ptrdiff_t blas_m;
+    ptrdiff_t blas_n;
+    double one = 1.0;
+    double zero = 0.0;
+    ptrdiff_t one_int = 1;
     switch (Order) {
         case CblasRowMajor:
             switch (TransA) {
                 case CblasNoTrans:
-                    ptrdiff_t blas_m = (ptrdiff_t) n;
-                    ptrdiff_t blas_n = (ptrdiff_t) m;
-                    double one = 1.0;
-                    double zero = 0.0;
-                    ptrdiff_t one_int = 1;
+                    blas_m = (ptrdiff_t) n;
+                    blas_n = (ptrdiff_t) m;
                     dgemv_((char*) "T", &blas_m, &blas_n, &one, A, &blas_m, b, &one_int, &zero, c, &one_int);
                     break;
                     
@@ -146,11 +148,8 @@ inline void lcdgemv(const enum CBLAS_ORDER Order,
         case CblasColMajor:
             switch (TransA) {
                 case CblasNoTrans:
-                    ptrdiff_t blas_m = (ptrdiff_t) m;
-                    ptrdiff_t blas_n = (ptrdiff_t) n;
-                    double one = 1.0;
-                    double zero = 0.0;
-                    ptrdiff_t one_int = 1;
+                    blas_m = (ptrdiff_t) m;
+                    blas_n = (ptrdiff_t) n;
                     dgemv_((char*) "N", &blas_m, &blas_n, &one, A, &blas_m, b, &one_int, &zero, c, &one_int);
                     break;
                     
@@ -162,6 +161,14 @@ inline void lcdgemv(const enum CBLAS_ORDER Order,
         default:
             break;
     }
+}
+
+inline void lcdgemm(double* A, double* B, double* C, int mA, int nB) {
+    ptrdiff_t _mA = (ptrdiff_t) mA;
+    ptrdiff_t _nB = (ptrdiff_t) nB;
+    double one = 1.0;
+    double zero = 0.0;
+    dgemm_((char*) "N", (char*) "N", &_mA, &_nB, &_mA, &one, A, &_mA, B, &_mA, &zero, C, &_mA);
 }
 
 

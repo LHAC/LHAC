@@ -372,7 +372,8 @@ void LBFGS::computeLowRankApprox_v2(work_set_struct* work_set)
     /* R now store R-1 */
     int cblas_N = (int) work_set->numActive + p_sics;
 //    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, cblas_N, 0.0, Q_bar, _2cols);
-    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, _2cols, 0.0, Q_bar, _2cols);
+//    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, _2cols, 0.0, Q_bar, _2cols);
+    lcdgemm(R, Q, Q_bar, _2cols, cblas_N);
     
 //    et = (clock() - et)/CLOCKS_PER_SEC;
 //    tQ_bar += et;
