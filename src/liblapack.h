@@ -38,11 +38,8 @@ inline int inverse(double*w, int _n) {
     __CLPK_integer info = 0;
     __CLPK_integer n = (__CLPK_integer) _n;
     static __CLPK_integer ipiv[MAX_SY_PAIRS+1];
-//    __CLPK_integer ipiv[n+1];
     static __CLPK_integer lwork = MAX_SY_PAIRS*MAX_SY_PAIRS;
-//    __CLPK_integer lwork = n*n;
     static double work[MAX_SY_PAIRS*MAX_SY_PAIRS];
-//    double work[n*n];
     dgetrf_(&n, &n, w, &n, ipiv, &info);
     dgetri_(&n, w, &n, ipiv, work, &lwork, &info);
     

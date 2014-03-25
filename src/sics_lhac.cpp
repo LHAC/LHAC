@@ -166,9 +166,6 @@ static inline void stdSelector( double* w, double* L_grad, work_set_struct* work
 static inline void computeWorkSet( double* w, double* L_grad, work_set_struct* work_set, double* normsg )
 {
     stdSelector(w, L_grad, work_set, normsg);
-//    printf("normsg = %f\n", *normsg);
-//    greedySelector(w, L_grad, work_set, normsg);
-//    printf("normsg = %f\n", *normsg);
     
     ushort_pair_t* idxs = work_set->idxs;
     unsigned long* idxs_vec_l = work_set->idxs_vec_l;
@@ -219,7 +216,6 @@ static inline double DiagNewton(const double* S, const double* Lambda, const dou
                     D[ij] += mu;
                 }
             }
-            //            flopsCount++;
         }
     }
     logdetW = 0.0;
@@ -250,7 +246,6 @@ static inline double DiagNewton(const double* S, const double* Lambda, const dou
             }
         }
         D[k] += mu;
-        //        flopsCount++;
     }
     double fX = -logdetW + trSW + l1normW;
     return fX;
@@ -300,19 +295,6 @@ static inline void lineSearch(const double* S, double* D, double* L_grad, double
             Delta = gradD + l1normW1 - l1normW;
             MSG("\t \t Delta = %+.3e\n", Delta);
         }
-//        ptrdiff_t info = 0;
-//        ptrdiff_t p0 = p_sics;
-//        dpotrf_((char*) "U", (int *)&p0, w, (int *)&p0, (int *)&info);
-//        for (unsigned long i = 0; i < p_sics; i++) {
-//            for (unsigned long j = 0; j <= i; j++) {
-//                double tmp = w[i*p_sics+j];
-//                w[j*p_sics+i] = tmp;
-//            }
-//        }
-//        write2mat("w1.mat", "w1", w, p_2, 1);
-//        int info = 0;
-//        int p0 = (int) p_sics;
-//        dpotrf_((char*) "U", &p0, w, &p0, &info);
         
         int info = 0;
         lcdpotrf_(w, p_sics, &info);
@@ -339,13 +321,7 @@ static inline void lineSearch(const double* S, double* D, double* L_grad, double
         a *= bbeta;
     }
     
-//    ptrdiff_t info;
-//    ptrdiff_t p0 = p_sics;
-//    dpotri_((char*) "U", (int *)&p0, w, (int *)&p0, (int *)&info);
-    
-//    int info;
-//    int p0 = (int) p_sics;
-//    dpotri_((char*) "U", &p0, w, &p0, &info);
+
     
     int info = 0;
     lcdpotri_(w, p_sics, &info);
@@ -358,7 +334,6 @@ static inline void lineSearch(const double* S, double* D, double* L_grad, double
         }
     }
     
-//    write2mat("invW.mat", "invW", w, p_2, 1);
     
     // w stored X-1
     // now we wrote it back to X
@@ -372,16 +347,6 @@ static inline void lineSearch(const double* S, double* D, double* L_grad, double
             w[ji] = w[ij];
         }
     }
-//    for (unsigned long i = 0; i < p_2; i++) {
-//        L_grad[i] = S[i] - w[i];
-//        w[i] = w_prev[i] + a*D[i];
-//    }
-    
-//    write2mat("D.mat", "D", D, p_2, 1);
-//    write2mat("w.mat", "w", w, p_2, 1);
-//    write2mat("w_prev.mat", "w_prev", w_prev, p_2, 1);
-//    write2mat("L_grad.mat", "L_grad", L_grad, p_2, 1);
-//    MSG(" f_current = %f\n", f_current);
     
     return;
 }
@@ -395,10 +360,6 @@ static inline double computeObject(const double* S, double* D, double* L_grad, d
             w[ij] = w_prev[ij] + D[ij];
         }
     }
-    
-//    int p0 = (int) p_sics;
-//    ptrdiff_t p0 = p_sics;
-//    dpotrf_((char*) "U", &p0, w, &p0, info);
     
     lcdpotrf_(w, p_sics, info);
     if (*info != 0) {
@@ -453,32 +414,10 @@ static inline double computeModelValue(double* D, double* L_grad, double* d_bar,
     double* buffer = lR->buff;
     
 
-//    int cblas_lda = cblas_M;
-//    cblas_dgemv(CblasColMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_lda, d_bar, 1, 0.0, buffer, 1);
-    
-//#ifdef __ACCELERATE__
-//    int cblas_M = (int) work_set->numActive + (int) p_sics;
-//    int cblas_N = (int) m;
-//    cblas_dgemv(CblasRowMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_N, d_bar, 1, 0.0, buffer, 1);
-//#elif defined(blas_h)
-//    ptrdiff_t blas_m = (ptrdiff_t) m;
-//    ptrdiff_t blas_n = (ptrdiff_t) work_set->numActive + (ptrdiff_t) p_sics;
-//    double one = 1.0;
-//    double zero = 0.0;
-//    ptrdiff_t one_int = 1;
-//    dgemv_((char*) "T", &blas_m, &blas_n, &one, Q, &blas_m, d_bar, &one_int, &zero, buffer, &one_int);
-//#endif
-
+    /* Q in row major */
     int cblas_M = (int) work_set->numActive + (int) p_sics;
     int cblas_N = (int) m;
     lcdgemv(CblasRowMajor, CblasNoTrans, Q, d_bar, buffer, cblas_M, cblas_N);
-    
-//    write2mat("Qm.mat", "Qm", Q, (unsigned long) cblas_M, (unsigned long) cblas_N);
-//    write2mat("Qm_bar.mat", "Qm_bar", Q_bar, cblas_N, cblas_M);
-//    write2mat("d_bar.mat", "d_bar", d_bar, cblas_N, 1);
-//    write2mat("Dm.mat", "Dm", D, p_2, 1);
-//    write2mat("L_grad.mat", "L_grad", L_grad, p_2, 1);
-    //    write2mat("work_set.mat", "work_set", work_set);
     
     
     double vp1 = 0;
@@ -487,7 +426,6 @@ static inline double computeModelValue(double* D, double* L_grad, double* d_bar,
     ushort_pair_t* idxs = work_set->idxs;
     unsigned long* permut = work_set->permut;
     unsigned long* idxs_vec_u = work_set->idxs_vec_u;
-    //    write2mat("permut.mat", "permut", permut, cblas_M, 1);
     for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
         unsigned long idx = idxs[ii].i;
         unsigned long jdx = idxs[ii].j;
@@ -507,26 +445,18 @@ static inline double computeModelValue(double* D, double* L_grad, double* d_bar,
     order2 = mu*gama*lcddot((int)p_2, D, 1, D, 1)-vp;
     order2 = order2*0.5;
     
-//    for (unsigned long i = 0; i < p_2; i++) {
-//        l1norm += lmd[i]*(fabs(w_prev[i] + D[i]) - fabs(w_prev[i]));
-//    }
-    
     l1norm = 0.0;
-//    order1 = 0.0;
     for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
         for (unsigned long j = 0; j < i; j++) {
             unsigned long ij = k + j;
             double wnew = w_prev[ij] + D[ij];
             l1norm += fabs(wnew)*lmd[ij];
-//            order1 += L_grad[ij]*D[ij];
         }
     }
     l1norm *= 2.0;
-//    order1 *= 2.0;
     for (unsigned long i = 0, k = 0; i < p_sics; i++, k += (p_sics+1)) {
         double wnew = w_prev[k] + D[k];
         l1norm += fabs(wnew)*lmd[k];
-//        order1 += L_grad[k]*D[k];
     }
     
     order1 = lcddot((int)p_2, D, 1, L_grad, 1);
@@ -706,9 +636,7 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         }
         
         gvaltime = CFAbsoluteTimeGetCurrent();
-//        int p0 = (int) p_sics;
-//        int info;
-//        dpotrf_((char*) "U", &p0, w, &p0, &info);
+
         int info;
         lcdpotrf_(w, p_sics, &info);
         (sols->record1)++;
@@ -722,23 +650,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
             continue;
         }
         
-//        double l1normW1 = 0.0;
-//        double trSW1 = 0.0;
-//        for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
-//            for (unsigned long j = 0; j < i; j++) {
-//                unsigned long ij = k + j;
-//                double wnew = w_prev[ij] + D[ij];
-//                l1normW1 += fabs(wnew)*lmd[ij];
-//                trSW1 += wnew*S[ij];
-//            }
-//        }
-//        l1normW1 *= 2.0;
-//        trSW1 *= 2.0;
-//        for (unsigned long i = 0, k = 0; i < p_sics; i++, k += (p_sics+1)) {
-//            double wnew = w_prev[k] + D[k];
-//            l1normW1 += fabs(wnew)*lmd[k];
-//            trSW1 += wnew*S[k];
-//        }
         
         fvaltime = CFAbsoluteTimeGetCurrent();
         
@@ -767,11 +678,10 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
             trSW = trSW1;
             
             gvaltime = CFAbsoluteTimeGetCurrent();
-//            int info;
-//            int p0 = (int) p_sics;
-//            dpotri_((char*) "U", &p0, w, &p0, &info);
+
             int info;
             lcdpotri_(w, p_sics, &info);
+            
             sols->gvalTime += CFAbsoluteTimeGetCurrent() - gvaltime;
             (sols->record1)++;
             
@@ -928,8 +838,6 @@ static inline void coordinateDescent(double* w, unsigned long iter, LBFGS* lR,  
 //        shuffle( work_set );
     }
     
-    //    printout(D, p);
-    
     return;
 }
 
@@ -971,8 +879,6 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
     sols->fvalTime = 0.0;
     sols->nls = 0;
     
-
-    double timeBegin = 0.0;
     
     double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
     
@@ -985,7 +891,6 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
     double* H_diag = new double[p_sics];
     double* H_diag_2 = new double[(p_sics+1)*p_sics/2]; // for computing Hii when i~=j
     
-//    double f_prev;
     
     // initialize to identity
     memset(w, 0, p_2*sizeof(double));
@@ -1038,7 +943,6 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
     
     unsigned short newton_iter;
     double normsg;
-//    double et;
     for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
         computeWorkSet(w, L_grad, work_set, &normsg);
         
@@ -1066,10 +970,6 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
                               H_diag_2, w_prev, D);
         }
         
-//        write2mat("w.mat", "w", w, p_2, 1);
-//        write2mat("w_prev.mat", "w_prev", w_prev, p_2, 1);
-//        write2mat("L_grad.mat", "L_grad", L_grad, p_2, 1);
-//        write2mat("L_grad_prev.mat", "L_grad_prev", L_grad_prev, p_2, 1);
         
         /* elapsed time */
         elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
@@ -1087,27 +987,6 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
         sols->lbfgsTime2 += CFAbsoluteTimeGetCurrent() - lbfgs2;
 
         
-        /* track cputime */
-//        et = clock();
-//        lR->computeLowRankApprox_v2(work_set);
-//        et = (clock() - et)/CLOCKS_PER_SEC;
-//        sols->lbfgsTime1 += et;
-//        
-//        et = clock();
-//        coordinateDescent(w, newton_iter, lR, L_grad, work_set, d_bar, H_diag, H_diag_2, D);
-//        et = (clock() - et)/CLOCKS_PER_SEC;
-//        sols->cdTime += et;
-//        
-//        et = clock();
-//        lineSearch(S, D, L_grad, w, L_grad_prev, w_prev);
-//        et = (clock() - et)/CLOCKS_PER_SEC;
-//        sols->lsTime += et;
-//        
-//        et = clock();
-//        lR->updateLBFGS(w, w_prev, L_grad, L_grad_prev);
-//        et = (clock() - et)/CLOCKS_PER_SEC;
-//        sols->lbfgsTime2 += et;
-        
         if (normsg <= opt_outer_tol*normsg0) {
             break;
         }
@@ -1123,11 +1002,6 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
     
     sols->w = w;
     sols->p_sics = (int) p_sics;
-    
-
-    
-    
-//    write2mat("X.mat", "X", w, p_sics, p_sics);
 
     delete [] w_prev;
     delete [] D;

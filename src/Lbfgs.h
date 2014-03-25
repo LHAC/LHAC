@@ -61,19 +61,9 @@ public:
     
     void initData(double* w, double* w_prev, double* L_grad, double* L_grad_prev);
     
-    void computeLowRankApprox();
-    
-    void computeLowRankApprox(work_set_struct* work_set);
-    
     void computeLowRankApprox_v2(work_set_struct* work_set);
     
     void updateLBFGS(double* w, double* w_prev, double* L_grad, double* L_grad_prev);
-    
-    void computeHDiag(double* H_diag);
-    
-    double computeHdj(double Di, double* d_bar, unsigned long idx);
-    
-    void updateDbar(double* d_bar, unsigned long idx, double z);
     
 private:
     LMatrix* Sm;
@@ -90,9 +80,7 @@ private:
     unsigned short l; // lbfgs param
     
     
-    void computeQR();
     void computeQR_v2(work_set_struct* work_set);
-//    unsigned long* Q_bar_idxs; // cols of Q_bar to update
     
 };
     
