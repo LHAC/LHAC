@@ -58,7 +58,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                           argIdx + 1);
     }
     mxArray* tf;
-    // verbose
+    // verbose level
     int verbose = 2;
     // precision
     double opt_outer_tol = 1e-6;
