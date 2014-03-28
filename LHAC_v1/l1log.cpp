@@ -18,6 +18,8 @@
 #include <algorithm>
 
 
+
+
 static inline void shuffle( work_set_struct* work_set )
 {
     unsigned long lens = work_set->numActive;
@@ -907,6 +909,14 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
         }
         
         sols->cdTime += CFAbsoluteTimeGetCurrent() - cdtime;
+        
+        /* add accelerated step */
+//        tk1 = (1 + sqrt(1 + 4*tk*tk))/2;
+//        double fs = (1 + (tk-1)/tk1);
+//        for (unsigned long i = 0; i < work_set->numActive; i++) {
+//            unsigned long idx = idxs[i].j;
+//            D[idx] = fs * D[idx];
+//        }
         
         if (sd_iters == 0) {
             eTime = CFAbsoluteTimeGetCurrent();
