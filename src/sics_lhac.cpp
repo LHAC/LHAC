@@ -52,9 +52,6 @@ double mu0=1.0;
 solution* sols;
 
 
-/* accelerated step */
-double tk = 1;
-double tk1 = 1;
 
 
 static inline void shuffle( work_set_struct* work_set )
@@ -614,20 +611,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
 
         }
         sols->cdTime += (CFAbsoluteTimeGetCurrent() - cdtime);
-        
-        
-        /* add accelerated step */
-//        tk1 = (1 + sqrt(1 + 4*tk*tk))/2;
-//        double fs = (1 + (tk-1)/tk1);
-//        for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
-//            for (unsigned long j = 0; j < i; j++) {
-//                unsigned long ij = k + j;
-//                unsigned long ji = j*p_sics + i;
-//                D[ij] = fs * D[ij];
-//                D[ji] = fs * D[ji];
-//            }
-//        }
-        
         
         fvaltime = CFAbsoluteTimeGetCurrent();
         
