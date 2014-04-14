@@ -127,6 +127,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
 //    printout("logs = ", sols, _param);
     
+    double* W = NULL;
     double* fval = NULL;
     double* normdf =NULL;
     double* cputime = NULL;
@@ -136,6 +137,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int nlhIdx = 0;
     
     unsigned long optsize = sols->size;
+    if (nlhs > nlhIdx) {
+        mwSize dims[] = {p,p};
+        plhs[nlhIdx] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
+        W = (double*) mxGetPr(plhs[nlhIdx]);
+        memcpy(W, sols->w, p*p*sizeof(double));
+        nlhIdx++;
+    }
     if (nlhs > nlhIdx) {
         mwSize dims[] = {optsize};
         plhs[nlhIdx] = mxCreateNumericArray(1, dims, mxINT32_CLASS, mxREAL);
