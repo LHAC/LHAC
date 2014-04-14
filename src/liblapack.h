@@ -49,7 +49,6 @@ inline int inverse(double*w, int _n) {
 
 inline double lcddot(int n, double* dx, int incx, double* dy, int incy) {
     return cblas_ddot(n, dx, incx, dy, incy);
-
 }
 
 
@@ -65,8 +64,6 @@ inline void lcdgemv(const enum CBLAS_ORDER Order,
 inline void lcdgemm(double* A, double* B, double* C, int mA, int nB) {
     cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, mA, nB, mA, 1.0, A, mA, B, mA, 0.0, C, mA);
 }
-
-
 
 
 

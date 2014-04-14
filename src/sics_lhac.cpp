@@ -52,6 +52,10 @@ double mu0=1.0;
 solution* sols;
 
 
+/* accelerated step */
+double tk = 1;
+double tk1 = 1;
+
 
 static inline void shuffle( work_set_struct* work_set )
 {
@@ -175,8 +179,8 @@ static inline void computeWorkSet( double* w, double* L_grad, work_set_struct* w
     for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
         unsigned long idx = idxs[ii].i;
         unsigned long jdx = idxs[ii].j;
-        idxs_vec_u[ii] = jdx*p_sics + idx;
-        idxs_vec_l[ii] = idx*p_sics + jdx;
+        idxs_vec_l[ii] = jdx*p_sics + idx;
+        idxs_vec_u[ii] = idx*p_sics + jdx;
         permut[ii] = ii;
     }
     
@@ -408,7 +412,6 @@ static inline double computeModelValue(double* D, double* L_grad, double* d_bar,
     double l1norm = 0;
     
     double* Q = lR->Q;
-//    double* Q_bar = lR->Q_bar;
     const unsigned short m = lR->m; // # of cols in Q
     const double gama = lR->gama;
     double* buffer = lR->buff;
@@ -565,7 +568,8 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
                     Hii = H_diag[idx] + dH_diag;
                 }
                 else {
-                    G = 2*Hd_j + L_grad[ij] + L_grad[ji];
+//                    G = 2*Hd_j + L_grad[ij] + L_grad[ji];
+                    G = 2*Hd_j + 2*L_grad[ij];
                     Gp = G + 2*lmd[ij];
                     Gn = G - 2*lmd[ij];
                     Hii = H_diag_2[permut[ii]];
@@ -610,6 +614,20 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
 
         }
         sols->cdTime += (CFAbsoluteTimeGetCurrent() - cdtime);
+        
+        
+        /* add accelerated step */
+//        tk1 = (1 + sqrt(1 + 4*tk*tk))/2;
+//        double fs = (1 + (tk-1)/tk1);
+//        for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
+//            for (unsigned long j = 0; j < i; j++) {
+//                unsigned long ij = k + j;
+//                unsigned long ji = j*p_sics + i;
+//                D[ij] = fs * D[ij];
+//                D[ji] = fs * D[ji];
+//            }
+//        }
+        
         
         fvaltime = CFAbsoluteTimeGetCurrent();
         
