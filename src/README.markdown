@@ -1,10 +1,9 @@
 
-# LHAC
+# LHAC: Low rank Hessian Approximation in Active-set Coordinate descent
 
 
 [I am](http://goo.gl/hphZnl) a Ph.D. candidate in [Industrial & Systems Engineering](http://www.lehigh.edu/ise/) at [Lehigh University](http://www4.lehigh.edu/default.aspx), working with Prof. [Katya Scheinberg](http://coral.ie.lehigh.edu/~katyas/) on developing [practical algorithms](http://goo.gl/ERZb3i) (and their theoretical analysis) for machine learning problems and many other real-world applications.
 
-![Xiaocheng Tangi](https://dl.dropboxusercontent.com/u/2799722/mysite/xct_profile3.jpg)
 
 Prior to study at Lehigh, I earned my undergraduate degree in [Control Science and Engineering](http://www.cse.zju.edu.cn/english/) from [Chu KoChen Honors College](http://ckc.zju.edu.cn/en-US/Introduction) in [Zhejiang University](http://goo.gl/u01q4Q), Hangzhou, China. During summer I worked at [industrial research labs](http://goo.gl/hphZnl) on projects in different fields such as machine learning, hierarchical classifications, time series forecasting, traffic control, etc.  
 
