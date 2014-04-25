@@ -30,6 +30,6 @@ You will probably also need to modify the `mexopts.sh` in `~/.matlab` before you
 
 ## Usage Guide
 
-After you have the MEX-file. Simply start matlab in the same folder and run demo1.m. You should be also to see the outputs immediately and have a structure returned named algs.
+After you have the MEX-file. Simply start MATLAB in the same folder and run `LHAC_demo.m`. You should be able to see the outputs immediately and have a structure returned named `algs`.
 
 
