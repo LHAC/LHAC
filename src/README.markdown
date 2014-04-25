@@ -20,13 +20,15 @@ tar xvf LEHIGH-universal.zip
 cd LEHIGH-universal/src
 ```
 
-
 LHAC comes with a MATLAB interface through MEX-files. To build the MEX-file, just run
 ```
-mex -largeArrayDims sics_lhac.cpp sics_lhac-mex.cpp Lbfgs.cpp  -lmwblas -lmwlapack -lrt
+mex -largeArrayDims sics_lhac.cpp sics_lhac-mex.cpp Lbfgs.cpp  -lmwblas -lmwlapack -lrt -output LHAC
 ```
+Note that LHAC uses BLAS and LAPACK. The above command links to the BLAS and LAPACK library come with MATLAB. You can also link to one tuned for your platform, i.e., use `-framework Accelerate` on Mac OS to link to Accelerate. In that case, you might also want to take a look at the header file `liblapack.h` provided in the LHAC package.
 
 You will probably also need to modify the `mexopts.sh` in `~/.matlab` before you run `mex` so that gcc uses c++11 standard. To do that, simply replace the flag `-ansi` in CXXFLAG with `-std=c++0x`.
+
+## Usage Guide
 
 After you have the MEX-file. Simply start matlab in the same folder and run demo1.m. You should be also to see the outputs immediately and have a structure returned named algs.
 
