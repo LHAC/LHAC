@@ -1,29 +1,33 @@
 
-# LHAC:  
-__L__ow rank **H**essian **A**pproximation in active-set **C**oordinate descent
+# LHAC
+by Xiaocheng Tang [http://goo.gl/6QuMl]  
+
+**LHAC** implements the regularized empirical risk minimization algorithm -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  --  and is optimized specifically for solving _sparse inverse covariance selection_ problems.
 
 
+## Citation
+If you use LHAC in your research, please cite the following paper:
 
-[I am](http://goo.gl/hphZnl) a Ph.D. candidate in [Industrial & Systems Engineering](http://www.lehigh.edu/ise/) at [Lehigh University](http://www4.lehigh.edu/default.aspx), working with Prof. [Katya Scheinberg](http://coral.ie.lehigh.edu/~katyas/) on developing [practical algorithms](http://goo.gl/ERZb3i) (and their theoretical analysis) for machine learning problems and many other real-world applications.
+* "Practical Inexact Proximal Quasi-Newton Method with Global Complexity Analysis", Katya Scheinberg, Xiaocheng Tang ([BibTex]())
 
-
-Prior to study at Lehigh, I earned my undergraduate degree in [Control Science and Engineering](http://www.cse.zju.edu.cn/english/) from [Chu KoChen Honors College](http://ckc.zju.edu.cn/en-US/Introduction) in [Zhejiang University](http://goo.gl/u01q4Q), Hangzhou, China. During summer I worked at [industrial research labs](http://goo.gl/hphZnl) on projects in different fields such as machine learning, hierarchical classifications, time series forecasting, traffic control, etc.  
-
-
-# Contact
-
-* Email: xiaocheng.t AT gmail.com
-* [Linkedin](http://goo.gl/hphZnl)
-* [Instagram](http://goo.gl/8yqofD)
-* [Weibo](http://goo.gl/dNzrl6)
+## Build Guide
+[Download](http://goo.gl/wuFEJ4) the package archive.
 
 
-## Latest
+Extract the files:
+```
+tar xvf LEHIGH-universal.zip
+cd LEHIGH-universal/src
+```
 
-`March 2014`  
-I gave a talk at [Theory And Practice: Dealing With Big Data And Other Challenges](http://www.caam.rice.edu/~ios2014/index.html) Informs Optimization Conference 2014, [here are the slides](http://goo.gl/LpY7GT).
 
-`January 2014`  
-I am going to Yahoo lab in Sunnyvale for the summer of 2014 and I am looking for a place to stay for around 3 months. Anyone has any information, please [drop me a line](mailto:xiaocheng.t@gmail.com).
+LHAC comes with a MATLAB interface through MEX-files. To build the MEX-file, just run
+```
+mex -largeArrayDims sics_lhac.cpp sics_lhac-mex.cpp Lbfgs.cpp  -lmwblas -lmwlapack -lrt
+```
+
+You will probably also need to modify the `mexopts.sh` in `~/.matlab` before you run `mex` so that gcc uses c++11 standard. To do that, simply replace the flag `-ansi` in CXXFLAG with `-std=c++0x`.
+
+After you have the MEX-file. Simply start matlab in the same folder and run demo1.m. You should be also to see the outputs immediately and have a structure returned named algs.
 
 
