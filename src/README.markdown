@@ -1,5 +1,5 @@
 
-# LHAC: Low rank Hessian Approximation in Active-set Coordinate descent
+# LHAC: ## Low rank Hessian Approximation in Active-set Coordinate descent
 
 
 [I am](http://goo.gl/hphZnl) a Ph.D. candidate in [Industrial & Systems Engineering](http://www.lehigh.edu/ise/) at [Lehigh University](http://www4.lehigh.edu/default.aspx), working with Prof. [Katya Scheinberg](http://coral.ie.lehigh.edu/~katyas/) on developing [practical algorithms](http://goo.gl/ERZb3i) (and their theoretical analysis) for machine learning problems and many other real-world applications.
