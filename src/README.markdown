@@ -1,6 +1,6 @@
 
 # LHAC:  
-**L**ow rank **H**essian **A**pproximation in active-set **C**oordinate descent
+__L__ow rank **H**essian **A**pproximation in active-set **C**oordinate descent
 
 
 
