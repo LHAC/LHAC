@@ -295,7 +295,7 @@ static inline void lineSearch(const double* S, double* D, double* L_grad, double
         }
         if (a == 1) {
             Delta = gradD + l1normW1 - l1normW;
-            MSG("\t \t Delta = %+.3e\n", Delta);
+//            MSG("\t \t Delta = %+.3e\n", Delta);
         }
         
         int info = 0;
@@ -304,7 +304,7 @@ static inline void lineSearch(const double* S, double* D, double* L_grad, double
         (sols->record1)++;
         if (info != 0) {
             a *= bbeta;
-            MSG(" a = %f\n", a);
+//            MSG(" a = %f\n", a);
             continue;
         }
         double logdetW1 = 0.0;
@@ -488,7 +488,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         H_diag_2[ii] =  lcddot(m, &Q[idx*m], 1, &Q_bar[jdx*m], 1);
     }
     
-//    unsigned long max_cd_pass = std::min(1 + iter/3, max_inner_iter);
     unsigned long max_cd_pass = 1 + iter/cd_rate;
     unsigned long cd_pass;
     int sd_iters;
@@ -505,7 +504,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
             double normd = 0;
             
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
-//                unsigned long rii = rand()%(work_set->numActive);
                 unsigned long rii = ii;
                 idx = idxs[rii].i;
                 jdx = idxs[rii].j;
@@ -522,7 +520,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
                     Hii = H_diag[idx] + dH_diag;
                 }
                 else {
-//                    G = 2*Hd_j + L_grad[ij] + L_grad[ji];
                     G = 2*Hd_j + 2*L_grad[ij];
                     Gp = G + 2*lmd[ij];
                     Gn = G - 2*lmd[ij];
@@ -563,8 +560,6 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
                 MSG("\t\t Coordinate descent pass %3ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
                        cd_pass, diffd, normd);
             }
-            
-//            shuffle( work_set );
 
         }
         sols->cdTime += (CFAbsoluteTimeGetCurrent() - cdtime);
@@ -604,7 +599,10 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         
         if (info != 0) {
             mu = 2*mu;
-            MSG("\t \t \t # of line searches = %3d; no PSD!; gama_scale = %f\n", sd_iters, gama_scale);
+            if (msgFlag >= LHAC_MSG_CD) {
+                MSG("\t \t \t # of line searches = %3d; no PSD!; gama_scale = %f\n", sd_iters, gama_scale);
+            }
+            
             continue;
         }
         
@@ -625,11 +623,16 @@ static inline double suffcientDecrease(double* S, double* w, unsigned long iter,
         
         rho_trial = (f_trial-f_current)/(f_mdl-f_current);
         
-        MSG("\t \t \t # of line searches = %3d; model quality: %+.3f; Delta = %+.3e\n", sd_iters, rho_trial, rho*(f_mdl - f_current));
+        if (msgFlag >= LHAC_MSG_NEWTON) {
+            MSG("\t \t \t # of line searches = %3d; model quality: %+.3f; Delta = %+.3e\n", sd_iters, rho_trial, rho*(f_mdl - f_current));
+        }
         
         if (rho_trial > rho) {
             
-            MSG("\t \t \t function decrease = %+.5e; mu0 = %f\n", f_current - f_trial, mu0);
+            if (msgFlag >= LHAC_MSG_NEWTON) {
+                MSG("\t \t \t function decrease = %+.5e; mu0 = %f\n", f_current - f_trial, mu0);
+            }
+            
             f_current = f_trial;
             l1normW = l1normW1;
             logdetW = logdetW1;
@@ -906,7 +909,7 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
         
 
         double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
-        if (msgFlag >= LHAC_MSG_NEWTON) {
+        if (msgFlag >= LHAC_MSG_MIN) {
             MSG("%.4e  iter %2d:   obj.f = %+.5e    obj.normsg = %+.4e   |work_set| = %ld\n",
                    elapsedTime, newton_iter, f_current, normsg, work_set->numActive);
         }
