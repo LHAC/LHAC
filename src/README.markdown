@@ -20,16 +20,14 @@ tar xvf LEHIGH-universal.zip
 cd LEHIGH-universal/src
 ```
 
-LHAC comes with a MATLAB interface through MEX-files. To build the MEX-file, just run
+LHAC comes with a MATLAB interface through MEX-files. To build the MEX-file on Linux, just run
 ```
 mex -largeArrayDims sics_lhac.cpp sics_lhac-mex.cpp Lbfgs.cpp  -lmwblas -lmwlapack -lrt -output LHAC
 ```
-Note that LHAC uses BLAS and LAPACK. The above command links to the BLAS and LAPACK library come with MATLAB. You can also link to ones tuned for your platform, i.e., use `-framework Accelerate` on Mac OS to link to Accelerate. In that case, you might also want to take a look at the header file `liblapack.h` provided in the LHAC package.
+Or if you are running Mac OS, you may compile the program using the provided Makefile. Note that LHAC uses BLAS and LAPACK. The above command links to the BLAS and LAPACK library come with MATLAB, and using the Makefile will link to Apple's Accelerate framework that contains a version of BLAS and LAPACK optimized for Mac OS. 
 
-You will probably also need to modify the `mexopts.sh` in `~/.matlab` before you run `mex` so that gcc uses c++11 standard. To do that, simply replace the flag `-ansi` in CXXFLAG with `-std=c++0x`.
+You will probably also need to modify the `mexopts.sh` in `~/.matlab` before you run `mex` so that the compiler uses c++11 standard. To do that, simply replace the flag `-ansi` in CXXFLAG with `-std=c++0x`.
 
 ## Usage Guide
 
-After you have the MEX-file. Simply start MATLAB in the same folder and run `LHAC_demo.m`. You should be able to see the outputs immediately and have a structure returned named `algs`.
-
-
+After MEX-file is compiled successfully, start MATLAB in the same folder and run `LHAC_demo.m` to verify that LHAC is successfully installed. `LHAC_demo.m` will produce output on the screen and upon completion returns the inverse covariance matrix in variable `W`.
