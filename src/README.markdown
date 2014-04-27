@@ -41,3 +41,27 @@ You will probably also need to modify the `mexopts.sh` in `~/.matlab` before you
 ## Usage Guide
 
 After the MEX-file is compiled successfully, start MATLAB in the same folder and run `LHAC_demo.m` to verify the installation process. If successfully installed, `LHAC_demo.m` will produce outputs on the screen and upon completion returns the inverse covariance matrix in the variable named `W`.
+
+Typical usage of LHAC is:
+```
+W = LHAC(S, lambda, Param);
+```
+where the solution `W` is the inverse covariance matrix recovered from the input `S` the sample covariance matrix, `lambda` is a positive scalar known as the regularization parameter and `Param` is a MATLAB `struct` that contains the algorithm parameters for LHAC. Some commonly used parameters are 
+
+* `v`: set verbosity level (default 2)
+* `e`: optimality tolerance (default 1e-6)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
