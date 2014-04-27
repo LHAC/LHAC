@@ -2,7 +2,7 @@
 # LHAC
 by Xiaocheng Tang [http://goo.gl/6QuMl]  
 
-**LHAC** implements the regularized empirical risk minimization algorithm -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  --  and is optimized specifically for solving _sparse inverse covariance selection_ problems where the task is to recover from a low-rank sample covariance matrix the inverse covariance matrix that is expected to have a sparse structure.
+**LHAC** implements the regularized empirical risk minimization algorithm -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  --  and is optimized specifically for solving _sparse inverse covariance selection_ problems which recover from a low-rank sample covariance matrix the inverse covariance matrix that is expected to have a sparse structure.
 
 ## Features
 LHAC
