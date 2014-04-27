@@ -53,82 +53,83 @@ solution* sols;
 
 
 
+//
+//static inline void shuffle( work_set_struct* work_set )
+//{
+//    unsigned long lens = work_set->numActive;
+//    ushort_pair_t* idxs = work_set->idxs;
+//    unsigned long* permut = work_set->permut;
+//    
+//    for (unsigned long i = 0; i < lens; i++) {
+//        unsigned long j = i + rand()%(lens - i);
+//        unsigned short k1 = idxs[i].i;
+//        unsigned short k2 = idxs[i].j;
+//        double vlt = idxs[i].vlt;
+//        idxs[i].i = idxs[j].i;
+//        idxs[i].j = idxs[j].j;
+//        idxs[i].vlt = idxs[j].vlt;
+//        idxs[j].i = k1;
+//        idxs[j].j = k2;
+//        idxs[j].vlt = vlt;
+//        
+//        /* update permutation */
+//        unsigned long tmp = permut[i];
+//        permut[i] = permut[j];
+//        permut[j] = tmp;
+//    }
+//    
+//    return;
+//}
 
-static inline void shuffle( work_set_struct* work_set )
-{
-    unsigned long lens = work_set->numActive;
-    ushort_pair_t* idxs = work_set->idxs;
-    unsigned long* permut = work_set->permut;
-    
-    for (unsigned long i = 0; i < lens; i++) {
-        unsigned long j = i + rand()%(lens - i);
-        unsigned short k1 = idxs[i].i;
-        unsigned short k2 = idxs[i].j;
-        double vlt = idxs[i].vlt;
-        idxs[i].i = idxs[j].i;
-        idxs[i].j = idxs[j].j;
-        idxs[i].vlt = idxs[j].vlt;
-        idxs[j].i = k1;
-        idxs[j].j = k2;
-        idxs[j].vlt = vlt;
-        
-        /* update permutation */
-        unsigned long tmp = permut[i];
-        permut[i] = permut[j];
-        permut[j] = tmp;
-    }
-    
-    return;
-}
-
-static inline void greedySelector( double* w, double* L_grad, work_set_struct* work_set, double* normsg )
-{
-    ushort_pair_t* idxs = work_set->idxs;
-    unsigned long numActive = 0;
-    
-    double _normsg = 0.0;
-    
-    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += p_sics) {
-        for (unsigned long j = 0; j <= i; j++) {
-            double g = L_grad[k+j];
-            if (w[k+j] == 0.0 && (fabs(g) > lmd[k+j])) {
-                idxs[numActive].i = (unsigned short) i;
-                idxs[numActive].j = (unsigned short) j;
-                g = fabs(g) - lmd[k+j];
-                idxs[numActive].vlt = fabs(g);
-                numActive++;
-                _normsg += fabs(g);
-            }
-
-            if (w[k+j] != 0.0) {
-                if (w[k+j] > 0)
-                    g += lmd[k+j];
-                else
-                    g -= lmd[k+j];
-                _normsg += fabs(g);
-            }
-            
-        }
-    }
-    qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
-
-    numActive = (numActive<work_size)?numActive:work_size;
-    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += p_sics) {
-        for (unsigned long j = 0; j <= i; j++) {
-            if (w[k+j] != 0) {
-                idxs[numActive].i = (unsigned short) i;
-                idxs[numActive].j = (unsigned short) j;
-                numActive++;
-            }
-        }
-    }
-    
-    *normsg = _normsg;
-    
-    work_set->numActive = numActive;
-    
-    return;
-}
+//
+//static inline void greedySelector( double* w, double* L_grad, work_set_struct* work_set, double* normsg )
+//{
+//    ushort_pair_t* idxs = work_set->idxs;
+//    unsigned long numActive = 0;
+//    
+//    double _normsg = 0.0;
+//    
+//    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += p_sics) {
+//        for (unsigned long j = 0; j <= i; j++) {
+//            double g = L_grad[k+j];
+//            if (w[k+j] == 0.0 && (fabs(g) > lmd[k+j])) {
+//                idxs[numActive].i = (unsigned short) i;
+//                idxs[numActive].j = (unsigned short) j;
+//                g = fabs(g) - lmd[k+j];
+//                idxs[numActive].vlt = fabs(g);
+//                numActive++;
+//                _normsg += fabs(g);
+//            }
+//
+//            if (w[k+j] != 0.0) {
+//                if (w[k+j] > 0)
+//                    g += lmd[k+j];
+//                else
+//                    g -= lmd[k+j];
+//                _normsg += fabs(g);
+//            }
+//            
+//        }
+//    }
+//    qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
+//
+//    numActive = (numActive<work_size)?numActive:work_size;
+//    for (unsigned long k = 0, i = 0; i < p_sics; i++, k += p_sics) {
+//        for (unsigned long j = 0; j <= i; j++) {
+//            if (w[k+j] != 0) {
+//                idxs[numActive].i = (unsigned short) i;
+//                idxs[numActive].j = (unsigned short) j;
+//                numActive++;
+//            }
+//        }
+//    }
+//    
+//    *normsg = _normsg;
+//    
+//    work_set->numActive = numActive;
+//    
+//    return;
+//}
 
 static inline void stdSelector( double* w, double* L_grad, work_set_struct* work_set, double* normsg )
 {
@@ -350,50 +351,6 @@ static inline void lineSearch(const double* S, double* D, double* L_grad, double
     }
     
     return;
-}
-
-
-static inline double computeObject(const double* S, double* D, double* L_grad, double* w_prev, double* w, int* info)
-{
-    for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
-        for (unsigned long j = 0; j <= i; j++) {
-            unsigned long ij = k + j;
-            w[ij] = w_prev[ij] + D[ij];
-        }
-    }
-    
-    lcdpotrf_(w, p_sics, info);
-    if (*info != 0) {
-        return 0;
-    }
-    
-    l1normW = 0.0;
-    trSW = 0.0;
-    for (unsigned long i = 0, k = 0; i < p_sics ; i++, k += p_sics) {
-        for (unsigned long j = 0; j < i; j++) {
-            unsigned long ij = k + j;
-            double wnew = w_prev[ij] + D[ij];
-            l1normW += fabs(wnew)*lmd[ij];
-            trSW += wnew*S[ij];
-        }
-    }
-    l1normW *= 2.0;
-    trSW *= 2.0;
-    for (unsigned long i = 0, k = 0; i < p_sics; i++, k += (p_sics+1)) {
-        double wnew = w_prev[k] + D[k];
-        l1normW += fabs(wnew)*lmd[k];
-        trSW += wnew*S[k];
-    }
-    
-    logdetW = 0.0;
-    for (unsigned long i = 0, k = 0; i < p_sics; i++, k += (p_sics+1)) {
-        double wnew = w_prev[k] + D[k];
-        logdetW += log(wnew);
-    }
-    logdetW *= 2.0;
-    
-    return ((trSW + l1normW) - logdetW);
-    
 }
 
 /*******************************************************************************
