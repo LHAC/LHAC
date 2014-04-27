@@ -46,12 +46,16 @@ Typical usage of LHAC is:
 ```
 W = LHAC(S, lambda, Param);
 ```
-where the solution `W` is the inverse covariance matrix recovered from the input `S` the sample covariance matrix, `lambda` is a positive scalar known as the regularization parameter and `Param` is a MATLAB `struct` that contains the algorithm parameters for LHAC. Some commonly used parameters are 
+where the solution `W` is the inverse covariance matrix recovered from the input `S` the sample covariance matrix, `lambda` is a positive scalar known as the regularization parameter and `Param` is a MATLAB `struct` that contains the algorithm parameters for LHAC. Some commonly-used parameters are listed below:
 
-* `v`: set verbosity level (default 2)
+* `v`: verbosity level 0-3 (default 2)
 * `e`: optimality tolerance (default 1e-6)
+* `i`: maximum number of iterations allowed (default 500)
 
-
+Optionally, records of the optimization process, i.e., objective values, iteration counter, norm of the subgradient, etc., can be passed out to the output variable list besides the optimal solution:
+```
+[W, iter, fval, t, normgs, numActive] = LHAC(S, lambda, Param);
+```
 
 
 
