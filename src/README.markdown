@@ -11,7 +11,7 @@ LHAC
 * can handle _sparse logistic regression_ problems (please [contact me](mailto:xiaocheng.t@gmail.com) for more details)
 * supports various platforms, i.e., Mac OS X and Linux
 * supports both BLAS and CBLAS interfaces
-* implements a fast limited-memory BFGS library that can be used in general nonlinear optimizations 
+* implements a fast _limited-memory BFGS_ library that can be used in general nonlinear optimizations 
 
 The extension of LHAC to other regularizations other than l1 is possible. In particular, the one that handles **group sparsity** is forthcoming.
 
