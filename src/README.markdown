@@ -2,7 +2,7 @@
 # LHAC
 by Xiaocheng Tang [http://goo.gl/6QuMl]  
 
-**LHAC** implements the regularized empirical risk minimization algorithm -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  --  and is optimized specifically for solving _sparse inverse covariance selection_ problems.
+**LHAC** implements the regularized empirical risk minimization algorithm -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  --  and is optimized specifically for solving _sparse inverse covariance selection_ problems where the task is to recover from a low-rank sample covariance matrix the inverse covariance matrix that is expected to have a sparse structure.
 
 ## Features
 LHAC
@@ -40,4 +40,4 @@ You will probably also need to modify the `mexopts.sh` in `~/.matlab` before you
 
 ## Usage Guide
 
-After MEX-file is compiled successfully, start MATLAB in the same folder and run `LHAC_demo.m` to verify the installation process. If successfully installed, `LHAC_demo.m` will produce outputs on the screen and upon completion returns the inverse covariance matrix in the variable named `W`.
+After the MEX-file is compiled successfully, start MATLAB in the same folder and run `LHAC_demo.m` to verify the installation process. If successfully installed, `LHAC_demo.m` will produce outputs on the screen and upon completion returns the inverse covariance matrix in the variable named `W`.
