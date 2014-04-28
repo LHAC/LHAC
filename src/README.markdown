@@ -2,18 +2,26 @@
 # LHAC
 by Xiaocheng Tang [http://goo.gl/6QuMl]  
 
-**LHAC** implements the regularized empirical risk minimization algorithm -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  --  and is optimized specifically for solving _sparse inverse covariance selection_ problems which recover from a low-rank sample covariance matrix the inverse covariance matrix that is expected to have a sparse structure.
+**LHAC** implements the algorithm -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  -- for minimizing composite functions, i.e.,  
+
+* `min f(x) + g(x)`  
+
+where `f(x)` can be any _smooth_ function, i.e., _logistic loss_, _square loss_, etc., and `g(x)` is assumed to be _simple_, i.e., `l1-norm`, `l1/l2-norm`, etc.  In practice, the regularization functions will be built into the software for users to choose from, and users will need to provide the function evaluation and gradient computation routines for `f(x)`.   There are, for now, two varieties of LHAC that handle
+
+* _sparse inverse covariance selections_ problems 
+* _sparse logistic regression_ problems
+
+This package, in particular, implements LHAC for solving _sparse inverse covariance selection_ problems, and recovers from a low-rank sample covariance matrix the inverse covariance matrix that is expected to have a sparse structure.
+
+On use of LHAC for general composite minimization, please contact me [here](http://goo.gl/6QuMl) for more details.
 
 ## Features
-LHAC
+This package
 
-* can handle _sparse inverse covariance selections_ problems
-* can handle _sparse logistic regression_ problems (please [contact me](mailto:xiaocheng.t@gmail.com) for more details)
+* handles _sparse inverse covariance selections_ problems
 * supports various platforms, i.e., Mac OS X and Linux
 * supports both BLAS and CBLAS interfaces
-* implements a fast _limited-memory BFGS_ library that can be used in general nonlinear optimizations 
-
-The extension of LHAC to other regularizations other than l1 is possible. In particular, the one that handles **group sparsity** is forthcoming.
+* includes a fast _limited-memory BFGS_ library that can be used in general nonlinear optimizations 
 
 
 ## Citation
