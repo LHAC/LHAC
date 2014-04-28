@@ -80,6 +80,9 @@ void libsvmExperiment(command_line_param* cparam)
         transformToDenseFormat(Dset, Dset_sp);
         releaseProb(Dset_sp);
         
+//        write2mat("gisette_x", "X", Dset->X, Dset->N, Dset->p);
+//        write2mat("gisette_y", "y", Dset->y, Dset->N, 1);
+        
         solution* sols;
         
         l1log* mdl = new l1log(Dset, param);
