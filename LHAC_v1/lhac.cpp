@@ -326,7 +326,8 @@ solution* lhac(Objective* mdl, Parameter* param)
     
     // line search
     for (unsigned long lineiter = 0; lineiter < max_linesearch_iter; lineiter++) {
-        f_trial = (mdl->computeObject(w) + computeReg(w, p, param));
+        f_trial = mdl->computeObject(w);
+        f_trial += computeReg(w, p, param);
         if (f_trial < f_current + a*ssigma*delta) {
             f_current = f_trial;
             break;
