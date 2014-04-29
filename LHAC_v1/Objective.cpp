@@ -36,6 +36,11 @@ Objective::Objective(const char *filename)
     memcpy(y, Dset->y, sizeof(double)*N);
     
     e_ywx = new double[N]; // N
+    
+//    /* variables initialized to 0 */
+//    for (unsigned long i = 0; i < N; i++) {
+//        e_ywx[i] = 1;
+//    }
     B = new double[N]; // N
 
 }

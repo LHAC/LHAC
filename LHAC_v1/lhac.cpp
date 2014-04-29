@@ -182,7 +182,7 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
             w[i] = w_prev[i] + D[i];
         }
         
-        f_trial = mdl->computeObject(w) + computeReg(w, p, param);
+        f_trial = (mdl->computeObject(w) + computeReg(w, p, param));
         double order1 = cblas_ddot((int)p, D, 1, L_grad, 1);
         double order2 = 0;
         double l1norm = 0;
@@ -193,7 +193,6 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
         int cblas_N = (int) m;
         
         cblas_dgemv(CblasRowMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_N, d_bar, 1, 0.0, buffer, 1);
-        
         
         double vp = 0;
         for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
@@ -283,7 +282,7 @@ solution* lhac(Objective* mdl, Parameter* param)
     memset(w_prev, 0, p*sizeof(double));
     memset(D, 0, p*sizeof(double));
     
-    f_current = mdl->computeObject(w) + computeReg(w, p, param);
+    f_current = (mdl->computeObject(w) + computeReg(w, p, param));
     mdl->computeGradient(w, L_grad);
     normsg0 = computeSubgradient(lmd, L_grad, w, p);
     
@@ -325,7 +324,7 @@ solution* lhac(Objective* mdl, Parameter* param)
     
     // line search
     for (unsigned long lineiter = 0; lineiter < max_linesearch_iter; lineiter++) {
-        f_trial = mdl->computeObject(w) + computeReg(w, p, param);
+        f_trial = (mdl->computeObject(w) + computeReg(w, p, param));
         if (f_trial < f_current + a*ssigma*delta) {
             f_current = f_trial;
             break;
