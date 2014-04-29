@@ -182,7 +182,9 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
             w[i] = w_prev[i] + D[i];
         }
         
-        f_trial = (mdl->computeObject(w) + computeReg(w, p, param));
+//        f_trial = (mdl->computeObject(w) + computeReg(w, p, param));
+        f_trial = mdl->computeObject(w);
+        f_trial += computeReg(w, p, param);
         double order1 = cblas_ddot((int)p, D, 1, L_grad, 1);
         double order2 = 0;
         double l1norm = 0;
@@ -376,8 +378,8 @@ solution* lhac(Objective* mdl, Parameter* param)
             (sols->size)++;
         }
         if (msgFlag >= LHAC_MSG_NEWTON) {
-            printf("%.4e  iter %2d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
-                   elapsedTime, newton_iter, f_current, normsg, work_set->numActive);
+            printf("%.4e  iter %2d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld   |w| = %.4e\n",
+                   elapsedTime, newton_iter, f_current, normsg, work_set->numActive, computeReg(w, p, param));
         }
         
         
@@ -388,8 +390,7 @@ solution* lhac(Objective* mdl, Parameter* param)
         /* update LBFGS */
         lR->updateLBFGS(w, w_prev, L_grad, L_grad_prev);
         
-        
-        
+
         if (normsg <= opt_outer_tol*normsg0) {
             break;
         }
