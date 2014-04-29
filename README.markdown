@@ -30,13 +30,13 @@ If you use LHAC in your research, please cite the following paper:
 * Katya Scheinberg and Xiaocheng Tang, _Practical Inexact Proximal Quasi-Newton Method with Global Complexity Analysis_, submitted, 2014  ([BibTex](http://goo.gl/fVJgWN))
 
 ## Build Guide
-[Download](http://goo.gl/wuFEJ4) the package archive.
+[Download](http://goo.gl/6UGbOV) the package archive.
 
 
 Extract the files:
 ```
-tar xvf LEHIGH-universal.zip
-cd LEHIGH-universal/src
+tar xvf LHAC-SICS.zip
+cd LHAC-SICS/src
 ```
 
 LHAC comes with a MATLAB interface through MEX-files. To build the MEX-file on Linux, just run
