@@ -790,20 +790,12 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
     double Hwd;
     double Qd_bar;
     
-//    double d1,d2,d3,d4,d5,d3_,z_square,d6,redc;
-    
     double f_trial;
     double f_mdl;
     double rho_trial;
     
-    double eTime=0;
-    
     memcpy(w_prev, w, p*sizeof(double));
     
-    /* libsvm format */
-    if (mode == LIBSVM) {
-        memset(Xd, 0, N*sizeof(double));
-    }
     double lmd = param->lmd;
     unsigned long l = param->l;
     
@@ -824,12 +816,6 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
         diag_sum += H_diag[i];
     }
     
-    /* cumulative probability */
-//    L_prob[0] = H_diag[0] / diag_sum;
-//    for (unsigned long i = 1; i < work_set->numActive; i++) {
-//        L_prob[i] = H_diag[i] / diag_sum + L_prob[i-1];
-//    }
-    
 
     /* mdl value change */
     dQ = 0;
@@ -848,16 +834,12 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
         double gama_scale = mu*gama;
         double dH_diag = gama_scale-mu0*gama;
         
-        double cdtime = CFAbsoluteTimeGetCurrent();
         for (cd_pass = 1; cd_pass <= max_cd_pass; cd_pass++) {
             double diffd = 0;
             double normd = 0;
             
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
-//                unsigned long rii = rand()%(work_set->numActive);
-//                unsigned long rii = randomCoordinateSelector(work_set->numActive);
                 unsigned long rii = ii;
-//                printf("%f, %f, %f\n", L_prob[rii], L_prob[rii-1], L_prob[rii+1]);
                 unsigned long idx = idxs[rii].j;
                 unsigned long idx_Q = permut[rii];
                 unsigned long Q_idx_m = idx_Q*m;
@@ -883,21 +865,8 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
                 for (unsigned long k = Q_idx_m, j = 0; j < m; j++)
                     d_bar[j] = d_bar[j] + z*Q_bar[k+j];
                 
-                
-                /* libsvm format */
-                if (mode == LIBSVM) {
-                    feature_node* xnode = X_libsvm[idx];
-                    while (xnode->index != -1) {
-                        int ind = xnode->index-1;
-                        Xd[ind] += z*(xnode->value);
-                        xnode++;
-                    }
-                }
-                
                 diffd += fabs(z);
                 normd += fabs(D[idx]);
-                
-                
             }
             
             if (MSG >= LHAC_MSG_CD) {
@@ -908,24 +877,9 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
 //            shuffle( work_set );
         }
         
-        sols->cdTime += CFAbsoluteTimeGetCurrent() - cdtime;
         
-        /* add accelerated step */
-//        tk1 = (1 + sqrt(1 + 4*tk*tk))/2;
-//        double fs = (1 + (tk-1)/tk1);
-//        for (unsigned long i = 0; i < work_set->numActive; i++) {
-//            unsigned long idx = idxs[i].j;
-//            D[idx] = fs * D[idx];
-//        }
-        
-        if (sd_iters == 0) {
-            eTime = CFAbsoluteTimeGetCurrent();
-        }
-        
-        double fvaltime = CFAbsoluteTimeGetCurrent();
         f_trial = computeObject();
         f_mdl = computeModelValue(lR, work_set, mu);
-        sols->fvalTime += CFAbsoluteTimeGetCurrent() - fvaltime;
         rho_trial = (f_trial-f_current)/(f_mdl-f_current);
         
         printf("\t \t \t # of line searches = %3d; model quality: %+.3f\n", sd_iters, rho_trial);
@@ -938,11 +892,8 @@ double l1log::suffcientDecrease(LBFGS* lR, work_set_struct* work_set, double mu0
         mu = 2*mu;
         
     }
-    sols->nls += sd_iters;
     
-    eTime = CFAbsoluteTimeGetCurrent() - eTime;
-    
-    return eTime;
+    return 0;
     
 }
 

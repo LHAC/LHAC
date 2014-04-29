@@ -152,6 +152,39 @@ typedef struct {
     unsigned long active_set;
 } l1log_param;
 
+typedef struct {
+    char* fileName;
+    unsigned long work_size;
+    unsigned short max_iter;
+    unsigned long max_inner_iter;
+    double lmd;
+    double opt_inner_tol;
+    double opt_outer_tol;
+    /**** line search ****/
+    double bbeta;
+    double ssigma;
+    unsigned long max_linesearch_iter;
+    
+    unsigned long l; // lbfgs sy pair number <= MAX_SY_PAIRS
+    int verbose;
+    
+    /* line search */
+    int sd_flag; // 1 = sufficient decrease; 0 = line search
+    
+    /* gama in lbfgs */
+    double shrink = 1; // gama = gama/shrink
+    
+    double rho;
+    
+    unsigned long cd_rate;
+    
+    // active set stragety
+    unsigned long active_set;
+    
+    // verbose level
+    int msgFlag;
+} _param;
+
 
 class l1log
 {

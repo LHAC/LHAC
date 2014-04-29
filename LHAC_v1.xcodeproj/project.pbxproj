@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D42F1EDE190FEED40074C780 /* Objective.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D42F1EDC190FEED40074C780 /* Objective.cpp */; };
+		D42F1EDF190FEED40074C780 /* Objective.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D42F1EDC190FEED40074C780 /* Objective.cpp */; };
+		D42F1EE0190FEED40074C780 /* Objective.h in Headers */ = {isa = PBXBuildFile; fileRef = D42F1EDD190FEED40074C780 /* Objective.h */; };
 		D443207216C84F5400112D18 /* myUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D443207016C84F5400112D18 /* myUtilities.cpp */; };
 		D468136E183DB92200C17532 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D468136D183DB92200C17532 /* Accelerate.framework */; };
 		D480ECF116B58AD500BECB33 /* l1log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D480ECEF16B58AD500BECB33 /* l1log.cpp */; };
@@ -42,6 +45,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D42F1EDC190FEED40074C780 /* Objective.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Objective.cpp; sourceTree = "<group>"; };
+		D42F1EDD190FEED40074C780 /* Objective.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Objective.h; sourceTree = "<group>"; };
 		D443207016C84F5400112D18 /* myUtilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = myUtilities.cpp; sourceTree = "<group>"; };
 		D443207116C84F5400112D18 /* myUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = myUtilities.h; sourceTree = "<group>"; };
 		D468136D183DB92200C17532 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -107,6 +112,8 @@
 				D49D5B6E18AB136E00D832AD /* l1log-mex.cpp */,
 				D4FE842116BB6BD8004371C4 /* lhac.h */,
 				D4B48E2016C1EA3F00107AB3 /* lhac.cpp */,
+				D42F1EDC190FEED40074C780 /* Objective.cpp */,
+				D42F1EDD190FEED40074C780 /* Objective.h */,
 				D443207016C84F5400112D18 /* myUtilities.cpp */,
 				D443207116C84F5400112D18 /* myUtilities.h */,
 				D4FE841A16B97155004371C4 /* Lbfgs.cpp */,
@@ -123,6 +130,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D42F1EE0190FEED40074C780 /* Objective.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -199,6 +207,7 @@
 				D49D5B7918AB24EB00D832AD /* l1log-mex.cpp in Sources */,
 				D49D5B7B18AB24EB00D832AD /* lhac.h in Sources */,
 				D49D5B7C18AB24EB00D832AD /* lhac.cpp in Sources */,
+				D42F1EDF190FEED40074C780 /* Objective.cpp in Sources */,
 				D49D5B7D18AB24EB00D832AD /* myUtilities.cpp in Sources */,
 				D49D5B7E18AB24EB00D832AD /* myUtilities.h in Sources */,
 				D49D5B7F18AB24EB00D832AD /* Lbfgs.cpp in Sources */,
@@ -211,6 +220,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D480ECF116B58AD500BECB33 /* l1log.cpp in Sources */,
+				D42F1EDE190FEED40074C780 /* Objective.cpp in Sources */,
 				D4FE841C16B97155004371C4 /* Lbfgs.cpp in Sources */,
 				D4FE841F16B99683004371C4 /* drive.cpp in Sources */,
 				D4B48E2116C1EA3F00107AB3 /* lhac.cpp in Sources */,
@@ -378,6 +388,7 @@
 				D49D5B7718AB248F00D832AD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		D4FBD17616AD90C6006E7958 /* Build configuration list for PBXProject "LHAC_v1" */ = {
 			isa = XCConfigurationList;
