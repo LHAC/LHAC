@@ -67,7 +67,7 @@ static inline void computeWorkSet( work_set_struct* &work_set, double lmd,
 }
 
 static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solution* sols,
-                                     Objective* mdl, _param* param, unsigned short iter, double* w,
+                                     Objective* mdl, Parameter* param, unsigned short iter, double* w,
                                      double* w_prev, double* D, double* d_bar, double* H_diag,
                                      double* L_grad, unsigned long p, double* f_current)
 {
@@ -223,7 +223,7 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
 }
 
 
-solution* lhac(Objective* mdl, _param* param)
+solution* lhac(Objective* mdl, Parameter* param)
 {
     
     double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
@@ -399,6 +399,7 @@ solution* lhac(Objective* mdl, _param* param)
     delete lR;
     delete [] work_set->idxs;
     delete work_set;
+    
     return sols;
 }
 
