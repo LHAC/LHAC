@@ -12,13 +12,12 @@
 #include <Accelerate/Accelerate.h>
 
 
-Objective::Objective(Parameter* param)
+Objective::Objective(const char *filename)
 {
-    lmd = param->lmd;
     
     // sparse format
     training_set_sp* Dset_sp = new training_set_sp;
-    readLibsvm(param->fileName, Dset_sp);
+    readLibsvm(filename, Dset_sp);
     
     /* statistics of the problem */
     printf("p = %ld, N = %ld, nnz = %ld\n", Dset_sp->p, Dset_sp->N, Dset_sp->nnz);
@@ -35,6 +34,9 @@ Objective::Objective(Parameter* param)
     
     memcpy(X, Dset->X, sizeof(double)*p*N);
     memcpy(y, Dset->y, sizeof(double)*N);
+    
+    e_ywx = new double[N]; // N
+    B = new double[N]; // N
 
 }
 
@@ -66,9 +68,9 @@ double Objective::computeObject(double* wnew)
         
     }
     
-    for (unsigned long i = 0; i < p; i++) {
-        fval += lmd*fabs(wnew[i]);
-    }
+//    for (unsigned long i = 0; i < p; i++) {
+//        fval += lmd*fabs(wnew[i]);
+//    }
     
     return fval;
 }

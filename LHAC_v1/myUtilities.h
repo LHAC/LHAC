@@ -31,7 +31,7 @@ void printout(const char* desc, LMatrix* x, int mode);
 
 void printout(const char* desc, training_set_sp* Dset, int mode);
 
-void printout(const char* desc, solution* sols, l1log_param* param);
+//void printout(const char* desc, solution* sols, l1log_param* param);
 
 
 double norm(double* x, unsigned long s1, int p);

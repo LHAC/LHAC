@@ -637,86 +637,86 @@ void releaseSolution(solution* sols)
     
     return;
 }
-
-void printout(const char* desc, solution* sols, l1log_param* param)
-{
-    FILE *fp;
-    time_t current_time;
-    
-    time(&current_time);
-    
-    fp = fopen( "LHAC_log", "a" );
-	if (fp == NULL)
-	{
-		perror ("Error opening file");
-		return;
-	}
-    
-    fprintf(fp, "====================================================\n");
-    fprintf(fp, "%s     %s", param->fileName, ctime(&current_time));
-    fprintf(fp, "sufficient decrease: \t %d\n", param->sd_flag);
-    fprintf(fp, "gamma scale: \t\t\t %.1f\n", param->shrink);
-    fprintf(fp, "# max iters: \t\t\t %d\n", param->max_iter);
-    fprintf(fp, "====================================================\n");
-    fprintf(fp, "%s \n", desc);
-    
-    fprintf(fp, "#iter \t fval \t time \t normgs\n");
-    for (unsigned long i = 0; i < sols->size; i++) {
-        fprintf(fp, "%4d \t %+.5e\t %.5e\t %.5e\n", sols->niter[i], sols->fval[i], sols->t[i], sols->normgs[i]);
-    }
-    
-    fprintf(fp, "\n");
-    
-    fprintf(fp, "totaltime \t LStime \t ratio\n");
-    fprintf(fp, "%.5e \t %.5e \t %2.1f%%\n", sols->t[sols->size-1], sols->lsTime, sols->lsTime *100 / sols->t[sols->size-1]);
-//    fprintf(fp, " CD Time = %.5e\n", sols->cdTime);
-//    fprintf(fp, " LS Time = %.5e\n", sols->lsTime);
-//    fprintf(fp, " LBFGS Time 1 = %.5e\n", sols->lbfgsTime1);
-//    fprintf(fp, " LBFGS Time 2 = %.5e\n", sols->lbfgsTime2);
-    
-    fclose(fp);
-    
-    fp = fopen( "LHAC_brief", "a" );
-	if (fp == NULL)
-	{
-		perror ("Error opening file");
-		return;
-	}
-    //    fprintf(fp, "gamma_scale \t #iter \t time \t lstime \t sd\n");
-    fprintf(fp, "%3.0f \t %4d \t %+.5e \t %+.5e \t %d \t %s",
-            param->shrink, sols->niter[sols->size-1], sols->t[sols->size-1], sols->lsTime, param->sd_flag, param->fileName);
-    if (param->sd_flag == 1) {
-        fprintf(fp, " \t %.2f\n", param->rho);
-    }
-    else {
-        fprintf(fp, " \t --\n");
-    }
-    fclose(fp);
-    
-    fp = fopen("LHAC_timeProfile", "a");
-    if (fp == NULL)
-	{
-		perror ("Error opening file");
-		return;
-	}
-    //    fprintf(fp, "gamma_scale \t #iter \t time \t lstime \t sd\n");
-    
-    /* name || dimension || tolerance || totaltime || cdtime || fvaltime || gvaltime || #iter || #ls || #factors */
-    fprintf(fp, "%s \t",param->fileName);
-    fprintf(fp, "%.0e \t",param->opt_outer_tol);
-    fprintf(fp, "%.5e \t",sols->t[sols->size-1]);
-    fprintf(fp, "%.5e \t",sols->cdTime);
-    fprintf(fp, "%.5e \t",sols->fvalTime);
-    fprintf(fp, "%.5e \t",sols->gvalTime);
-    fprintf(fp, "%.5e \t",sols->lbfgsTime1);
-    fprintf(fp, "%.5e \t",sols->lbfgsTime2);
-    fprintf(fp, "%d \t",sols->niter[sols->size-1]);
-    fprintf(fp, "%ld \t",sols->nls);
-    fprintf(fp, "\n");
-    fclose(fp);
-    return;
-    
-}
+//
+//void printout(const char* desc, solution* sols, l1log_param* param)
+//{
+//    FILE *fp;
+//    time_t current_time;
+//    
+//    time(&current_time);
+//    
+//    fp = fopen( "LHAC_log", "a" );
+//	if (fp == NULL)
+//	{
+//		perror ("Error opening file");
+//		return;
+//	}
+//    
+//    fprintf(fp, "====================================================\n");
+//    fprintf(fp, "%s     %s", param->fileName, ctime(&current_time));
+//    fprintf(fp, "sufficient decrease: \t %d\n", param->sd_flag);
+//    fprintf(fp, "gamma scale: \t\t\t %.1f\n", param->shrink);
+//    fprintf(fp, "# max iters: \t\t\t %d\n", param->max_iter);
+//    fprintf(fp, "====================================================\n");
+//    fprintf(fp, "%s \n", desc);
+//    
+//    fprintf(fp, "#iter \t fval \t time \t normgs\n");
+//    for (unsigned long i = 0; i < sols->size; i++) {
+//        fprintf(fp, "%4d \t %+.5e\t %.5e\t %.5e\n", sols->niter[i], sols->fval[i], sols->t[i], sols->normgs[i]);
+//    }
+//    
+//    fprintf(fp, "\n");
+//    
+//    fprintf(fp, "totaltime \t LStime \t ratio\n");
+//    fprintf(fp, "%.5e \t %.5e \t %2.1f%%\n", sols->t[sols->size-1], sols->lsTime, sols->lsTime *100 / sols->t[sols->size-1]);
+////    fprintf(fp, " CD Time = %.5e\n", sols->cdTime);
+////    fprintf(fp, " LS Time = %.5e\n", sols->lsTime);
+////    fprintf(fp, " LBFGS Time 1 = %.5e\n", sols->lbfgsTime1);
+////    fprintf(fp, " LBFGS Time 2 = %.5e\n", sols->lbfgsTime2);
+//    
+//    fclose(fp);
+//    
+//    fp = fopen( "LHAC_brief", "a" );
+//	if (fp == NULL)
+//	{
+//		perror ("Error opening file");
+//		return;
+//	}
+//    //    fprintf(fp, "gamma_scale \t #iter \t time \t lstime \t sd\n");
+//    fprintf(fp, "%3.0f \t %4d \t %+.5e \t %+.5e \t %d \t %s",
+//            param->shrink, sols->niter[sols->size-1], sols->t[sols->size-1], sols->lsTime, param->sd_flag, param->fileName);
+//    if (param->sd_flag == 1) {
+//        fprintf(fp, " \t %.2f\n", param->rho);
+//    }
+//    else {
+//        fprintf(fp, " \t --\n");
+//    }
+//    fclose(fp);
+//    
+//    fp = fopen("LHAC_timeProfile", "a");
+//    if (fp == NULL)
+//	{
+//		perror ("Error opening file");
+//		return;
+//	}
+//    //    fprintf(fp, "gamma_scale \t #iter \t time \t lstime \t sd\n");
+//    
+//    /* name || dimension || tolerance || totaltime || cdtime || fvaltime || gvaltime || #iter || #ls || #factors */
+//    fprintf(fp, "%s \t",param->fileName);
+//    fprintf(fp, "%.0e \t",param->opt_outer_tol);
+//    fprintf(fp, "%.5e \t",sols->t[sols->size-1]);
+//    fprintf(fp, "%.5e \t",sols->cdTime);
+//    fprintf(fp, "%.5e \t",sols->fvalTime);
+//    fprintf(fp, "%.5e \t",sols->gvalTime);
+//    fprintf(fp, "%.5e \t",sols->lbfgsTime1);
+//    fprintf(fp, "%.5e \t",sols->lbfgsTime2);
+//    fprintf(fp, "%d \t",sols->niter[sols->size-1]);
+//    fprintf(fp, "%ld \t",sols->nls);
+//    fprintf(fp, "\n");
+//    fclose(fp);
+//    return;
+//    
+//}
 
 void transformToDenseFormat(training_set* Dset, training_set_sp* Dset_sp)
 {

@@ -8,11 +8,20 @@
 
 #include "lhac.h"
 
-#include "Objective.h"
-
 #include <math.h>
 
-
+static inline double computeReg(double* w, unsigned long p, Parameter* param)
+{
+    double gval = 0.0;
+    
+    double lmd = param->lmd;
+    
+    for (unsigned long i = 0; i < p; i++) {
+        gval += lmd*abs(w[i]);
+    }
+    
+    return gval;
+}
 
 static inline double computeSubgradient(double lmd, double* L_grad, double* w, unsigned long p)
 {
@@ -56,8 +65,6 @@ static inline void computeWorkSet( work_set_struct* &work_set, double lmd,
     
     work_set->numActive = numActive;
     
-    return;
-    
     
     /* reset permutation */
     for (unsigned long j = 0; j < work_set->numActive; j++) {
@@ -74,7 +81,7 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
     int max_sd_iters = 20;
     double mu = 1.0;
     double rho = param->rho;
-    int msgFlag = param->msgFlag;
+    int msgFlag = param->verbose;
     
     double z = 0.0;
     double Hd_j;
@@ -103,13 +110,11 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
     memset(D, 0, p*sizeof(double));
     memset(d_bar, 0, 2*l*sizeof(double));
     
-    double diag_sum = 0.0;
+
     for (unsigned long k = 0, i = 0; i < work_set->numActive; i++, k += m) {
         H_diag[i] = gama;
         for (unsigned long j = 0; j < m; j++)
             H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[k+j];
-        
-        diag_sum += H_diag[i];
     }
     
     
@@ -176,7 +181,7 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
             w[i] = w_prev[i] + D[i];
         }
         
-        f_trial = mdl->computeObject(w);
+        f_trial = mdl->computeObject(w) + computeReg(w, p, param);
         double order1 = cblas_ddot((int)p, D, 1, L_grad, 1);
         double order2 = 0;
         double l1norm = 0;
@@ -232,7 +237,7 @@ solution* lhac(Objective* mdl, Parameter* param)
     double opt_outer_tol = param->opt_outer_tol;
     unsigned short max_iter = param->max_iter;
     double lmd = param->lmd;
-    int msgFlag = param->msgFlag;
+    int msgFlag = param->verbose;
     
     solution* sols = new solution;
     sols->fval = new double[max_iter];
@@ -277,7 +282,7 @@ solution* lhac(Objective* mdl, Parameter* param)
     memset(w_prev, 0, p*sizeof(double));
     memset(D, 0, p*sizeof(double));
     
-    f_current = mdl->computeObject(w);
+    f_current = mdl->computeObject(w) + computeReg(w, p, param);
     mdl->computeGradient(w, L_grad);
     normsg0 = computeSubgradient(lmd, L_grad, w, p);
     
@@ -318,8 +323,8 @@ solution* lhac(Objective* mdl, Parameter* param)
     delta += l1_next - l1_current;
     
     // line search
-    f_trial = mdl->computeObject(w);
     for (unsigned long lineiter = 0; lineiter < max_linesearch_iter; lineiter++) {
+        f_trial = mdl->computeObject(w) + computeReg(w, p, param);
         if (f_trial < f_current + a*ssigma*delta) {
             f_current = f_trial;
             break;
@@ -330,8 +335,6 @@ solution* lhac(Objective* mdl, Parameter* param)
         for (unsigned long i = 0; i < p; i++) {
             w[i] = w_prev[i] + a*D[i];
         }
-        
-        f_trial = mdl->computeObject(w);
     }
 
     memcpy(L_grad_prev, L_grad, p*sizeof(double));

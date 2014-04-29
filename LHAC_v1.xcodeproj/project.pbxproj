@@ -13,7 +13,6 @@
 		D443207216C84F5400112D18 /* myUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D443207016C84F5400112D18 /* myUtilities.cpp */; };
 		D468136E183DB92200C17532 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D468136D183DB92200C17532 /* Accelerate.framework */; };
 		D491142017360E0E00F75EAD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D491141F17360E0E00F75EAD /* CoreFoundation.framework */; };
-		D49D5B6F18AB136E00D832AD /* l1log-mex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D49D5B6E18AB136E00D832AD /* l1log-mex.cpp */; };
 		D49D5B7918AB24EB00D832AD /* l1log-mex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D49D5B6E18AB136E00D832AD /* l1log-mex.cpp */; };
 		D49D5B7B18AB24EB00D832AD /* lhac.h in Sources */ = {isa = PBXBuildFile; fileRef = D4FE842116BB6BD8004371C4 /* lhac.h */; };
 		D49D5B7C18AB24EB00D832AD /* lhac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4B48E2016C1EA3F00107AB3 /* lhac.cpp */; };
@@ -218,7 +217,6 @@
 				D4FE841C16B97155004371C4 /* Lbfgs.cpp in Sources */,
 				D4FE841F16B99683004371C4 /* drive.cpp in Sources */,
 				D4B48E2116C1EA3F00107AB3 /* lhac.cpp in Sources */,
-				D49D5B6F18AB136E00D832AD /* l1log-mex.cpp in Sources */,
 				D443207216C84F5400112D18 /* myUtilities.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

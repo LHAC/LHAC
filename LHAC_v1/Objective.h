@@ -9,7 +9,6 @@
 #ifndef __LHAC_v1__Objective__
 #define __LHAC_v1__Objective__
 
-#include "lhac.h"
 
 /* implements l1log reg objective */
 class Objective
@@ -21,7 +20,8 @@ public:
     
     void computeGradient(double* wnew, double* df);
     
-    Objective(Parameter* param);
+    /* data input file name */
+    Objective(const char *filename);
     
     ~Objective();
     
@@ -29,7 +29,6 @@ private:
     unsigned long p;
     unsigned long N;
     
-    double lmd;
     double* X;
     double* y;
     double* e_ywx; // N

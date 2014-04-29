@@ -6,34 +6,21 @@
 #include "myUtilities.h"
 #include "lhac.h"
 
-solution* libsvmExperiment(l1log_param* param)
+solution* libsvmExperiment(Parameter* param)
 {
-    // sparse format
-    training_set_sp* Dset_sp = new training_set_sp;
-    readLibsvm(param->fileName, Dset_sp);
     
-    /* statistics of the problem */
-    printf("p = %ld, N = %ld, nnz = %ld\n", Dset_sp->p, Dset_sp->N, Dset_sp->nnz);
     
-    /* elapsed time (not cputime) */
-    time_t start;
-    time_t end;
-    time(&start);
-    double elapsedtime = 0;
     
-    training_set* Dset = new training_set;
-    transformToDenseFormat(Dset, Dset_sp);
-    releaseProb(Dset_sp);
+    Objective* obj = new Objective(param->fileName);
+    //        write2mat("gisette_x", "X", Dset->X, Dset->N, Dset->p);
+    //        write2mat("gisette_y", "y", Dset->y, Dset->N, 1);
     
-    l1log* mdl = new l1log(Dset, param);
     
-    solution* sols = lhac(mdl);
+    //    l1log* mdl = new l1log(Dset, param);
+    //    l1log* mdl = new l1log(Dset);
     
-    releaseProb(Dset);
-    
-    time(&end);
-    elapsedtime = difftime(end, start);
-    printf("%.f seconds\n", elapsedtime);
+    solution* sols = lhac(obj, param);
+
     
     delete param;
     return sols;
@@ -125,7 +112,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     
     
-    l1log_param* param = new l1log_param;
+    Parameter* param = new Parameter;
     param->l = 10;
     param->work_size = work_size;
     param->max_iter = max_iter;

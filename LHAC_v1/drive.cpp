@@ -14,7 +14,6 @@
 #include "lhac.h"
 #include "myUtilities.h"
 #include <CoreFoundation/CoreFoundation.h>
-#include "Objective.h"
 
 
 
@@ -31,7 +30,7 @@ void libsvmExperiment(Parameter* param)
 
     
     
-    Objective* obj = new Objective(param);
+    Objective* obj = new Objective(param->fileName);
 //        write2mat("gisette_x", "X", Dset->X, Dset->N, Dset->p);
 //        write2mat("gisette_y", "y", Dset->y, Dset->N, 1);
     
@@ -117,6 +116,13 @@ void parse_command_line(int argc, const char * argv[],
 		}
 	}
     
+    if(i>=argc) {
+        printf("wrong input format\n");
+        exit(1);
+    }
+    
+    strcpy(param->fileName, argv[i]);
+    
     
 }
 
@@ -130,7 +136,7 @@ int main(int argc, const char * argv[])
     libsvmExperiment(param);
     
     
-    delete [] cparam->fileName;
-    delete cparam;
+    delete [] param->fileName;
+    delete param;
     exit( 0 );
 }

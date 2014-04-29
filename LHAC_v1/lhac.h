@@ -13,6 +13,7 @@
 #include <Accelerate/Accelerate.h>
 #include <math.h>
 #include "Lbfgs.h"
+#include "Objective.h"
 
 
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
@@ -103,8 +104,6 @@ typedef struct {
     // active set stragety
     unsigned long active_set;
     
-    // verbose level
-    int msgFlag;
 } Parameter;
 
 
