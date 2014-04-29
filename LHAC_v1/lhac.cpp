@@ -15,11 +15,11 @@ static inline double computeReg(double* w, unsigned long p, Parameter* param)
 {
     double gval = 0.0;
     
-    double lmd = param->lmd;
-    
-    for (unsigned long i = 0; i < p; i++) {
-        gval += lmd*abs(w[i]);
-    }
+//    double lmd = param->lmd;
+//    
+//    for (unsigned long i = 0; i < p; i++) {
+//        gval += lmd*abs(w[i]);
+//    }
     
     return gval;
 }
@@ -328,7 +328,11 @@ solution* lhac(Objective* mdl, Parameter* param)
     for (unsigned long lineiter = 0; lineiter < max_linesearch_iter; lineiter++) {
         f_trial = mdl->computeObject(w);
         f_trial += computeReg(w, p, param);
-        printf("%.4e\n", f_trial);
+        double l1norm = 0;
+        for (unsigned long ii = 0; ii < p; ii++) {
+            l1norm += param->lmd*abs(w[ii]);
+        }
+        printf("%.6e, %.6e\n", f_trial, l1norm);
         if (f_trial < f_current + a*ssigma*delta) {
             f_current = f_trial;
             break;

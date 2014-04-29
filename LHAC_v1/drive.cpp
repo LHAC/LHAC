@@ -44,9 +44,6 @@ void libsvmExperiment(Parameter* param)
 
     releaseSolution(sols);
     
-
-
-    delete param;
     return;
 }
 
@@ -61,7 +58,7 @@ void parse_command_line(int argc, const char * argv[],
     param->lmd = 1;
     param->max_inner_iter = 100;
     param->opt_inner_tol = 5*1e-6;
-    param->opt_outer_tol = 1e-6;
+    param->opt_outer_tol = 1e-7;
     param->max_linesearch_iter = 1000;
     param->bbeta = 0.5;
     param->ssigma = 0.001;
