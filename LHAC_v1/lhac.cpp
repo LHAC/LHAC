@@ -165,6 +165,8 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
                 for (unsigned long k = Q_idx_m, j = 0; j < m; j++)
                     d_bar[j] = d_bar[j] + z*Q_bar[k+j];
                 
+                diffd += fabs(z);
+                normd += fabs(D[idx]);
                 
             }
             
