@@ -10,6 +10,7 @@
 
 #include <math.h>
 
+/* may generalize to other regularizations beyond l1 */
 static inline double computeReg(double* w, unsigned long p, Parameter* param)
 {
     double gval = 0.0;
@@ -57,8 +58,6 @@ static inline void computeWorkSet( work_set_struct* &work_set, double lmd,
         if (w[j] != 0.0 || (fabs(g) > lmd)) {
             idxs[numActive].i = (unsigned short) j;
             idxs[numActive].j = (unsigned short) j;
-            //            g = fabs(g) - lmd;
-            //            idxs[numActive].vlt = fabs(g);
             numActive++;
         }
     }
