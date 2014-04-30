@@ -10,7 +10,6 @@
 #define __LHAC_v1__Objective__
 
 
-/* implements l1log reg objective */
 class Objective
 {
 public:

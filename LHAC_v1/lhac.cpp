@@ -372,7 +372,7 @@ Solution* lhac(Objective* mdl, Parameter* param)
             break;
         }
     }
-    delete mdl;
+
     delete lR;
     delete [] work_set->idxs;
     delete work_set;

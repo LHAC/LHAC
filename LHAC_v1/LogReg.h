@@ -11,6 +11,8 @@
 
 #include "Objective.h"
 
+
+/* implements l1log reg objective */
 class LogReg : public Objective
 {
 public:

@@ -101,6 +101,7 @@ int main(int argc, const char * argv[])
     LogReg* obj = new LogReg(param->fileName);
     Solution* sols = lhac(obj, param);
     
+    delete obj;
     delete [] param->fileName;
     delete param;
     delete sols;
