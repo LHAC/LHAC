@@ -10,14 +10,11 @@
 		D42F1EDE190FEED40074C780 /* Objective.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D42F1EDC190FEED40074C780 /* Objective.cpp */; };
 		D42F1EDF190FEED40074C780 /* Objective.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D42F1EDC190FEED40074C780 /* Objective.cpp */; };
 		D42F1EE0190FEED40074C780 /* Objective.h in Headers */ = {isa = PBXBuildFile; fileRef = D42F1EDD190FEED40074C780 /* Objective.h */; };
-		D443207216C84F5400112D18 /* myUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D443207016C84F5400112D18 /* myUtilities.cpp */; };
 		D468136E183DB92200C17532 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D468136D183DB92200C17532 /* Accelerate.framework */; };
 		D491142017360E0E00F75EAD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D491141F17360E0E00F75EAD /* CoreFoundation.framework */; };
 		D49D5B7918AB24EB00D832AD /* l1log-mex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D49D5B6E18AB136E00D832AD /* l1log-mex.cpp */; };
 		D49D5B7B18AB24EB00D832AD /* lhac.h in Sources */ = {isa = PBXBuildFile; fileRef = D4FE842116BB6BD8004371C4 /* lhac.h */; };
 		D49D5B7C18AB24EB00D832AD /* lhac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4B48E2016C1EA3F00107AB3 /* lhac.cpp */; };
-		D49D5B7D18AB24EB00D832AD /* myUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D443207016C84F5400112D18 /* myUtilities.cpp */; };
-		D49D5B7E18AB24EB00D832AD /* myUtilities.h in Sources */ = {isa = PBXBuildFile; fileRef = D443207116C84F5400112D18 /* myUtilities.h */; };
 		D49D5B7F18AB24EB00D832AD /* Lbfgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4FE841A16B97155004371C4 /* Lbfgs.cpp */; };
 		D49D5B8018AB24EB00D832AD /* Lbfgs.h in Sources */ = {isa = PBXBuildFile; fileRef = D4FE841B16B97155004371C4 /* Lbfgs.h */; };
 		D49D5B8118AB24F100D832AD /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D468136D183DB92200C17532 /* Accelerate.framework */; };
@@ -44,8 +41,6 @@
 /* Begin PBXFileReference section */
 		D42F1EDC190FEED40074C780 /* Objective.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Objective.cpp; sourceTree = "<group>"; };
 		D42F1EDD190FEED40074C780 /* Objective.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Objective.h; sourceTree = "<group>"; };
-		D443207016C84F5400112D18 /* myUtilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = myUtilities.cpp; sourceTree = "<group>"; };
-		D443207116C84F5400112D18 /* myUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = myUtilities.h; sourceTree = "<group>"; };
 		D468136D183DB92200C17532 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		D491141F17360E0E00F75EAD /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		D49D5B6E18AB136E00D832AD /* l1log-mex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "l1log-mex.cpp"; sourceTree = "<group>"; };
@@ -109,8 +104,6 @@
 				D4B48E2016C1EA3F00107AB3 /* lhac.cpp */,
 				D42F1EDC190FEED40074C780 /* Objective.cpp */,
 				D42F1EDD190FEED40074C780 /* Objective.h */,
-				D443207016C84F5400112D18 /* myUtilities.cpp */,
-				D443207116C84F5400112D18 /* myUtilities.h */,
 				D4FE841A16B97155004371C4 /* Lbfgs.cpp */,
 				D4FE841B16B97155004371C4 /* Lbfgs.h */,
 				D4FBD18216AD90C7006E7958 /* LHAC_v1.1 */,
@@ -202,8 +195,6 @@
 				D49D5B7B18AB24EB00D832AD /* lhac.h in Sources */,
 				D49D5B7C18AB24EB00D832AD /* lhac.cpp in Sources */,
 				D42F1EDF190FEED40074C780 /* Objective.cpp in Sources */,
-				D49D5B7D18AB24EB00D832AD /* myUtilities.cpp in Sources */,
-				D49D5B7E18AB24EB00D832AD /* myUtilities.h in Sources */,
 				D49D5B7F18AB24EB00D832AD /* Lbfgs.cpp in Sources */,
 				D49D5B8018AB24EB00D832AD /* Lbfgs.h in Sources */,
 			);
@@ -217,7 +208,6 @@
 				D4FE841C16B97155004371C4 /* Lbfgs.cpp in Sources */,
 				D4FE841F16B99683004371C4 /* drive.cpp in Sources */,
 				D4B48E2116C1EA3F00107AB3 /* lhac.cpp in Sources */,
-				D443207216C84F5400112D18 /* myUtilities.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

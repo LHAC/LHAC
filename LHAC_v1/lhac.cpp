@@ -273,7 +273,6 @@ solution* lhac(Objective* mdl, Parameter* param)
     memset(w_prev, 0, p*sizeof(double));
     memset(D, 0, p*sizeof(double));
     
-//    f_current = (mdl->computeObject(w) + computeReg(w, p, param));
     obj->add(mdl->computeObject(w), computeReg(w, p, param));
     mdl->computeGradient(w, L_grad);
     normsg0 = computeSubgradient(lmd, L_grad, w, p);
@@ -316,7 +315,6 @@ solution* lhac(Objective* mdl, Parameter* param)
     
     // line search
     for (unsigned long lineiter = 0; lineiter < max_linesearch_iter; lineiter++) {
-//        f_trial = mdl->computeObject(w) + computeReg(w, p, param);
         double f_trial = mdl->computeObject(w);
         double g_trial = computeReg(w, p, param);
         double obj_trial = f_trial + g_trial;

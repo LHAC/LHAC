@@ -3,28 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "myUtilities.h"
 #include "lhac.h"
 
-solution* libsvmExperiment(Parameter* param)
-{
-    
-    
-    
-    Objective* obj = new Objective(param->fileName);
-    //        write2mat("gisette_x", "X", Dset->X, Dset->N, Dset->p);
-    //        write2mat("gisette_y", "y", Dset->y, Dset->N, 1);
-    
-    
-    //    l1log* mdl = new l1log(Dset, param);
-    //    l1log* mdl = new l1log(Dset);
-    
-    solution* sols = lhac(obj, param);
-
-    
-    delete param;
-    return sols;
-}
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -131,9 +111,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     param->cd_rate = cd_rate;
     param->active_set = active_set;
     
-    solution* sols = NULL;
     
-    sols = libsvmExperiment(param);
+    Objective* obj = new Objective(param->fileName);;
+    
+    solution* sols = lhac(obj, param);
     
     //    printout("logs = ", sols, cparam);
     
@@ -180,9 +161,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     
     
-    releaseSolution(sols);
+    sols->releaseMe();
     
     //    delete [] S;
-    
+    delete param;
+    delete sols;
     return;
 }

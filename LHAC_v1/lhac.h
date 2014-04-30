@@ -11,12 +11,9 @@
 
 #include <time.h>
 #include <Accelerate/Accelerate.h>
-#include <math.h>
 #include "Lbfgs.h"
 #include "Objective.h"
 
-
-#define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
 #define MAX_LENS 1024
 
@@ -32,7 +29,7 @@ enum{ ALG_L1LOG = 1, ALG_SICS };
 
 enum{  GREEDY= 1, STD };
 
-struct Funcstrct {
+typedef struct {
     double f;
     double g;
     double val; // f + g
@@ -42,38 +39,7 @@ struct Funcstrct {
         g = _g;
         val = f + g;
     };
-    
-    Funcstrct& operator=(Funcstrct other) {
-        f = other.f;
-        g = other.g;
-        val = other.val;
-        
-        return *this;
-    };
-};
-
-typedef struct Funcstrct Func;
-
-typedef struct {
-    int index; // starting from 1 (not 0), ending with -1
-    double value;
-} feature_node;
-
-typedef struct {
-    feature_node** X;
-    double* y;
-    unsigned long p;
-    unsigned long N;
-    unsigned long nnz; // number of nonzeros
-    feature_node* x_space;
-} training_set_sp;
-
-typedef struct {
-    double* X;
-    double* y;
-    unsigned long p;
-    unsigned long N;
-} training_set;
+} Func;
 
 typedef struct {
     double* t;
@@ -95,6 +61,15 @@ typedef struct {
     
     /* result */
     int p_sics; //dimension of w
+    
+    void releaseMe() {
+        delete [] fval;
+        delete [] normgs;
+        delete [] t;
+        delete [] niter;
+        
+        return;
+    };
 } solution;
 
 typedef struct {
@@ -127,6 +102,7 @@ typedef struct {
     unsigned long active_set;
     
 } Parameter;
+
 
 
 //solution* lhac(l1log* mdl);

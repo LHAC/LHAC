@@ -14,7 +14,7 @@
 //#include <vecLib/cblas.h>
 #include <Accelerate/Accelerate.h>
 
-#include "myUtilities.h"
+//#include "myUtilities.h"
 
 LMatrix::LMatrix(unsigned long s1, unsigned long s2)
 {

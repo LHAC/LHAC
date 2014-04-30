@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "lhac.h"
-#include "myUtilities.h"
 
 
 
@@ -101,9 +100,10 @@ int main(int argc, const char * argv[])
     
     Objective* obj = new Objective(param->fileName);
     solution* sols = lhac(obj, param);
-    releaseSolution(sols);
+    sols->releaseMe();
     
     delete [] param->fileName;
     delete param;
+    delete sols;
     exit( 0 );
 }
