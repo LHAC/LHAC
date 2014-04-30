@@ -203,8 +203,9 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, Solut
         
         rho_trial = (obj_trial-obj->val)/(f_mdl-obj->val);
         
-        printf("\t \t \t # of line searches = %3d; model quality: %+.3f\n", sd_iters, rho_trial);
-        
+        if (msgFlag >= LHAC_MSG_SD) {
+            printf("\t \t \t # of line searches = %3d; model quality: %+.3f\n", sd_iters, rho_trial);
+        }
         
         if (rho_trial > rho) {
             obj->add(f_trial, g_trial);
@@ -245,6 +246,7 @@ Solution* lhac(Objective* mdl, Parameter* param)
     sols->gvalTime = 0.0;
     sols->fvalTime = 0.0;
     sols->nls = 0;
+    sols->size = 0;
     
     unsigned long p = mdl->getDims();
     
@@ -338,13 +340,9 @@ Solution* lhac(Objective* mdl, Parameter* param)
     work_set->idxs = new ushort_pair_t[p];
     work_set->permut = new unsigned long[p];
     
-
-    unsigned short newton_iter;
-    sols->size = 0;
-    
     LBFGS* lR = new LBFGS(p, l, param->shrink);
     lR->initData(w, w_prev, L_grad, L_grad_prev);
-    for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
+    for (unsigned short newton_iter = 1; newton_iter < max_iter; newton_iter++) {
         computeWorkSet( work_set, lmd, L_grad, w, p);
         lR->computeLowRankApprox_v2(work_set);
         suffcientDecrease(lR, work_set, sols, mdl, param,
@@ -361,7 +359,7 @@ Solution* lhac(Objective* mdl, Parameter* param)
             (sols->size)++;
         }
         if (msgFlag >= LHAC_MSG_NEWTON) {
-            printf("%.4e  iter %2d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
+            printf("%.4e  iter %3d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
                    elapsedTime, newton_iter, obj->f, normsg, work_set->numActive);
         }
         memcpy(L_grad_prev, L_grad, p*sizeof(double));
