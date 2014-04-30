@@ -75,7 +75,7 @@ static inline void computeWorkSet( work_set_struct* &work_set, double lmd,
 static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solution* sols,
                                      Objective* mdl, Parameter* param, unsigned short iter, double* w,
                                      double* w_prev, double* D, double* d_bar, double* H_diag,
-                                     double* L_grad, unsigned long p, double* f_current)
+                                     double* L_grad, unsigned long p, Func* obj)
 {
     int max_sd_iters = 20;
     double mu = 1.0;
@@ -91,7 +91,6 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
     double wpd;
     double Hwd;
     double Qd_bar;
-    double f_trial;
     double f_mdl;
     double rho_trial;
     
@@ -177,10 +176,11 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
             w[i] = w_prev[i] + D[i];
         }
         
-        f_trial = mdl->computeObject(w) + computeReg(w, p, param);
+        double f_trial = mdl->computeObject(w);
+        double g_trial = computeReg(w, p, param);
+        double obj_trial = f_trial + g_trial;
         double order1 = cblas_ddot((int)p, D, 1, L_grad, 1);
         double order2 = 0;
-        double l1norm = 0;
         
         double* buffer = lR->buff;
         
@@ -199,19 +199,15 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
         order2 = mu*gama*cblas_ddot((int)p, D, 1, D, 1)-vp;
         order2 = order2*0.5;
         
-        for (unsigned long i = 0; i < p; i++) {
-            l1norm += lmd*(fabs(w[i]) - fabs(w_prev[i]));
-        }
+        f_mdl = obj->f + order1 + order2 + g_trial;
         
-        f_mdl = *f_current + order1 + order2 + l1norm;
-        
-        rho_trial = (f_trial-*f_current)/(f_mdl-*f_current);
+        rho_trial = (obj_trial-obj->val)/(f_mdl-obj->val);
         
         printf("\t \t \t # of line searches = %3d; model quality: %+.3f\n", sd_iters, rho_trial);
         
         
         if (rho_trial > rho) {
-            *f_current = f_trial;
+            obj->add(f_trial, g_trial);
             break;
         }
         mu = 2*mu;
@@ -255,14 +251,14 @@ solution* lhac(Objective* mdl, Parameter* param)
     double* D;
     double normsg0;
     double normsg;
-    double f_current;
-    double f_trial;
     double* w_prev;
     double* w;
     double* L_grad_prev;
     double* L_grad;
     double* H_diag; // p
     double* d_bar; // 2*l
+    
+    Func* obj = new Func;
     
     w_prev = new double[p];
     w = new double[p];
@@ -277,7 +273,8 @@ solution* lhac(Objective* mdl, Parameter* param)
     memset(w_prev, 0, p*sizeof(double));
     memset(D, 0, p*sizeof(double));
     
-    f_current = (mdl->computeObject(w) + computeReg(w, p, param));
+//    f_current = (mdl->computeObject(w) + computeReg(w, p, param));
+    obj->add(mdl->computeObject(w), computeReg(w, p, param));
     mdl->computeGradient(w, L_grad);
     normsg0 = computeSubgradient(lmd, L_grad, w, p);
     
@@ -319,9 +316,12 @@ solution* lhac(Objective* mdl, Parameter* param)
     
     // line search
     for (unsigned long lineiter = 0; lineiter < max_linesearch_iter; lineiter++) {
-        f_trial = mdl->computeObject(w) + computeReg(w, p, param);
-        if (f_trial < f_current + a*ssigma*delta) {
-            f_current = f_trial;
+//        f_trial = mdl->computeObject(w) + computeReg(w, p, param);
+        double f_trial = mdl->computeObject(w);
+        double g_trial = computeReg(w, p, param);
+        double obj_trial = f_trial + g_trial;
+        if (obj_trial < obj->val + a*ssigma*delta) {
+            obj->add(f_trial, g_trial);
             break;
         }
         
@@ -354,14 +354,14 @@ solution* lhac(Objective* mdl, Parameter* param)
         lR->computeLowRankApprox_v2(work_set);
         suffcientDecrease(lR, work_set, sols, mdl, param,
                           newton_iter, w, w_prev, D, d_bar, H_diag,
-                          L_grad, p, &f_current);
+                          L_grad, p, obj);
         
         double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
         
         normsg = computeSubgradient(lmd, L_grad, w, p);
         
         if (newton_iter == 1 || newton_iter % 30 == 0 ) {
-            sols->fval[sols->size] = f_current;
+            sols->fval[sols->size] = obj->val;
             sols->normgs[sols->size] = normsg;
             sols->t[sols->size] = elapsedTime;
             sols->niter[sols->size] = newton_iter;
@@ -370,7 +370,7 @@ solution* lhac(Objective* mdl, Parameter* param)
         }
         if (msgFlag >= LHAC_MSG_NEWTON) {
             printf("%.4e  iter %2d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
-                   elapsedTime, newton_iter, f_current, normsg, work_set->numActive);
+                   elapsedTime, newton_iter, obj->f, normsg, work_set->numActive);
         }
         
         memcpy(L_grad_prev, L_grad, p*sizeof(double));

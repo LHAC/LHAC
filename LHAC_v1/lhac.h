@@ -32,7 +32,7 @@ enum{ ALG_L1LOG = 1, ALG_SICS };
 
 enum{  GREEDY= 1, STD };
 
-typedef struct {
+struct Funcstrct {
     double f;
     double g;
     double val; // f + g
@@ -42,7 +42,17 @@ typedef struct {
         g = _g;
         val = f + g;
     };
-} Func;
+    
+    Funcstrct& operator=(Funcstrct other) {
+        f = other.f;
+        g = other.g;
+        val = other.val;
+        
+        return *this;
+    };
+};
+
+typedef struct Funcstrct Func;
 
 typedef struct {
     int index; // starting from 1 (not 0), ending with -1
