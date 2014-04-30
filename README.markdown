@@ -6,7 +6,7 @@ by Xiaocheng Tang [http://goo.gl/6QuMl]
 
 * `min f(x) + g(x)`  
 
-where `f(x)` can be any _smooth_ function, i.e., _logistic loss_, _square loss_, etc., and `g(x)` is assumed to be _simple_, i.e., `l1-norm`, `l1/l2-norm`, etc.  In practice, the regularization functions will be built into the software for users to choose from, and users will need to provide the function evaluation and gradient computation routines for `f(x)`.   There are, for now, two varieties of LHAC that handle
+where `f(x)` can be any _smooth_ function, i.e., _logistic loss_, _square loss_, etc., and `g(x)` is assumed to be _simple_, i.e., `l1-norm`, `l1/l2-norm`, etc.  In practice, the regularization functions will be built into the software for users to choose from, and users will need to provide the function evaluation and gradient computation routines for `f(x)`.   There are for now two varieties of LHAC that handle
 
 * _sparse inverse covariance selections_ problems 
 * _sparse logistic regression_ problems
