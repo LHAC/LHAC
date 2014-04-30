@@ -10,7 +10,6 @@
 #define __LHAC_v1__lhac__
 
 #include "Lbfgs.h"
-#include "Objective.h"
 #include <math.h>
 #include <Accelerate/Accelerate.h>
 

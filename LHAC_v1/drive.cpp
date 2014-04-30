@@ -35,7 +35,7 @@ void parse_command_line(int argc, const char * argv[],
     param->sd_flag = 1; // default using suffcient decrease
     param->shrink = 4;
     param->fileName = new char[MAX_LENS];
-    param->rho = 0.5;
+    param->rho = 0.01;
     param->cd_rate = 5;
     param->active_set = STD;
     
