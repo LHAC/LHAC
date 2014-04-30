@@ -18,6 +18,7 @@
 		D45C271B1910A8CD0087DBA3 /* liblapack.h in Headers */ = {isa = PBXBuildFile; fileRef = D45C27191910A8CD0087DBA3 /* liblapack.h */; };
 		D45C271C1910A8CD0087DBA3 /* timing.h in Headers */ = {isa = PBXBuildFile; fileRef = D45C271A1910A8CD0087DBA3 /* timing.h */; };
 		D468136E183DB92200C17532 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D468136D183DB92200C17532 /* Accelerate.framework */; };
+		D489C16A19115B8200D8368B /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = D489C16919115B8200D8368B /* Makefile */; };
 		D491142017360E0E00F75EAD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D491141F17360E0E00F75EAD /* CoreFoundation.framework */; };
 		D49D5B7B18AB24EB00D832AD /* lhac.h in Sources */ = {isa = PBXBuildFile; fileRef = D4FE842116BB6BD8004371C4 /* lhac.h */; };
 		D49D5B7C18AB24EB00D832AD /* lhac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4B48E2016C1EA3F00107AB3 /* lhac.cpp */; };
@@ -51,6 +52,7 @@
 		D45C27191910A8CD0087DBA3 /* liblapack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = liblapack.h; sourceTree = "<group>"; };
 		D45C271A1910A8CD0087DBA3 /* timing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timing.h; sourceTree = "<group>"; };
 		D468136D183DB92200C17532 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		D489C16919115B8200D8368B /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		D491141F17360E0E00F75EAD /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		D49D5B7418AB248F00D832AD /* l1log-mex.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "l1log-mex.mexmaci64"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4B48E2016C1EA3F00107AB3 /* lhac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lhac.cpp; sourceTree = "<group>"; };
@@ -105,6 +107,7 @@
 			isa = PBXGroup;
 			children = (
 				D45C27141910A8350087DBA3 /* Lbfgs.cpp */,
+				D489C16919115B8200D8368B /* Makefile */,
 				D45C27151910A8350087DBA3 /* Lbfgs.h */,
 				D45C27191910A8CD0087DBA3 /* liblapack.h */,
 				D45C271A1910A8CD0087DBA3 /* timing.h */,
@@ -216,6 +219,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D489C16A19115B8200D8368B /* Makefile in Sources */,
 				D45C27161910A8350087DBA3 /* Lbfgs.cpp in Sources */,
 				D41802DA19114B0F00655F93 /* LogReg.cpp in Sources */,
 				D4FE841F16B99683004371C4 /* drive.cpp in Sources */,

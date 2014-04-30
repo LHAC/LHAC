@@ -87,7 +87,7 @@ typedef struct {
     int sd_flag; // 1 = sufficient decrease; 0 = line search
     
     /* gama in lbfgs */
-    double shrink = 1; // gama = gama/shrink
+    double shrink; // gama = gama/shrink
     
     double rho;
     

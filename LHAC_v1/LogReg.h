@@ -35,7 +35,6 @@ private:
     double* y;
     double* e_ywx; // N
     double* B; // N
-    double* Xd; // N
     
 };
 

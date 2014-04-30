@@ -18,6 +18,8 @@ public:
     virtual double computeObject(double* wnew) =0;
     
     virtual void computeGradient(double* wnew, double* df) =0;
+    
+    virtual ~Objective() {};
 };
 
 #endif /* defined(__LHAC_v1__Objective__) */
