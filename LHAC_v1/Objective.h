@@ -14,27 +14,11 @@
 class Objective
 {
 public:
-    unsigned long getDims();
+    virtual unsigned long getDims() =0;
     
-    double computeObject(double* wnew);
+    virtual double computeObject(double* wnew) =0;
     
-    void computeGradient(double* wnew, double* df);
-    
-    /* data input file name */
-    Objective(const char *filename);
-    
-    ~Objective();
-    
-private:
-    unsigned long p;
-    unsigned long N;
-    
-    double* X;
-    double* y;
-    double* e_ywx; // N
-    double* B; // N
-    double* Xd; // N
-    
+    virtual void computeGradient(double* wnew, double* df) =0;
 };
 
 #endif /* defined(__LHAC_v1__Objective__) */

@@ -1,12 +1,12 @@
 //
-//  Objective.cpp
+//  LogReg.cpp
 //  LHAC_v1
 //
-//  Created by Xiaocheng Tang on 4/29/14.
+//  Created by Xiaocheng Tang on 4/30/14.
 //  Copyright (c) 2014 Xiaocheng Tang. All rights reserved.
 //
 
-#include "Objective.h"
+#include "LogReg.h"
 #include <math.h>
 #include "liblapack.h"
 
@@ -260,7 +260,7 @@ void transformToDenseFormat(training_set* Dset, training_set_sp* Dset_sp)
     return;
 }
 
-Objective::Objective(const char *filename)
+LogReg::LogReg(const char *filename)
 {
     
     // sparse format
@@ -285,22 +285,22 @@ Objective::Objective(const char *filename)
     
     e_ywx = new double[N]; // N
     B = new double[N]; // N
-
+    
 }
 
-unsigned long Objective::getDims()
+unsigned long LogReg::getDims()
 {
     return p;
 }
 
-double Objective::computeObject(double* wnew)
+double LogReg::computeObject(double* wnew)
 {
     double fval = 0;
     
     double alpha = 1.0;
     double beta = 0.0;
     cblas_dgemv(CblasColMajor, CblasNoTrans, (int)N, (int)p, alpha, X, (int)N, wnew, 1, beta, e_ywx, 1);
-//    lcdgemv(CblasColMajor, CblasNoTrans, X, wnew, e_ywx, (int)N, (int)p);
+    //    lcdgemv(CblasColMajor, CblasNoTrans, X, wnew, e_ywx, (int)N, (int)p);
     for (unsigned long i = 0; i < N; i++) {
         double nc1;
         double nc2;
@@ -320,23 +320,24 @@ double Objective::computeObject(double* wnew)
     return fval;
 }
 
-void Objective::computeGradient(double* wnew, double* df)
+void LogReg::computeGradient(double* wnew, double* df)
 {
     for (unsigned long i = 0; i < N; i++) {
         B[i] = -y[i]/(1+e_ywx[i]);
     }
     cblas_dgemv(CblasColMajor, CblasTrans, (int)N, (int)p, 1.0, X, (int)N, B, 1, 0.0, df, 1);
-//    lcdgemv(CblasColMajor, CblasNoTrans, X, B, df, (int)N, (int)p);
+    //    lcdgemv(CblasColMajor, CblasNoTrans, X, B, df, (int)N, (int)p);
     return;
 }
 
-Objective::~Objective()
+LogReg::~LogReg()
 {
     delete [] X;
     delete [] y;
     delete [] e_ywx;
     delete [] B;
 }
+
 
 
 

@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "lhac.h"
+#include "LogReg.h"
 
 
 
@@ -87,8 +88,7 @@ void parse_command_line(int argc, const char * argv[],
     }
     
     strcpy(param->fileName, argv[i]);
-    
-    
+
 }
 
 
@@ -98,7 +98,7 @@ int main(int argc, const char * argv[])
     Parameter* param = new Parameter;
     parse_command_line(argc, argv, param);
     
-    Objective* obj = new Objective(param->fileName);
+    LogReg* obj = new LogReg(param->fileName);
     Solution* sols = lhac(obj, param);
     
     delete [] param->fileName;
