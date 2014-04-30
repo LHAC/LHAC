@@ -10,9 +10,9 @@
 		D42F1EDE190FEED40074C780 /* Objective.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D42F1EDC190FEED40074C780 /* Objective.cpp */; };
 		D42F1EDF190FEED40074C780 /* Objective.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D42F1EDC190FEED40074C780 /* Objective.cpp */; };
 		D42F1EE0190FEED40074C780 /* Objective.h in Headers */ = {isa = PBXBuildFile; fileRef = D42F1EDD190FEED40074C780 /* Objective.h */; };
+		D45C271319108D350087DBA3 /* lhac-mex-gen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D45C271219108D350087DBA3 /* lhac-mex-gen.cpp */; };
 		D468136E183DB92200C17532 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D468136D183DB92200C17532 /* Accelerate.framework */; };
 		D491142017360E0E00F75EAD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D491141F17360E0E00F75EAD /* CoreFoundation.framework */; };
-		D49D5B7918AB24EB00D832AD /* l1log-mex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D49D5B6E18AB136E00D832AD /* l1log-mex.cpp */; };
 		D49D5B7B18AB24EB00D832AD /* lhac.h in Sources */ = {isa = PBXBuildFile; fileRef = D4FE842116BB6BD8004371C4 /* lhac.h */; };
 		D49D5B7C18AB24EB00D832AD /* lhac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4B48E2016C1EA3F00107AB3 /* lhac.cpp */; };
 		D49D5B7F18AB24EB00D832AD /* Lbfgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4FE841A16B97155004371C4 /* Lbfgs.cpp */; };
@@ -41,9 +41,9 @@
 /* Begin PBXFileReference section */
 		D42F1EDC190FEED40074C780 /* Objective.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Objective.cpp; sourceTree = "<group>"; };
 		D42F1EDD190FEED40074C780 /* Objective.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Objective.h; sourceTree = "<group>"; };
+		D45C271219108D350087DBA3 /* lhac-mex-gen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "lhac-mex-gen.cpp"; sourceTree = "<group>"; };
 		D468136D183DB92200C17532 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		D491141F17360E0E00F75EAD /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
-		D49D5B6E18AB136E00D832AD /* l1log-mex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "l1log-mex.cpp"; sourceTree = "<group>"; };
 		D49D5B7418AB248F00D832AD /* l1log-mex.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "l1log-mex.mexmaci64"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4B48E2016C1EA3F00107AB3 /* lhac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lhac.cpp; sourceTree = "<group>"; };
 		D4FBD17C16AD90C7006E7958 /* LHAC_v1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LHAC_v1; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -99,10 +99,10 @@
 			isa = PBXGroup;
 			children = (
 				D4FE841D16B99683004371C4 /* drive.cpp */,
-				D49D5B6E18AB136E00D832AD /* l1log-mex.cpp */,
 				D4FE842116BB6BD8004371C4 /* lhac.h */,
 				D4B48E2016C1EA3F00107AB3 /* lhac.cpp */,
 				D42F1EDC190FEED40074C780 /* Objective.cpp */,
+				D45C271219108D350087DBA3 /* lhac-mex-gen.cpp */,
 				D42F1EDD190FEED40074C780 /* Objective.h */,
 				D4FE841A16B97155004371C4 /* Lbfgs.cpp */,
 				D4FE841B16B97155004371C4 /* Lbfgs.h */,
@@ -191,10 +191,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D49D5B7918AB24EB00D832AD /* l1log-mex.cpp in Sources */,
 				D49D5B7B18AB24EB00D832AD /* lhac.h in Sources */,
 				D49D5B7C18AB24EB00D832AD /* lhac.cpp in Sources */,
 				D42F1EDF190FEED40074C780 /* Objective.cpp in Sources */,
+				D45C271319108D350087DBA3 /* lhac-mex-gen.cpp in Sources */,
 				D49D5B7F18AB24EB00D832AD /* Lbfgs.cpp in Sources */,
 				D49D5B8018AB24EB00D832AD /* Lbfgs.h in Sources */,
 			);

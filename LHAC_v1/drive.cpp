@@ -100,7 +100,6 @@ int main(int argc, const char * argv[])
     
     Objective* obj = new Objective(param->fileName);
     solution* sols = lhac(obj, param);
-    sols->releaseMe();
     
     delete [] param->fileName;
     delete param;

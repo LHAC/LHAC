@@ -1,3 +1,11 @@
+//
+//  lhac-mex-gen.c
+//  LHAC_v1
+//
+//  Created by Xiaocheng Tang on 4/29/14.
+//  Copyright (c) 2014 Xiaocheng Tang. All rights reserved.
+//
+
 #include <mex.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +23,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                           "             L - the regularization parameter.");
     }
     
-
+    
     long argIdx = 0;
     
     // data file name
@@ -167,3 +175,4 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     delete sols;
     return;
 }
+

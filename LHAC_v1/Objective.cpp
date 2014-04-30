@@ -21,36 +21,32 @@ typedef struct {
     double value;
 } feature_node;
 
-typedef struct {
+typedef struct training_set_sp_strct {
     feature_node** X;
     double* y;
     unsigned long p;
     unsigned long N;
     unsigned long nnz; // number of nonzeros
     feature_node* x_space;
+    
+    ~training_set_sp_strct() {
+        delete [] x_space;
+        delete [] X;
+        delete [] y;
+    }
 } training_set_sp;
 
-typedef struct {
+typedef struct training_set_strct {
     double* X;
     double* y;
     unsigned long p;
     unsigned long N;
+    
+    ~training_set_strct() {
+        delete [] X;
+        delete [] y;
+    }
 } training_set;
-
-void releaseProb(training_set* Dset)
-{
-    delete [] Dset->X;
-    delete [] Dset->y;
-    delete Dset;
-}
-
-void releaseProb(training_set_sp* Dset)
-{
-    delete [] Dset->x_space;
-    delete [] Dset->X;
-    delete [] Dset->y;
-    delete Dset;
-}
 
 
 static char* readline(FILE *input)
@@ -279,7 +275,7 @@ Objective::Objective(const char *filename)
     
     training_set* Dset = new training_set;
     transformToDenseFormat(Dset, Dset_sp);
-    releaseProb(Dset_sp);
+    delete Dset_sp;
     
     p = Dset->p;
     N = Dset->N;

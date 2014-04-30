@@ -41,7 +41,7 @@ typedef struct {
     };
 } Func;
 
-typedef struct {
+typedef struct solution_struct {
     double* t;
     double* fval;
     double* normgs;
@@ -62,7 +62,7 @@ typedef struct {
     /* result */
     int p_sics; //dimension of w
     
-    void releaseMe() {
+    ~solution_struct() {
         delete [] fval;
         delete [] normgs;
         delete [] t;
