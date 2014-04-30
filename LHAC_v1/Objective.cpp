@@ -68,10 +68,6 @@ double Objective::computeObject(double* wnew)
         
     }
     
-//    for (unsigned long i = 0; i < p; i++) {
-//        fval += fabs(wnew[i]);
-//    }
-    
     return fval;
 }
 

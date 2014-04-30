@@ -33,6 +33,18 @@ enum{ ALG_L1LOG = 1, ALG_SICS };
 enum{  GREEDY= 1, STD };
 
 typedef struct {
+    double f;
+    double g;
+    double val; // f + g
+    
+    void add(double _f, double _g) {
+        f = _f;
+        g = _g;
+        val = f + g;
+    };
+} Func;
+
+typedef struct {
     int index; // starting from 1 (not 0), ending with -1
     double value;
 } feature_node;

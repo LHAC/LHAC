@@ -91,7 +91,6 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
     double wpd;
     double Hwd;
     double Qd_bar;
-    
     double f_trial;
     double f_mdl;
     double rho_trial;
@@ -115,10 +114,6 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
         for (unsigned long j = 0; j < m; j++)
             H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[k+j];
     }
-    
-    
-    /* mdl value change */
-    double dQ = 0;
     
     //    unsigned long max_cd_pass = std::min(1 + iter/3, param->max_inner_iter);
     unsigned long max_cd_pass = 1 + iter / param->cd_rate;
@@ -171,8 +166,8 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
             }
             
             if (msgFlag >= LHAC_MSG_CD) {
-                printf("\t\t Coordinate descent pass %ld:   Change in d = %+.4e   norm(d) = %+.4e   Change in Q = %+.4e\n",
-                       cd_pass, diffd, normd, dQ);
+                printf("\t\t Coordinate descent pass %ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
+                       cd_pass, diffd, normd);
             }
             
             //            shuffle( work_set );
@@ -356,12 +351,10 @@ solution* lhac(Objective* mdl, Parameter* param)
         computeWorkSet( work_set, lmd,
                        L_grad, w, p);
         
-        
         lR->computeLowRankApprox_v2(work_set);
         suffcientDecrease(lR, work_set, sols, mdl, param,
                           newton_iter, w, w_prev, D, d_bar, H_diag,
                           L_grad, p, &f_current);
-        
         
         double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
         
@@ -376,10 +369,9 @@ solution* lhac(Objective* mdl, Parameter* param)
             (sols->size)++;
         }
         if (msgFlag >= LHAC_MSG_NEWTON) {
-            printf("%.4e  iter %2d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld   |w| = %.4e\n",
-                   elapsedTime, newton_iter, f_current, normsg, work_set->numActive, computeReg(w, p, param));
+            printf("%.4e  iter %2d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
+                   elapsedTime, newton_iter, f_current, normsg, work_set->numActive);
         }
-        
         
         memcpy(L_grad_prev, L_grad, p*sizeof(double));
         

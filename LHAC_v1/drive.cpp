@@ -13,39 +13,8 @@
 #include <string.h>
 #include "lhac.h"
 #include "myUtilities.h"
-#include <CoreFoundation/CoreFoundation.h>
 
 
-
-/* Parameters */
-#define _P 4000
-#define _N 5000
-#define _NNZ_PERC 0.1
-
-
-
-
-void libsvmExperiment(Parameter* param)
-{
-
-    
-    
-    Objective* obj = new Objective(param->fileName);
-//        write2mat("gisette_x", "X", Dset->X, Dset->N, Dset->p);
-//        write2mat("gisette_y", "y", Dset->y, Dset->N, 1);
-    
-    
-//    l1log* mdl = new l1log(Dset, param);
-    //    l1log* mdl = new l1log(Dset);
-    
-    solution* sols = lhac(obj, param);
-    
-    
-
-    releaseSolution(sols);
-    
-    return;
-}
 
 void parse_command_line(int argc, const char * argv[],
                         Parameter* param)
@@ -130,8 +99,9 @@ int main(int argc, const char * argv[])
     Parameter* param = new Parameter;
     parse_command_line(argc, argv, param);
     
-    libsvmExperiment(param);
-    
+    Objective* obj = new Objective(param->fileName);
+    solution* sols = lhac(obj, param);
+    releaseSolution(sols);
     
     delete [] param->fileName;
     delete param;
