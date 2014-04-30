@@ -9,9 +9,6 @@
 #ifndef __LHAC_v1__Lbfgs__
 #define __LHAC_v1__Lbfgs__
 
-
-#define MAX_SY_PAIRS 100
-
 typedef struct {
     unsigned long i;
     unsigned long j;
@@ -26,7 +23,6 @@ typedef struct {
     unsigned long numActive;
     unsigned long _p_sics_;
 } work_set_struct;
-
 
 class LMatrix {
 public:
@@ -61,12 +57,15 @@ public:
     double* Q_bar;
     unsigned short m; // no. of cols in Q
     double gama;
-    double* buff; // p
     
     // for test
-    double tQ = 0;
-    double tR = 0;
-    double tQ_bar = 0;
+    double tQ;
+    double tR;
+    double tQ_bar;
+    
+    double* buff;
+    
+    double shrink;
     
     LBFGS(unsigned long _p, unsigned short _l, double _s);
     
@@ -74,40 +73,26 @@ public:
     
     void initData(double* w, double* w_prev, double* L_grad, double* L_grad_prev);
     
-    void computeLowRankApprox();
-    
-    void computeLowRankApprox(work_set_struct* work_set);
-    
     void computeLowRankApprox_v2(work_set_struct* work_set);
     
     void updateLBFGS(double* w, double* w_prev, double* L_grad, double* L_grad_prev);
-    
-    void computeHDiag(double* H_diag);
-    
-    double computeHdj(double Di, double* d_bar, unsigned long idx);
-    
-    void updateDbar(double* d_bar, unsigned long idx, double z);
     
 private:
     LMatrix* Sm;
     LMatrix* Tm;
     LMatrix* Lm;
     LMatrix* STS;
+    unsigned long* permut; // for updating lbfgs, length of l
+    double* permut_mx; // for updating lbfgs, l*l
+    double* buff2; // length of l
+    
     double* Dm;
     double* R;
     unsigned long p; // no. of rows in Q
     unsigned short l; // lbfgs param
     
-    double shrink;
     
-    /* for lapack */
-    int ipiv[MAX_SY_PAIRS+1];
-    int lwork = MAX_SY_PAIRS*MAX_SY_PAIRS;
-    double work[MAX_SY_PAIRS*MAX_SY_PAIRS];
-    
-    void computeQR();
     void computeQR_v2(work_set_struct* work_set);
-//    unsigned long* Q_bar_idxs; // cols of Q_bar to update
     
 };
     

@@ -217,9 +217,6 @@ void readLibsvm(const char *filename, training_set_sp* Dset_col)
     //    printout("Dset = ", Dset, ROW_MAJOR);
     transpose(Dset, Dset_col);
     
-    delete [] Dset->y;
-    delete [] Dset->X;
-    delete [] Dset->x_space;
     delete Dset;
     return;
 }

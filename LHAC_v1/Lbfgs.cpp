@@ -7,21 +7,16 @@
 //
 
 #include "Lbfgs.h"
+#include "liblapack.h"
 
+#include <math.h>
 #include <string.h>
 #include <stdio.h>
-//#include <vecLib/clapack.h>
-//#include <vecLib/cblas.h>
-#include <Accelerate/Accelerate.h>
 
-//#include "myUtilities.h"
 
 LMatrix::LMatrix(unsigned long s1, unsigned long s2)
 {
     data = new double*[s2];
-//    for (unsigned short i = 0; i < s2; i++) {
-//        data[i] = new double[s1];
-//    }
     data_space = new double[s1*s2];
     for (unsigned long i = 0, k = 0; i < s2; i++, k += s1) {
         data[i] = &data_space[k];
@@ -36,9 +31,7 @@ LMatrix::LMatrix(unsigned long s1, unsigned long s2)
 
 LMatrix::~LMatrix()
 {
-//    for (unsigned short i = 0; i < maxcols; i++) {
-//        delete [] data[i];
-//    }
+
     delete [] data_space;
     delete [] data;
 }
@@ -89,9 +82,8 @@ void LMatrix::insertRow(double* x)
 void LMatrix::insertCol(double* x)
 {
     double* cl = data[cols];
-    for (unsigned long j = 0; j < rows; j++) {
-        cl[j] = x[j];
-    }
+
+    memcpy(cl, x, rows*sizeof(double));
     
     ++cols;
     
@@ -129,11 +121,23 @@ LBFGS::LBFGS(unsigned long _p, unsigned short _l, double _s)
     p = _p;
     shrink = _s;
     
+    tQ = 0;
+    tR = 0;
+    tQ_bar = 0;
+    
     Sm = new LMatrix(p, l);
     Tm = new LMatrix(p, l);
     Lm = new LMatrix(l, l);
     STS = new LMatrix(l,l);
     Dm = new double[l];
+    permut = new unsigned long[l];
+    permut_mx = new double[l*l];
+    buff2 = new double[l];
+    /* initialize permut and permut matrix */
+    for (unsigned long j = 0; j < l; j++) {
+        permut[j] = j+1;
+    }
+    memset(permut_mx, 0, l*l*sizeof(double));
     
     Q = new double[2*l*p];
     Q_bar = new double[2*l*p];
@@ -147,17 +151,13 @@ void LBFGS::initData(double *w, double *w_prev, double *L_grad, double *L_grad_p
     /* S = [S obj.w-obj.w_prev]; */
     for (unsigned long i = 0; i < p; i++) {
         buff[i] = w[i] - w_prev[i];
-//        printf(" i = %ld\n", i);
     }
     Sm->init(buff, p, 1);
-    //    printout("Sm = ", Sm);
     
     double sTs;
-    sTs = cblas_ddot((int)p, buff, 1, buff, 1);
+    sTs = lcddot((int)p, buff, 1, buff, 1);
     STS->init(&sTs, 1, 1);
     
-//    write2mat("STS.mat", "STS", STS);
-//    write2mat("Sm.mat", "Sm", Sm);
     
     /* T = [T obj.L_grad-obj.L_grad_prev]; */
     double vv = 0.0;// S(:,end)'*T(:,end)
@@ -168,7 +168,6 @@ void LBFGS::initData(double *w, double *w_prev, double *L_grad, double *L_grad_p
         buff[i] = diff;
     }
     Tm->init(buff, p, 1);
-    //    printout("Sm = ", Tm);
     
     Dm[0] = vv;
     
@@ -177,6 +176,7 @@ void LBFGS::initData(double *w, double *w_prev, double *L_grad, double *L_grad_p
     
     return;
 }
+
 
 void LBFGS::computeQR_v2(work_set_struct* work_set)
 {
@@ -187,39 +187,20 @@ void LBFGS::computeQR_v2(work_set_struct* work_set)
     Tend = Tm->data[_cols-1];
     
     double vv = 0.0;
-    vv = cblas_ddot(_rows, Tend, 1, Tend, 1);
-    
+    vv = lcddot(_rows, Tend, 1, Tend, 1);
     gama = vv / Dm[_cols-1] / shrink;
+//    gama = Dm[_cols-1] / vv;
     
-    ushort_pair_t* idxs = work_set->idxs;
     unsigned long numActive = work_set->numActive;
+    /* different from SICS  */
+    ushort_pair_t* idxs = work_set->idxs;
     
-    /* Q */
-    //    printout("Sm =", Sm);
+    /* Q in row major */
     double** S = Sm->data;
     double** T = Tm->data;
     double* cl;
-    unsigned long num = 0;
-//    for (unsigned long i = 0; i < _cols; i++) {
-//        cl = S[i];
-//        for (unsigned long jj = 0; jj < numActive; jj++) {
-//            Q[num] = gama*cl[idxs[jj].j];
-//            num++;
-//        }
-//    }
-//    
-//    for (unsigned long i = 0; i < _cols; i++) {
-//        cl = T[i];
-//        for (unsigned long jj = 0; jj < numActive; jj++) {
-//            Q[num] = cl[idxs[jj].j];
-//            num++;
-//        }
-//    }
     
-//    write2mat("Qm_col.mat", "Qm", Q, numActive, 2*_cols);
-    
-    
-    /* row major */
+    /* different from SICS  */
     for (unsigned long i = 0; i < _cols; i++) {
         cl = S[i];
         for (unsigned long jj = 0, k = 0; jj < numActive; jj++, k += 2*_cols) {
@@ -234,18 +215,8 @@ void LBFGS::computeQR_v2(work_set_struct* work_set)
         }
     }
     
-//    write2mat("Qm_row.mat", "Qm", Q, 2*_cols, numActive);
-    
-    
-//    write2mat("Sm.mat", "Sm", Sm);
-//    write2mat("Tm.mat", "Tm", Tm);
-//    write2mat("Dm.mat", "Dm", Dm, _cols, 1);
-//    write2mat("Qm.mat", "Qm", Q, numActive, 2*_cols);
-//    write2mat("work_set.mat", "work_set", work_set);
-    
     /* R */
     double* cl1;
-    //    double* cl2;
     double** L = Lm->data;
     unsigned short _2cols = 2*_cols;
     memset(R, 0, _2cols*_2cols*sizeof(double));
@@ -289,43 +260,28 @@ void LBFGS::computeQR_v2(work_set_struct* work_set)
     }
     
     return;
+    
 }
 
-void LBFGS::computeLowRankApprox_v2(work_set_struct *work_set)
+void LBFGS::computeLowRankApprox_v2(work_set_struct* work_set)
 {
-//    int _rows = (int)Tm->rows;
+    int _rows = (int)Tm->rows;
     unsigned short _cols = Tm->cols;
     int _2cols = 2*_cols;
-    //    unsigned long _p_sics_ = work_set->_p_sics_;
+    int p_sics = sqrt(_rows);
     
     computeQR_v2(work_set);
     
     /* solve R*Q_bar = Q' for Q_bar */
+    inverse(R, _2cols);
     
-    int info;
-    dgetrf_(&_2cols, &_2cols, R, &_2cols, ipiv, &info);
-    dgetri_(&_2cols, R, &_2cols, ipiv, work, &lwork, &info);
     /* R now store R-1 */
-    
-    
-    int cblas_N = (int) work_set->numActive;
-//    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, cblas_N, 0.0, Q_bar, _2cols);
-    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, _2cols, cblas_N, _2cols, 1.0, R, _2cols, Q, _2cols, 0.0, Q_bar, _2cols);
-//    write2mat("Qm.mat", "Qm", Q, _2cols, cblas_N);
-//    write2mat("Qm.mat", "Qm", Q, cblas_N, _2cols);
-//    write2mat("Rm.mat", "Rm", R, _2cols, _2cols);
-//    write2mat("Q_barm.mat", "Q_barm", Q_bar, _2cols, cblas_N);
-    
-//    ushort_pair_t* idxs = work_set->idxs;
-//    for (unsigned long i1 = 0; i1 < work_set->numActive; i1++) {
-//        unsigned long i2 = idxs[i1].j;
-//        unsigned long i3 = i2*_2cols;
-//        
-//    }
+    int cblas_N = (int) work_set->numActive + p_sics;
+    lcdgemm(R, Q, Q_bar, _2cols, cblas_N);
     
     m = _2cols;
-    
     return;
+    
 }
 
 void LBFGS::updateLBFGS(double* w, double* w_prev, double* L_grad, double* L_grad_prev)
@@ -342,48 +298,77 @@ void LBFGS::updateLBFGS(double* w, double* w_prev, double* L_grad, double* L_gra
     for (unsigned long i = 0; i < p; i++) {
         buff[i] = w[i] - w_prev[i];
     }
-    //        printout("w = ", mdl->w, _P);
-    //        printout("w_prev = ", mdl->w_prev, _P);
-//    printout("buff = ", buff, p);
+
     Sm->insertCol(buff);
-    double vv = 0.0;// S(:,end)'*T(:,end)
-    double diff;
+
     for (unsigned long i = 0; i < p; i++) {
-        diff = L_grad[i] - L_grad_prev[i];
-        vv += buff[i]*diff;
-        buff[i] = diff;
+        buff[i] = L_grad[i] - L_grad_prev[i];
     }
-    //        printout("L_grad_prev = ", mdl->L_grad_prev, _P);
-    //        printout("L_grad = ", mdl->L_grad, _P);
-    //        printout("L_grad - L_grad_prev = ", buff, _P);
-//    printout("buff = ", buff, p);
     Tm->insertCol(buff);
+    
     double* cl1 = Sm->data[Sm->cols-1];
-    double* cl2;
-    for (unsigned short i = 0; i < Tm->cols-1; i++) {
-        cl2 = Tm->data[i];
-        //            printout("cl1 = ", cl1, _P);
-        //            printout("cl2 = ", cl2, _P);
-        buff[i] = cblas_ddot((int)Tm->rows, cl1, 1, cl2, 1);
+    int cblas_N = (int) Tm->rows;
+    int cblas_M = (int) Tm->cols;
+    lcdgemv(CblasRowMajor, CblasNoTrans, Tm->data_space, cl1, buff, cblas_M, cblas_N);
+    
+    if (Sm->cols >= l) {
+        /* update permut */
+        for (unsigned long j = 0; j < l; j++) {
+            if (permut[j] != 0) {
+                permut[j]--;
+            }
+            else
+                permut[j] = l-1;
+        }
+        
+        /* update permut matrix */
+        for (unsigned long j = 0; j < l; j++) {
+            unsigned long imx = permut[j];
+            unsigned long jmx = j;
+            unsigned long ij = jmx*l + imx;
+            permut_mx[ij] = 1;
+        }
+        
+        /* permuting buff */
+        lcdgemv(CblasColMajor, CblasNoTrans, permut_mx, buff, buff2, (int)l, (int)l);
+        
+        
+        Lm->insertRow(buff2);
+        Dm[Lm->rows-1] = buff2[l-1];
+        
     }
-    //        printout("Lm =", Lm);
-    Lm->insertRow(buff);
+    else {
+        Lm->insertRow(buff);
+        Dm[Lm->rows-1] = buff[Tm->cols-1];
+    }
+
+    
     memset(buff, 0, Lm->rows*sizeof(double));
-    //        printout("Lm = ", Lm);
     Lm->insertCol(buff);
-    //        printout("Lm = ", Lm);
-    Dm[Lm->rows-1] = vv;
+    
     
     cl1 = Sm->data[Sm->cols-1];
-    for (unsigned short i = 0; i < Sm->cols; i++) {
-        cl2 = Sm->data[i];
-        buff[i] = cblas_ddot((int)Sm->rows, cl1, 1, cl2, 1);
+    cblas_N = (int) Sm->rows;
+    cblas_M = (int) Sm->cols;
+    lcdgemv(CblasRowMajor, CblasNoTrans, Sm->data_space, cl1, buff, cblas_M, cblas_N);
+    
+    if (Sm->cols >= l) {
+        /* permuting buff */
+        lcdgemv(CblasColMajor, CblasNoTrans, permut_mx, buff, buff2, (int)l, (int)l);
+        
+        memset(permut_mx, 0, l*l*sizeof(double));        
+        
+        STS->insertRow(buff2);
+        STS->insertCol(buff2);
     }
-    STS->insertRow(buff);
-    STS->insertCol(buff);
+    else {
+        STS->insertRow(buff);
+        STS->insertCol(buff);
+    }
+
+
     return;
 }
-
 
 LBFGS::~LBFGS()
 {
@@ -396,6 +381,9 @@ LBFGS::~LBFGS()
     delete [] Q_bar;
     delete [] R;
     delete [] buff;
+    delete [] buff2;
+    delete [] permut_mx;
+    delete [] permut;
 }
 
 

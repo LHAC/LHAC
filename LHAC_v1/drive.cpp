@@ -99,7 +99,7 @@ int main(int argc, const char * argv[])
     parse_command_line(argc, argv, param);
     
     Objective* obj = new Objective(param->fileName);
-    solution* sols = lhac(obj, param);
+    Solution* sols = lhac(obj, param);
     
     delete [] param->fileName;
     delete param;

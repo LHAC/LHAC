@@ -9,8 +9,6 @@
 #ifndef __LHAC_v1__lhac__
 #define __LHAC_v1__lhac__
 
-#include <time.h>
-#include <Accelerate/Accelerate.h>
 #include "Lbfgs.h"
 #include "Objective.h"
 
@@ -19,13 +17,10 @@
 
 #define __MATLAB_API__
 
-enum { LIBSVM = 0, GENERAL };
 
-enum { FULL, COL_VIEW, ROW_VIEW };
 
 enum { LHAC_MSG_NO=0, LHAC_MSG_MIN, LHAC_MSG_NEWTON, LHAC_MSG_CD, LHAC_MSG_LINE, LHAC_MSG_MAX };
 
-enum{ ALG_L1LOG = 1, ALG_SICS };
 
 enum{  GREEDY= 1, STD };
 
@@ -70,7 +65,7 @@ typedef struct solution_struct {
         
         return;
     };
-} solution;
+} Solution;
 
 typedef struct {
     char* fileName;
@@ -106,7 +101,7 @@ typedef struct {
 
 
 //solution* lhac(l1log* mdl);
-solution* lhac(Objective* mdl, Parameter* param);
+Solution* lhac(Objective* mdl, Parameter* param);
 
 
 

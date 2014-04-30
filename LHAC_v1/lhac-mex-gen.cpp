@@ -1,5 +1,5 @@
 //
-//  lhac-mex-gen.c
+//  lhac-mex-gen.cpp
 //  LHAC_v1
 //
 //  Created by Xiaocheng Tang on 4/29/14.
@@ -122,7 +122,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     Objective* obj = new Objective(param->fileName);;
     
-    solution* sols = lhac(obj, param);
+    Solution* sols = lhac(obj, param);
     
     //    printout("logs = ", sols, cparam);
     

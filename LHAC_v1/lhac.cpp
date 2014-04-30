@@ -7,8 +7,8 @@
 //
 
 #include "lhac.h"
-
 #include <math.h>
+#include <Accelerate/Accelerate.h>
 
 /* may generalize to other regularizations beyond l1 */
 static inline double computeReg(double* w, unsigned long p, Parameter* param)
@@ -72,7 +72,7 @@ static inline void computeWorkSet( work_set_struct* &work_set, double lmd,
     return;
 }
 
-static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solution* sols,
+static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, Solution* sols,
                                      Objective* mdl, Parameter* param, unsigned short iter, double* w,
                                      double* w_prev, double* D, double* d_bar, double* H_diag,
                                      double* L_grad, unsigned long p, Func* obj)
@@ -219,7 +219,7 @@ static inline void suffcientDecrease(LBFGS* lR, work_set_struct* work_set, solut
 }
 
 
-solution* lhac(Objective* mdl, Parameter* param)
+Solution* lhac(Objective* mdl, Parameter* param)
 {
     
     double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
@@ -230,7 +230,7 @@ solution* lhac(Objective* mdl, Parameter* param)
     double lmd = param->lmd;
     int msgFlag = param->verbose;
     
-    solution* sols = new solution;
+    Solution* sols = new Solution;
     sols->fval = new double[max_iter];
     sols->normgs = new double[max_iter];
     sols->t = new double[max_iter];
@@ -345,19 +345,13 @@ solution* lhac(Objective* mdl, Parameter* param)
     LBFGS* lR = new LBFGS(p, l, param->shrink);
     lR->initData(w, w_prev, L_grad, L_grad_prev);
     for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
-        
-        computeWorkSet( work_set, lmd,
-                       L_grad, w, p);
-        
+        computeWorkSet( work_set, lmd, L_grad, w, p);
         lR->computeLowRankApprox_v2(work_set);
         suffcientDecrease(lR, work_set, sols, mdl, param,
                           newton_iter, w, w_prev, D, d_bar, H_diag,
                           L_grad, p, obj);
-        
         double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
-        
         normsg = computeSubgradient(lmd, L_grad, w, p);
-        
         if (newton_iter == 1 || newton_iter % 30 == 0 ) {
             sols->fval[sols->size] = obj->val;
             sols->normgs[sols->size] = normsg;
@@ -370,23 +364,14 @@ solution* lhac(Objective* mdl, Parameter* param)
             printf("%.4e  iter %2d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
                    elapsedTime, newton_iter, obj->f, normsg, work_set->numActive);
         }
-        
         memcpy(L_grad_prev, L_grad, p*sizeof(double));
-        
         mdl->computeGradient(w, L_grad);
-        
         /* update LBFGS */
         lR->updateLBFGS(w, w_prev, L_grad, L_grad_prev);
-        
-
         if (normsg <= opt_outer_tol*normsg0) {
             break;
         }
-        
     }
-    
-    
-    
     delete mdl;
     delete lR;
     delete [] work_set->idxs;
