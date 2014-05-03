@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "lhac.h"
+#include "LogReg.h"
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -120,7 +121,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     param->active_set = active_set;
     
     
-    Objective* obj = new Objective(param->fileName);;
+    LogReg* obj = new LogReg(param->fileName);
     
     Solution* sols = lhac(obj, param);
     
