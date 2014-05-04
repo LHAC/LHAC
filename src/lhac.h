@@ -164,6 +164,8 @@ public:
         sols = new Solution(max_iter);
         work_set = new work_set_struct(p);
         lR = new LBFGS(p, l, param->shrink);
+        
+        ista_size = 1;
     
     };
     
@@ -180,6 +182,30 @@ public:
         
     }
     
+    Solution* ista() {
+        double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
+        obj->add(mdl->computeObject(w), computeReg(w));
+        mdl->computeGradient(w, L_grad);
+        normsg0 = computeSubgradient();
+        normsg = normsg0;
+        for (ista_iter = 1; ista_iter <= 25; ista_iter++) {
+            istaStep();
+            double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
+            if (newton_iter == 1 || newton_iter % 30 == 0 )
+                sols->addEntry(obj->val, normsg, elapsedTime, newton_iter, work_set->numActive);
+            if (msgFlag >= LHAC_MSG_NEWTON)
+                printf("%.4e  iter %3d:   obj.f = %+.4e    obj.normsg = %+.4e\n",
+                       elapsedTime, ista_iter, obj->f, normsg);
+            normsg = computeSubgradient();
+            mdl->computeGradient(w, L_grad);
+            if (normsg <= opt_outer_tol*normsg0) {
+                break;
+            }
+        }
+        
+        return sols;
+    }
+    
     Solution* solve()
     {
         
@@ -189,7 +215,7 @@ public:
         mdl->computeGradient(w, L_grad);
         normsg0 = computeSubgradient();
         
-        // ista step
+        // initial step
         for (unsigned long idx = 0; idx < p; idx++) {
             double G = L_grad[idx];
             double Gp = G + lmd;
@@ -225,6 +251,7 @@ public:
         
         delta += l1_next - l1_current;
         
+        
         // line search
         for (unsigned long lineiter = 0; lineiter < max_linesearch_iter; lineiter++) {
             double f_trial = mdl->computeObject(w);
@@ -241,10 +268,9 @@ public:
                 w[i] = w_prev[i] + a*D[i];
             }
         }
-        
+    
         memcpy(L_grad_prev, L_grad, p*sizeof(double));
         mdl->computeGradient(w, L_grad);
-        
         lR->initData(w, w_prev, L_grad, L_grad_prev);
         for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
             computeWorkSet();
@@ -285,6 +311,8 @@ private:
     
     unsigned long p;
     unsigned short newton_iter;
+    unsigned short ista_iter;
+    double ista_size;
     
     double* D;
     double normsg0;
@@ -295,6 +323,41 @@ private:
     double* L_grad;
     double* H_diag; // p
     double* d_bar; // 2*l
+    
+    void istaStep() {
+        memcpy(w_prev, w, p*sizeof(double));
+        
+        double x1;
+        double x2 = ista_size*lmd;
+        while (1) {
+            double order1=0, order2=0;
+            for (unsigned long i = 0; i < p; i++) {
+                x1 = w_prev[i] - ista_size*L_grad[i];
+                if (x1 > x2)
+                    w[i] = x1 - x2;
+                else if (x1 < -x2)
+                    w[i] = x1 + x2;
+                else
+                    w[i] = 0.0;
+                
+                D[i] = w[i] - w_prev[i];
+                order1 += L_grad[i]*D[i];
+                order2 += D[i] * D[i];
+            }
+            
+
+            double f_trial = mdl->computeObject(w);
+            double g_trial = computeReg(w);
+            if (f_trial + g_trial > obj->f + order1 + 0.5*(1/ista_size)*order2) {
+                ista_size = ista_size * 0.5;
+                printf("st = %f\n", ista_size);
+                continue;
+            }
+            
+            obj->add(f_trial, g_trial);
+            return;
+        }
+    }
 
     /* may generalize to other regularizations beyond l1 */
     double computeReg(double* wnew)
@@ -310,7 +373,6 @@ private:
 
     double computeSubgradient()
     {
-        
         double subgrad = 0.0;
         
         for (unsigned long i = 0; i < p; i++) {
@@ -333,7 +395,6 @@ private:
     {
         ushort_pair_t* &idxs = work_set->idxs;
         unsigned long numActive = 0;
-        
         
         /*** select rule 2 ***/
         for (unsigned long j = 0; j < p; j++) {
@@ -496,10 +557,7 @@ private:
         }
         
         return;
-        
     }
-
-    
 };
 
 

@@ -13,7 +13,6 @@
 
 
 /* implements l1log reg objective */
-//class LogReg : public Objective
 class LogReg : public Objective<LogReg>
 {
 public:
