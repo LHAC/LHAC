@@ -39,7 +39,6 @@ void parse_command_line(int argc, const char * argv[],
     param->cd_rate = 5;
     param->active_set = STD;
     
-    
     // parse options
     int i;
 	for(i=1;i<argc;i++)
