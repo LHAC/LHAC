@@ -9,17 +9,22 @@
 #ifndef __LHAC_v1__Objective__
 #define __LHAC_v1__Objective__
 
-
+template <typename Derived>
 class Objective
 {
 public:
-    virtual unsigned long getDims() =0;
+    inline unsigned long getDims() {
+        return static_cast<Derived*>(this)->getDims();
+    };
     
-    virtual double computeObject(double* wnew) =0;
+    inline double computeObject(double* wnew) {
+        return static_cast<Derived*>(this)->computeObject(wnew);
+    };
     
-    virtual void computeGradient(double* wnew, double* df) =0;
+    inline void computeGradient(double* wnew, double* df) {
+        static_cast<Derived*>(this)->computeGradient(wnew, df);
+    };
     
-    virtual ~Objective() {};
 };
 
 #endif /* defined(__LHAC_v1__Objective__) */

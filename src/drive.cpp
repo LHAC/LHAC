@@ -99,7 +99,10 @@ int main(int argc, const char * argv[])
     parse_command_line(argc, argv, param);
     
     LogReg* obj = new LogReg(param->fileName);
-    Solution* sols = lhac(obj, param);
+//    Solution* sols = lhac(obj, param);
+    LHAC<LogReg>* Alg = new LHAC<LogReg>(obj, param);
+    Solution* sols = Alg->solve();
+    
     
     delete obj;
     delete [] param->fileName;

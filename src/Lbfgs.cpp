@@ -265,10 +265,10 @@ void LBFGS::computeQR_v2(work_set_struct* work_set)
 
 void LBFGS::computeLowRankApprox_v2(work_set_struct* work_set)
 {
-    int _rows = (int)Tm->rows;
+//    int _rows = (int)Tm->rows;
     unsigned short _cols = Tm->cols;
     int _2cols = 2*_cols;
-    int p_sics = sqrt(_rows);
+//    int p_sics = sqrt(_rows);
     
     computeQR_v2(work_set);
     
@@ -276,7 +276,10 @@ void LBFGS::computeLowRankApprox_v2(work_set_struct* work_set)
     inverse(R, _2cols);
     
     /* R now store R-1 */
-    int cblas_N = (int) work_set->numActive + p_sics;
+//    int cblas_N = (int) work_set->numActive + p_sics;
+    /* different from SICS  */
+    /* here there is no p_sics */
+    int cblas_N = (int) work_set->numActive;
     lcdgemm(R, Q, Q_bar, _2cols, cblas_N);
     
     m = _2cols;

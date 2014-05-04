@@ -14,7 +14,7 @@
 
 /* implements l1log reg objective */
 //class LogReg : public Objective
-class LogReg
+class LogReg : public Objective<LogReg>
 {
 public:
     unsigned long getDims();
