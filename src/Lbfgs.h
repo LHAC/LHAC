@@ -15,14 +15,24 @@ typedef struct {
     double vlt;
 } ushort_pair_t;
 
-typedef struct {
+struct work_set_struct {
     ushort_pair_t* idxs; //p*(p+1)/2
     unsigned long* permut; //p
     unsigned long* idxs_vec_l; // vectorized lower
     unsigned long* idxs_vec_u; // vectorized upper
     unsigned long numActive;
     unsigned long _p_sics_;
-} work_set_struct;
+    
+    work_set_struct(unsigned long p) {
+        idxs = new ushort_pair_t[p];
+        permut = new unsigned long[p];
+    }
+    
+    ~work_set_struct() {
+        delete [] idxs;
+        delete [] permut;
+    }
+};
 
 class LMatrix {
 public:

@@ -25,7 +25,7 @@ enum { LHAC_MSG_NO=0, LHAC_MSG_NEWTON, LHAC_MSG_SD, LHAC_MSG_CD, LHAC_MSG_MAX };
 
 enum{  GREEDY= 1, STD };
 
-typedef struct {
+struct Func {
     double f;
     double g;
     double val; // f + g
@@ -35,9 +35,9 @@ typedef struct {
         g = _g;
         val = f + g;
     };
-} Func;
+};
 
-typedef struct solution_struct {
+struct Solution {
     double* t;
     double* fval;
     double* normgs;
@@ -58,7 +58,35 @@ typedef struct solution_struct {
     /* result */
     int p_sics; //dimension of w
     
-    ~solution_struct() {
+    inline void addEntry(double objval, double normsg, double elapsedTime,
+                         int iter, unsigned long _numActive) {
+        fval[size] = objval;
+        normgs[size] = normsg;
+        t[size] = elapsedTime;
+        niter[size] = iter;
+        numActive[size] = _numActive;
+        (size)++;
+    };
+    
+    Solution(unsigned long max_iter) {
+        fval = new double[max_iter];
+        normgs = new double[max_iter];
+        t = new double[max_iter];
+        niter = new int[max_iter];
+        numActive = new unsigned long[max_iter];
+        cdTime = 0;
+        lbfgsTime1 = 0;
+        lbfgsTime2 = 0;
+        lsTime = 0;
+        ngval = 0;
+        nfval = 0;
+        gvalTime = 0.0;
+        fvalTime = 0.0;
+        nls = 0;
+        size = 0;
+    };
+    
+    ~Solution() {
         delete [] fval;
         delete [] normgs;
         delete [] t;
@@ -66,9 +94,10 @@ typedef struct solution_struct {
         
         return;
     };
-} Solution;
+};
 
-typedef struct {
+
+struct Parameter {
     char* fileName;
     unsigned long work_size;
     unsigned short max_iter;
@@ -97,7 +126,11 @@ typedef struct {
     // active set stragety
     unsigned long active_set;
     
-} Parameter;
+    ~Parameter() {
+        delete [] fileName;
+    }
+    
+};
 
 
 template <typename Derived>
@@ -115,23 +148,6 @@ public:
         lmd = param->lmd;
         msgFlag = param->verbose;
         
-        sols = new Solution;
-        sols->fval = new double[max_iter];
-        sols->normgs = new double[max_iter];
-        sols->t = new double[max_iter];
-        sols->niter = new int[max_iter];
-        sols->numActive = new unsigned long[max_iter];
-        sols->cdTime = 0;
-        sols->lbfgsTime1 = 0;
-        sols->lbfgsTime2 = 0;
-        sols->lsTime = 0;
-        sols->ngval = 0;
-        sols->nfval = 0;
-        sols->gvalTime = 0.0;
-        sols->fvalTime = 0.0;
-        sols->nls = 0;
-        sols->size = 0;
-        
         w_prev = new double[p];
         w = new double[p];
         L_grad_prev = new double[p];
@@ -145,14 +161,24 @@ public:
         memset(w_prev, 0, p*sizeof(double));
         memset(D, 0, p*sizeof(double));
         
-        // active set
-        work_set = new work_set_struct;
-        work_set->idxs = new ushort_pair_t[p];
-        work_set->permut = new unsigned long[p];
-        
+        sols = new Solution(max_iter);
+        work_set = new work_set_struct(p);
         lR = new LBFGS(p, l, param->shrink);
     
     };
+    
+    ~LHAC() {
+        delete [] w_prev;
+        delete [] w;
+        delete [] L_grad;
+        delete [] L_grad_prev;
+        delete [] D;
+        delete [] H_diag;
+        delete [] d_bar;
+        delete lR;
+        delete work_set;
+        
+    }
     
     Solution* solve()
     {
@@ -219,7 +245,6 @@ public:
         memcpy(L_grad_prev, L_grad, p*sizeof(double));
         mdl->computeGradient(w, L_grad);
         
-
         lR->initData(w, w_prev, L_grad, L_grad_prev);
         for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
             computeWorkSet();
@@ -227,18 +252,11 @@ public:
             suffcientDecrease();
             double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
             normsg = computeSubgradient();
-            if (newton_iter == 1 || newton_iter % 30 == 0 ) {
-                sols->fval[sols->size] = obj->val;
-                sols->normgs[sols->size] = normsg;
-                sols->t[sols->size] = elapsedTime;
-                sols->niter[sols->size] = newton_iter;
-                sols->numActive[sols->size] = work_set->numActive;
-                (sols->size)++;
-            }
-            if (msgFlag >= LHAC_MSG_NEWTON) {
+            if (newton_iter == 1 || newton_iter % 30 == 0 )
+                sols->addEntry(obj->val, normsg, elapsedTime, newton_iter, work_set->numActive);
+            if (msgFlag >= LHAC_MSG_NEWTON)
                 printf("%.4e  iter %3d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
                        elapsedTime, newton_iter, obj->f, normsg, work_set->numActive);
-            }
             memcpy(L_grad_prev, L_grad, p*sizeof(double));
             mdl->computeGradient(w, L_grad);
             /* update LBFGS */
@@ -248,9 +266,6 @@ public:
             }
         }
         
-        delete lR;
-        delete [] work_set->idxs;
-        delete work_set;
         return sols;
     };
     
@@ -259,6 +274,8 @@ private:
     Parameter* param;
     Solution* sols;
     work_set_struct* work_set;
+    Func* obj;
+    LBFGS* lR;
     
     unsigned long l;
     double opt_outer_tol;
@@ -267,6 +284,7 @@ private:
     int msgFlag;
     
     unsigned long p;
+    unsigned short newton_iter;
     
     double* D;
     double normsg0;
@@ -277,14 +295,6 @@ private:
     double* L_grad;
     double* H_diag; // p
     double* d_bar; // 2*l
-    
-    Func* obj;
-    LBFGS* lR;
-    
-    unsigned short newton_iter;
-    
-    
-
 
     /* may generalize to other regularizations beyond l1 */
     double computeReg(double* wnew)
@@ -336,7 +346,6 @@ private:
         }
         
         work_set->numActive = numActive;
-        
         
         /* reset permutation */
         for (unsigned long j = 0; j < work_set->numActive; j++) {

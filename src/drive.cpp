@@ -105,7 +105,7 @@ int main(int argc, const char * argv[])
     
     
     delete obj;
-    delete [] param->fileName;
+    delete Alg;
     delete param;
     delete sols;
     exit( 0 );
