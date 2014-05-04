@@ -123,9 +123,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     LogReg* obj = new LogReg(param->fileName);
     
-    Solution* sols = lhac(obj, param);
-    
-    //    printout("logs = ", sols, cparam);
+    LHAC<LogReg>* Alg = new LHAC<LogReg>(obj, param);
+    Solution* sols = Alg->solve();
     
     double* fval = NULL;
     double* normdf =NULL;
@@ -171,7 +170,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     
     
-    //    delete [] S;
+    delete Alg;
+    delete obj;
     delete param;
     delete sols;
     return;
