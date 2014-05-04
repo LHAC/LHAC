@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 
-LMatrix::LMatrix(unsigned long s1, unsigned long s2)
+LMatrix::LMatrix(const unsigned long s1, const unsigned long s2)
 {
     data = new double*[s2];
     data_space = new double[s1*s2];
@@ -36,7 +36,7 @@ LMatrix::~LMatrix()
     delete [] data;
 }
 
-void LMatrix::init(double *x, unsigned long n1, unsigned short n2)
+void LMatrix::init(const double* const x, const unsigned long n1, const unsigned short n2)
 {
     rows = n1;
     cols = n2;
@@ -66,7 +66,7 @@ void LMatrix::print()
     return;
 }
 
-void LMatrix::insertRow(double* x)
+void LMatrix::insertRow(const double* const x)
 {
     double* r;
     for (unsigned short i = 0; i < cols; i++) {
@@ -79,7 +79,7 @@ void LMatrix::insertRow(double* x)
     return;
 }
 
-void LMatrix::insertCol(double* x)
+void LMatrix::insertCol(const double* const x)
 {
     double* cl = data[cols];
 
@@ -115,7 +115,7 @@ void LMatrix::deleteCol()
     return;
 }
 
-LBFGS::LBFGS(unsigned long _p, unsigned short _l, double _s)
+LBFGS::LBFGS(const unsigned long _p, const unsigned short _l, const double _s)
 {
     l = _l;
     p = _p;
@@ -146,7 +146,8 @@ LBFGS::LBFGS(unsigned long _p, unsigned short _l, double _s)
     buff = new double[p];
 }
 
-void LBFGS::initData(double *w, double *w_prev, double *L_grad, double *L_grad_prev)
+void LBFGS::initData(const double* const w, const double* const w_prev,
+                     const double* const L_grad, const double* const L_grad_prev)
 {
     /* S = [S obj.w-obj.w_prev]; */
     for (unsigned long i = 0; i < p; i++) {
@@ -287,7 +288,8 @@ void LBFGS::computeLowRankApprox_v2(work_set_struct* work_set)
     
 }
 
-void LBFGS::updateLBFGS(double* w, double* w_prev, double* L_grad, double* L_grad_prev)
+void LBFGS::updateLBFGS(const double* const w, const double* const w_prev,
+                        const double* const L_grad, const double* const L_grad_prev)
 {
     if (Sm->cols >= l) {
         Sm->deleteCol();

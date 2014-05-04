@@ -288,12 +288,12 @@ LogReg::LogReg(const char *filename)
     
 }
 
-unsigned long LogReg::getDims()
+unsigned long LogReg::getDims() const
 {
     return p;
 }
 
-double LogReg::computeObject(double* wnew)
+double LogReg::computeObject(const double* wnew)
 {
     double fval = 0;
     
@@ -320,7 +320,7 @@ double LogReg::computeObject(double* wnew)
     return fval;
 }
 
-void LogReg::computeGradient(double* wnew, double* df)
+void LogReg::computeGradient(const double* wnew, double* df)
 {
     for (unsigned long i = 0; i < N; i++) {
         B[i] = -y[i]/(1+e_ywx[i]);

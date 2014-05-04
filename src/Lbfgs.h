@@ -43,18 +43,18 @@ public:
     unsigned long maxrows;
     unsigned short maxcols;
     
-    LMatrix(unsigned long s1, unsigned long s2); // initiate to be a matrix s1 X s2
+    LMatrix(const unsigned long s1, const unsigned long s2); // initiate to be a matrix s1 X s2
     
     ~LMatrix();
     
-    void init(double* x, unsigned long n1, unsigned short n2);
+    void init(const double* const x, const unsigned long n1, const unsigned short n2);
     // initialized to be the matrix n1 X n2
     
     void print();
     
-    void insertRow(double* x); // to the bottom
+    void insertRow(const double* const x); // to the bottom
     
-    void insertCol(double* x); // to the rightmost
+    void insertCol(const double* const x); // to the rightmost
     
     void deleteRow(); // first
     
@@ -77,15 +77,17 @@ public:
     
     double shrink;
     
-    LBFGS(unsigned long _p, unsigned short _l, double _s);
+    LBFGS(const unsigned long _p, const unsigned short _l, const double _s);
     
     ~LBFGS();
     
-    void initData(double* w, double* w_prev, double* L_grad, double* L_grad_prev);
+    void initData(const double* const w, const double* const w_prev,
+                  const double* const L_grad, const double* const L_grad_prev);
     
     void computeLowRankApprox_v2(work_set_struct* work_set);
     
-    void updateLBFGS(double* w, double* w_prev, double* L_grad, double* L_grad_prev);
+    void updateLBFGS(const double* const w, const double* const w_prev,
+                     const double* const L_grad, const double* const L_grad_prev);
     
 private:
     LMatrix* Sm;

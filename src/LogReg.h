@@ -16,11 +16,11 @@
 class LogReg : public Objective<LogReg>
 {
 public:
-    unsigned long getDims();
+    unsigned long getDims() const;
     
-    double computeObject(double* wnew);
+    double computeObject(const double* wnew);
     
-    void computeGradient(double* wnew, double* df);
+    void computeGradient(const double* wnew, double* const df);
     
     /* data input file name */
     LogReg(const char *filename);

@@ -17,11 +17,11 @@ public:
         return static_cast<Derived*>(this)->getDims();
     };
     
-    inline double computeObject(double* wnew) {
+    inline double computeObject(const double* wnew) {
         return static_cast<Derived*>(this)->computeObject(wnew);
     };
     
-    inline void computeGradient(double* wnew, double* df) {
+    inline void computeGradient(const double* wnew, double* df) {
         static_cast<Derived*>(this)->computeGradient(wnew, df);
     };
     

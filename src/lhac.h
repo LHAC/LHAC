@@ -138,7 +138,8 @@ class LHAC
 {
 public:
     
-    LHAC(Objective<Derived>* _mdl, Parameter* _param) : mdl(_mdl), param(_param) {
+    LHAC(Objective<Derived>* _mdl, const Parameter* _param)
+    : mdl(_mdl), param(_param) {
         p = mdl->getDims();
         obj = new Func;
         
@@ -208,67 +209,49 @@ public:
     
     Solution* solve()
     {
-        
         double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
         
         obj->add(mdl->computeObject(w), computeReg(w));
         mdl->computeGradient(w, L_grad);
         normsg0 = computeSubgradient();
         
-        // initial step
+        // initial step (only for l1)
         for (unsigned long idx = 0; idx < p; idx++) {
             double G = L_grad[idx];
             double Gp = G + lmd;
             double Gn = G - lmd;
             double Hwd = 0.0;
-            
-            double z = 0.0;
             if (Gp <= Hwd)
-                z = -Gp;
-            if (Gn >= Hwd)
-                z = -Gn;
-            
-            D[idx] = D[idx] + z;
+                D[idx] = -Gp;
+            else if (Gn >= Hwd)
+                D[idx] = -Gn;
+            else
+                D[idx] = 0.0;
         }
-        
-        double a = 1;
-        
-        double l1_current = 0.0;
+        double a = 1.0;
         double l1_next = 0.0;
         double delta = 0.0;
-        
-        unsigned long max_linesearch_iter = param->max_linesearch_iter;
-        double bbeta = param->bbeta;
-        double ssigma = param->ssigma;
-        
         for (unsigned long i = 0; i < p; i++) {
-            l1_current += lmd*fabs(w[i]);
-            w_prev[i] = w[i];
             w[i] += D[i];
             l1_next += lmd*fabs(w[i]);
             delta += L_grad[i]*D[i];
         }
-        
-        delta += l1_next - l1_current;
-        
-        
+        delta += l1_next - obj->g;
         // line search
-        for (unsigned long lineiter = 0; lineiter < max_linesearch_iter; lineiter++) {
+        for (unsigned long lineiter = 0; lineiter < 1000; lineiter++) {
             double f_trial = mdl->computeObject(w);
-            double g_trial = computeReg(w);
-            double obj_trial = f_trial + g_trial;
-            if (obj_trial < obj->val + a*ssigma*delta) {
-                obj->add(f_trial, g_trial);
+            double obj_trial = f_trial + l1_next;
+            if (obj_trial < obj->val + a*0.001*delta) {
+                obj->add(f_trial, l1_next);
                 break;
             }
-            
-            a = bbeta*a;
-            
+            a = 0.5*a;
+            l1_next = 0;
             for (unsigned long i = 0; i < p; i++) {
                 w[i] = w_prev[i] + a*D[i];
+                l1_next += lmd*fabs(w[i]);
             }
         }
-    
         memcpy(L_grad_prev, L_grad, p*sizeof(double));
         mdl->computeGradient(w, L_grad);
         lR->initData(w, w_prev, L_grad, L_grad_prev);
@@ -297,7 +280,7 @@ public:
     
 private:
     Objective<Derived>* mdl;
-    Parameter* param;
+    const Parameter* param;
     Solution* sols;
     work_set_struct* work_set;
     Func* obj;
@@ -360,7 +343,7 @@ private:
     }
 
     /* may generalize to other regularizations beyond l1 */
-    double computeReg(double* wnew)
+    double computeReg(const double* wnew)
     {
         double gval = 0.0;
         
@@ -437,11 +420,11 @@ private:
         
         memcpy(w_prev, w, p*sizeof(double));
         
-        double lmd = param->lmd;
-        unsigned long l = param->l;
+        const double lmd = param->lmd;
+        const unsigned long l = param->l;
         
-        double* Q = lR->Q;
-        double* Q_bar = lR->Q_bar;
+        const double* Q = lR->Q;
+        const double* Q_bar = lR->Q_bar;
         const unsigned short m = lR->m;
         const double gama = lR->gama;
         
