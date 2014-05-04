@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-c -Wall
 LDFLAGS=-framework Accelerate -framework CoreFoundation
-SOURCES=drive.cpp Lbfgs.cpp lhac.cpp LogReg.cpp
+SOURCES=drive.cpp Lbfgs.cpp LogReg.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=lhac-log-reg
 
