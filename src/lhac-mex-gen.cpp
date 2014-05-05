@@ -126,6 +126,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     LHAC<LogReg>* Alg = new LHAC<LogReg>(obj, param);
     Solution* sols = Alg->solve();
     
+    double* w = NULL;
     double* fval = NULL;
     double* normdf =NULL;
     double* cputime = NULL;
@@ -135,6 +136,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int nlhIdx = 0;
     
     unsigned long optsize = sols->size;
+    if (nlhs > nlhIdx) {
+        plhs[nlhIdx] = mxCreateDoubleMatrix(sols->p, 1, mxREAL);
+        w = mxGetPr(plhs[nlhIdx]);
+        memcpy(w, sols->w, sols->p*sizeof(double));
+        nlhIdx++;
+    }
     if (nlhs > nlhIdx) {
         mwSize dims[] = {optsize};
         plhs[nlhIdx] = mxCreateNumericArray(1, dims, mxINT32_CLASS, mxREAL);

@@ -43,6 +43,10 @@ struct Solution {
     double* normgs;
     int* niter;
     unsigned long* numActive;
+    
+    double* w;
+    unsigned long p; //dimension of w
+    
     double cdTime;
     double lsTime;
     double lbfgsTime1;
@@ -55,9 +59,6 @@ struct Solution {
     double gvalTime;
     double fvalTime;
     
-    /* result */
-    int p_sics; //dimension of w
-    
     inline void addEntry(double objval, double normsg, double elapsedTime,
                          int iter, unsigned long _numActive) {
         fval[size] = objval;
@@ -68,7 +69,7 @@ struct Solution {
         (size)++;
     };
     
-    Solution(unsigned long max_iter) {
+    Solution(unsigned long max_iter, unsigned long _p) {
         fval = new double[max_iter];
         normgs = new double[max_iter];
         t = new double[max_iter];
@@ -84,9 +85,12 @@ struct Solution {
         fvalTime = 0.0;
         nls = 0;
         size = 0;
+        p = _p;
+        w = new double[p];
     };
     
     ~Solution() {
+        delete [] w;
         delete [] fval;
         delete [] normgs;
         delete [] t;
@@ -162,7 +166,7 @@ public:
         memset(w_prev, 0, p*sizeof(double));
         memset(D, 0, p*sizeof(double));
         
-        sols = new Solution(max_iter);
+        sols = new Solution(max_iter, p);
         work_set = new work_set_struct(p);
         lR = new LBFGS(p, l, param->shrink);
         
@@ -275,6 +279,7 @@ public:
             }
         }
         
+        memcpy(sols->w, w, p*sizeof(double));
         return sols;
     };
     
