@@ -52,13 +52,13 @@ public:
     
     void print();
     
-    void insertRow(const double* const x); // to the bottom
+    inline void insertRow(const double* const x); // to the bottom
     
-    void insertCol(const double* const x); // to the rightmost
+    inline void insertCol(const double* const x); // to the rightmost
     
-    void deleteRow(); // first
+    inline void deleteRow(); // first
     
-    void deleteCol(); // leftmost
+    inline void deleteCol(); // leftmost
 };
 
 class LBFGS {

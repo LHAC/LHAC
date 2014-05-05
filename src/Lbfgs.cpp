@@ -66,7 +66,7 @@ void LMatrix::print()
     return;
 }
 
-void LMatrix::insertRow(const double* const x)
+inline void LMatrix::insertRow(const double* const x)
 {
     double* r;
     for (unsigned short i = 0; i < cols; i++) {
@@ -79,7 +79,7 @@ void LMatrix::insertRow(const double* const x)
     return;
 }
 
-void LMatrix::insertCol(const double* const x)
+inline void LMatrix::insertCol(const double* const x)
 {
     double* cl = data[cols];
 
@@ -90,7 +90,7 @@ void LMatrix::insertCol(const double* const x)
     return;
 }
 
-void LMatrix::deleteRow()
+inline void LMatrix::deleteRow()
 {
     double* cl;
     rows--;
@@ -102,7 +102,7 @@ void LMatrix::deleteRow()
     return;
 }
 
-void LMatrix::deleteCol()
+inline void LMatrix::deleteCol()
 {
     // save the first column pointer
     double* cl = data[0];
