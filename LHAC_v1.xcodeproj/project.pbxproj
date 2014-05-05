@@ -54,6 +54,8 @@
 		D4A6648D1916A7B1009EADB2 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = src/Makefile; sourceTree = SOURCE_ROOT; };
 		D4A6648F1916A7B1009EADB2 /* Objective.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Objective.h; path = src/Objective.h; sourceTree = SOURCE_ROOT; };
 		D4A664901916A7B1009EADB2 /* timing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = timing.h; path = src/timing.h; sourceTree = SOURCE_ROOT; };
+		D4EEB37219174A6800B574EE /* demo_l1log.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = demo_l1log.m; path = src/demo_l1log.m; sourceTree = SOURCE_ROOT; };
+		D4EEB37319174A6800B574EE /* a9a */ = {isa = PBXFileReference; lastKnownFileType = text; name = a9a; path = src/a9a; sourceTree = SOURCE_ROOT; };
 		D4FBD17C16AD90C7006E7958 /* LHAC_v1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LHAC_v1; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -101,6 +103,8 @@
 		D4FBD17F16AD90C7006E7958 /* LHAC_v1 */ = {
 			isa = PBXGroup;
 			children = (
+				D4EEB37219174A6800B574EE /* demo_l1log.m */,
+				D4EEB37319174A6800B574EE /* a9a */,
 				D4A664831916A7B1009EADB2 /* drive.cpp */,
 				D4A664841916A7B1009EADB2 /* Lbfgs.cpp */,
 				D4A664851916A7B1009EADB2 /* Lbfgs.h */,
