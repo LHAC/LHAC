@@ -172,7 +172,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     delete Alg;
     delete obj;
-    delete param;
     delete sols;
     return;
 }
