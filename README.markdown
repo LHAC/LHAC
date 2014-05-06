@@ -1,19 +1,22 @@
 
-# LHAC
+# Lcc
 by Xiaocheng Tang [http://goo.gl/6QuMl]  
 
-**LHAC** implements the algorithm -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  -- for minimizing composite functions, i.e.,  
+**Lcc**, or LHAC for Composite minimization, implements the algorithm **LHAC** -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  -- for minimizing composite functions, i.e.,  
 
 * `min f(x) + g(x)`  
 
-where `f(x)` can be any _smooth_ function, i.e., _logistic loss_, _square loss_, etc., and `g(x)` is assumed to be _simple_, i.e., `l1-norm`, `l1/l2-norm`, etc.  In practice, the regularization functions will be built into the software for users to choose from, and users will need to provide the function evaluation and gradient computation routines for `f(x)`.   There are for now two varieties of LHAC that handle
+where `f(x)` can be any _smooth_ function, i.e., _logistic loss_, _square loss_, etc., and `g(x)` is assumed to be _simple_, i.e., `l1-norm`, `l1/l2-norm`, etc.  In practice, the regularization functions `g(x)` are built into the software for users to choose from, and `f(x)` needs to be provided by users as function evaluation and gradient computation routines. As an example, **Lcc** includes a class named `LogReg` that is derived from the base class `Objective` and implements the `logistic loss` function. So the following lines of code demonstrate the use **Lcc** for solving _sparse logistic regression_:
+```c++
+// instantiate a logistic loss object from the data file
+LogReg* obj = new LogReg(param->fileName);
+LHAC<LogReg>* Alg = new LHAC<LogReg>(obj, param);
+Solution* sols = Alg->solve();
+```
 
-* _sparse inverse covariance selections_ problems 
-* _sparse logistic regression_ problems
 
-This package, in particular, implements LHAC for solving _sparse inverse covariance selection_ problems, and recovers from a low-rank sample covariance matrix the inverse covariance matrix that is expected to have a sparse structure.
 
-On use of LHAC for general composite minimization, please contact me [here](http://goo.gl/6QuMl) for more details.
+
 
 ## Features
 This package
@@ -30,13 +33,13 @@ If you use LHAC in your research, please cite the following paper:
 * Katya Scheinberg and Xiaocheng Tang, _Practical Inexact Proximal Quasi-Newton Method with Global Complexity Analysis_, submitted, 2014  ([BibTex](http://goo.gl/fVJgWN))
 
 ## Build Guide
-[Download](http://goo.gl/6UGbOV) the package archive.
+[Download](https://github.com/LHAC/LHAC/archive/GENERIC.zip) the package archive.
 
 
 Extract the files:
 ```
-tar xvf LHAC-SICS.zip
-cd LHAC-SICS/src
+tar xvf LHAC-GENERIC.zip
+cd LHAC-GENERIC/src
 ```
 
 LHAC comes with a MATLAB interface through MEX-files. To build the MEX-file on Linux, just run
