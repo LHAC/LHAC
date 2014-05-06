@@ -1,19 +1,10 @@
 
-# LHAC
+# Lss
 by Xiaocheng Tang [http://goo.gl/6QuMl]  
 
-**LHAC** implements the algorithm -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  -- for minimizing composite functions, i.e.,  
+**Lss**, or LHAC for Sparse inverse covariance Selection, implements the algorithm **LHAC** -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  -- for for solving _sparse inverse covariance selection_ problems, and recovers from a low-rank sample covariance matrix the inverse covariance matrix that is expected to have a sparse structure.
 
-* `min f(x) + g(x)`  
-
-where `f(x)` can be any _smooth_ function, i.e., _logistic loss_, _square loss_, etc., and `g(x)` is assumed to be _simple_, i.e., `l1-norm`, `l1/l2-norm`, etc.  In practice, the regularization functions will be built into the software for users to choose from, and users will need to provide the function evaluation and gradient computation routines for `f(x)`.   There are for now two varieties of LHAC that handle
-
-* _sparse inverse covariance selections_ problems 
-* _sparse logistic regression_ problems
-
-This package, in particular, implements LHAC for solving _sparse inverse covariance selection_ problems, and recovers from a low-rank sample covariance matrix the inverse covariance matrix that is expected to have a sparse structure.
-
-On use of LHAC for general composite minimization, please contact me [here](http://goo.gl/6QuMl) for more details.
+On use of LHAC for general composite minimization, please see [here](http://goo.gl/KqrYSl) for more details.
 
 ## Features
 This package
