@@ -2,7 +2,7 @@
 # Lss
 by Xiaocheng Tang [http://goo.gl/6QuMl]  
 
-**Lss**, or LHAC for Sparse inverse covariance Selection, implements the algorithm **LHAC** -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  -- for for solving _sparse inverse covariance selection_ problems, and recovers from a low-rank sample covariance matrix the inverse covariance matrix that is expected to have a sparse structure.
+**Lss**, or LHAC for Sparse inverse covariance Selection, implements the algorithm **LHAC** -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  -- for solving _sparse inverse covariance selection_ problems, and recovers from a low-rank sample covariance matrix the inverse covariance matrix that is expected to have a sparse structure.
 
 On use of LHAC for general composite minimization, please see [here](http://goo.gl/KqrYSl) for more details.
 
