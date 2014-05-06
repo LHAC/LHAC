@@ -6,25 +6,53 @@ by Xiaocheng Tang [http://goo.gl/6QuMl]
 
 * `min f(x) + g(x)`  
 
-where `f(x)` can be any _smooth_ function, i.e., _logistic loss_, _square loss_, etc., and `g(x)` is assumed to be _simple_, i.e., `l1-norm`, `l1/l2-norm`, etc.  In practice, the regularization functions `g(x)` are built into the software for users to choose from, and `f(x)` needs to be provided by users as function evaluation and gradient computation routines. As an example, **Lcc** includes a class named `LogReg` that is derived from the base class `Objective` and implements the `logistic loss` function. So the following lines of code demonstrate the use **Lcc** for solving _sparse logistic regression_:
+where `f(x)` can be any _smooth_ function, i.e., _logistic loss_, _square loss_, etc., and `g(x)` is assumed to be _simple_, i.e., `l1-norm`, `l1/l2-norm`, etc.  In practice, the regularization functions `g(x)` are built into the software for users to choose from, and `f(x)` needs to be provided by users as function evaluation and gradient computation routines. 
+
+## Example
+As an example, **Lcc** includes a class named `LogReg` that is derived from the base class `Objective` and implements the `logistic loss` function. The following lines of code demonstrate the use fo **Lcc** for solving _sparse logistic regression_:
 ```c++
 // instantiate a logistic loss object from the data file
 LogReg* obj = new LogReg(param->fileName);
+
+// create the algorithm object from the logistic function
 LHAC<LogReg>* Alg = new LHAC<LogReg>(obj, param);
+
+// solve the problem and return the solution
 Solution* sols = Alg->solve();
 ```
 
-
-
+In general, you can replace `LogReg.h` and `LogReg.cpp` with your own class files that implements the function `f(x)`. The only requirement is that the class has to be derived from the base class `Objective` and implements its three member functions:
+```c++
+template <typename Derived>
+class Objective
+{
+public:
+    // return the dimension of the problem
+    inline unsigned long getDims() {
+        return static_cast<Derived*>(this)->getDims();
+    };
+    
+    // return function evaluation at the point wnew
+    inline double computeObject(const double* wnew) {
+        return static_cast<Derived*>(this)->computeObject(wnew);
+    };
+    
+    // return gradient evaluation (in df) at point wnew
+    inline void computeGradient(const double* wnew, double* df) {
+        static_cast<Derived*>(this)->computeGradient(wnew, df);
+    };
+    
+};
+```
 
 
 ## Features
 This package
 
-* handles _sparse inverse covariance selections_ problems
-* supports various platforms, i.e., Mac OS X and Linux
-* supports both BLAS and CBLAS interfaces
-* includes a fast _limited-memory BFGS_ library that can be used in general nonlinear optimizations 
+* provides a fast and flexible framework for composite minimization
+* provides, through the framework, an efficient implementation of sparse logistic regression
+* provides a fast _limited-memory BFGS_ library that can be used in general nonlinear optimizations 
+* builds both a MATLAB interface and a standalone command line tool
 
 
 ## Citation
@@ -35,20 +63,22 @@ If you use LHAC in your research, please cite the following paper:
 ## Build Guide
 [Download](https://github.com/LHAC/LHAC/archive/GENERIC.zip) the package archive.
 
-
 Extract the files:
 ```
 tar xvf LHAC-GENERIC.zip
 cd LHAC-GENERIC/src
 ```
 
-LHAC comes with a MATLAB interface through MEX-files. To build the MEX-file on Linux, just run
+Run the provided Makefile from command line:
 ```
-mex -largeArrayDims sics_lhac.cpp sics_lhac-mex.cpp Lbfgs.cpp  -lmwblas -lmwlapack -lrt -output LHAC
+make
+make clean
 ```
-Or if you are running Mac OS, you may compile the program using the provided **Makefile** (need to modify the first line to reflect where MATLAB is installed). Note that LHAC uses BLAS and LAPACK. The above command links to the BLAS and LAPACK library come with MATLAB, and the Makefile links to Apple's Accelerate framework that contains a version of BLAS and LAPACK optimized for Mac OS. 
+and two files will be created in the current directory: the command line tool `LHACl1log` and the MATLAB MEX-file `LHACl1log.mexmaci64`.
 
-You will probably also need to modify the `mexopts.sh` in `~/.matlab` before you run `mex` so that the compiler uses c++11 standard. To do that, simply replace the flag `-ansi` in CXXFLAG with `-std=c++0x`.
+> Note that the Makefile included is only intended for use on Mac OS X.  
+> Note that the above procedures are tested successfully with Mac OS X 10.9.2 and MATLAB_R2013a
+
 
 ## Usage Guide
 
