@@ -39,77 +39,25 @@
 <li>
 <code>min f(x) + g(x)</code><br>
 </li>
-</ul><p>where <code>f(x)</code> can be any <em>smooth</em> function, i.e., <em>logistic loss</em>, <em>square loss</em>, etc., and <code>g(x)</code> is assumed to be <em>simple</em>, i.e., <code>l1-norm</code>, <code>l1/l2-norm</code>, etc.  In practice, the regularization functions will be built into the software for users to choose from, and users will need to provide the function evaluation and gradient computation routines for <code>f(x)</code>.   There are for now two varieties of LHAC that handle</p>
+</ul><p>where <code>f(x)</code> can be any <em>smooth</em> function, i.e., <em>logistic loss</em>, <em>square loss</em>, etc., and <code>g(x)</code> is assumed to be <em>simple</em>, i.e., <code>l1-norm</code>, <code>l1/l2-norm</code>, etc. There are for now two varieties of LHAC:</p>
 
 <ul>
 <li>
-<em>sparse inverse covariance selections</em> problems </li>
+<a href="http://goo.gl/KqrYSl"><strong>Lcc</strong></a>: LHAC for Composite minimization </li>
 <li>
-<em>sparse logistic regression</em> problems</li>
-</ul><p>This package, in particular, implements LHAC for solving <em>sparse inverse covariance selection</em> problems, and recovers from a low-rank sample covariance matrix the inverse covariance matrix that is expected to have a sparse structure.</p>
+<a href="http://goo.gl/oedlP0"><strong>Lss</strong></a>: LHAC for Sparse inverse covariance Selection</li>
+</ul><p>Both of the two packages implement LHAC, but are targeted at different sets of problems. In particular, <strong>Lss</strong> is specifically coded for the <em>sparse inverse covariance selection</em> problem and mainly handles variables in a matrix that is constrained to be positive definite, whereas <strong>Lcc</strong> is implemented for general composite minimization that treats variables as a vector with no extra constraints.</p>
 
-<p>On use of LHAC for general composite minimization, please contact me <a href="http://goo.gl/6QuMl">here</a> for more details.</p>
+<p>For more details on the two packages, please visit their repositories on Github.</p>
 
 <h2>
-<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
-
-<p>This package</p>
-
-<ul>
-<li>handles <em>sparse inverse covariance selections</em> problems</li>
-<li>supports various platforms, i.e., Mac OS X and Linux</li>
-<li>supports both BLAS and CBLAS interfaces</li>
-<li>includes a fast <em>limited-memory BFGS</em> library that can be used in general nonlinear optimizations </li>
-</ul><h2>
 <a name="citation" class="anchor" href="#citation"><span class="octicon octicon-link"></span></a>Citation</h2>
 
 <p>If you use LHAC in your research, please cite the following paper:</p>
 
 <ul>
 <li>Katya Scheinberg and Xiaocheng Tang, <em>Practical Inexact Proximal Quasi-Newton Method with Global Complexity Analysis</em>, submitted, 2014  (<a href="http://goo.gl/fVJgWN">BibTex</a>)</li>
-</ul><h2>
-<a name="build-guide" class="anchor" href="#build-guide"><span class="octicon octicon-link"></span></a>Build Guide</h2>
-
-<p><a href="http://goo.gl/6UGbOV">Download</a> the package archive.</p>
-
-<p>Extract the files:</p>
-
-<pre><code>tar xvf LHAC-SICS.zip
-cd LHAC-SICS/src
-</code></pre>
-
-<p>LHAC comes with a MATLAB interface through MEX-files. To build the MEX-file on Linux, just run</p>
-
-<pre><code>mex -largeArrayDims sics_lhac.cpp sics_lhac-mex.cpp Lbfgs.cpp  -lmwblas -lmwlapack -lrt -output LHAC
-</code></pre>
-
-<p>Or if you are running Mac OS, you may compile the program using the provided <strong>Makefile</strong> (need to modify the first line to reflect where MATLAB is installed). Note that LHAC uses BLAS and LAPACK. The above command links to the BLAS and LAPACK library come with MATLAB, and the Makefile links to Apple's Accelerate framework that contains a version of BLAS and LAPACK optimized for Mac OS. </p>
-
-<p>You will probably also need to modify the <code>mexopts.sh</code> in <code>~/.matlab</code> before you run <code>mex</code> so that the compiler uses c++11 standard. To do that, simply replace the flag <code>-ansi</code> in CXXFLAG with <code>-std=c++0x</code>.</p>
-
-<h2>
-<a name="usage-guide" class="anchor" href="#usage-guide"><span class="octicon octicon-link"></span></a>Usage Guide</h2>
-
-<p>After the MEX-file is compiled successfully, start MATLAB in the same folder and run <code>LHAC_demo.m</code> to verify the installation process. If successfully installed, <code>LHAC_demo.m</code> will produce outputs on the screen and upon completion returns the inverse covariance matrix in the variable named <code>W</code>.</p>
-
-<p>Typical usage of LHAC is:</p>
-
-<pre><code>W = LHAC(S, lambda, Param);
-</code></pre>
-
-<p>where the solution <code>W</code> is the inverse covariance matrix recovered from the input <code>S</code> the sample covariance matrix, <code>lambda</code> is a positive scalar known as the regularization parameter and <code>Param</code> is a MATLAB <code>struct</code> that contains the algorithm parameters for LHAC. Some commonly-used parameters are listed below:</p>
-
-<ul>
-<li>
-<code>v</code>: verbosity level 0-3 (default 2)</li>
-<li>
-<code>e</code>: optimality tolerance (default 1e-6)</li>
-<li>
-<code>i</code>: maximum number of iterations allowed (default 500)</li>
-</ul><p>Optionally, records of the optimization process, i.e., objective values, iteration counter, norm of the subgradient, etc., can be passed out to the output variable list besides the optimal solution:</p>
-
-<pre><code>[W, iter, fval, t, normgs, numActive] = LHAC(S, lambda, Param);
-</code></pre>
+</ul>
       </section>
     </div>
 
