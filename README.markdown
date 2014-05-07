@@ -21,7 +21,7 @@ LHAC<LogReg>* Alg = new LHAC<LogReg>(obj, param);
 Solution* sols = Alg->solve();
 ```
 
-In general, you can replace `LogReg.h` and `LogReg.cpp` with your own class files that implements the function `f(x)`. The only requirement is that the class has to be derived from the base class `Objective` and implements its three member functions:
+In general, you can replace `LogReg.h` and `LogReg.cpp` with your own class files that implements the function `f(x)`. The only requirement is that **the class has to be derived from the base class `Objective` and implements its three member functions**:
 ```c++
 template <typename Derived>
 class Objective
