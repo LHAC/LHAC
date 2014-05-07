@@ -74,10 +74,9 @@ Run the provided Makefile from command line:
 make
 make clean
 ```
-and two files will be created in the current directory: the command line tool `LHACl1log` and the MATLAB MEX-file `LHACl1log.mexmaci64`.
+and two files will be created in the current directory: the command line tool `LHACl1log` and the MATLAB MEX-file `LHACl1log.mexmaci64` (_that the above procedures are tested successfully with Mac OS X 10.9.2 and MATLAB_R2013a_).
 
 > Note that the Makefile included is only intended for use on Mac OS X.  
-> Note that the above procedures are tested successfully with Mac OS X 10.9.2 and MATLAB_R2013a
 
 
 ## Usage Guide
