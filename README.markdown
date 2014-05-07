@@ -82,13 +82,13 @@ and two files will be created in the current directory: the command line tool `L
 
 ## Usage Guide
 
-After the MEX-file is compiled successfully, start MATLAB in the same folder and run `LHAC_demo.m` to verify the installation process. If successfully installed, `LHAC_demo.m` will produce outputs on the screen and upon completion returns the inverse covariance matrix in the variable named `W`.
+After the MEX-file is compiled successfully, start MATLAB in the same folder and run `demo_l1log.m` to verify the installation process. If successfully installed, `demo_l1log.m` will produce outputs on the screen and upon completion returns the classifier in the variable named `w`.
 
-Typical usage of LHAC is:
+Typical usage of LHACl1log is:
 ```
-W = LHAC(S, lambda, Param);
+w = LHACl1log(datafile, lambda, Param);
 ```
-where the solution `W` is the inverse covariance matrix recovered from the input `S` the sample covariance matrix, `lambda` is a positive scalar known as the regularization parameter and `Param` is a MATLAB `struct` that contains the algorithm parameters for LHAC. Some commonly-used parameters are listed below:
+where the solution `w` is the logistic classifier from the input data set; `datafile` is a string containing the absolute path to the data file; `lambda` is a positive scalar known as the regularization parameter and `Param` is a MATLAB `struct` that contains the algorithm parameters for Lcc. Some commonly-used parameters are listed below:
 
 * `v`: verbosity level 0-3 (default 2)
 * `e`: optimality tolerance (default 1e-6)
@@ -96,7 +96,7 @@ where the solution `W` is the inverse covariance matrix recovered from the input
 
 Optionally, records of the optimization process, i.e., objective values, iteration counter, norm of the subgradient, etc., can be passed out to the output variable list besides the optimal solution:
 ```
-[W, iter, fval, t, normgs, numActive] = LHAC(S, lambda, Param);
+[w, iter, fval, t] = LHACl1log(datafile, lambda, Param);
 ```
 
 
