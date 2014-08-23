@@ -17,7 +17,7 @@ public:
         return static_cast<Derived*>(this)->getDims();
     };
     
-    inline double computeObject(const double* wnew) {
+    inline double computeObject(double* wnew) {
         return static_cast<Derived*>(this)->computeObject(wnew);
     };
     

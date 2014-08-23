@@ -7,7 +7,7 @@
 //
 
 #include "Lbfgs.h"
-#include "liblapack.h"
+#include "linalg.h"
 
 #include <math.h>
 #include <string.h>
@@ -314,7 +314,8 @@ void LBFGS::updateLBFGS(const double* const w, const double* const w_prev,
     double* cl1 = Sm->data[Sm->cols-1];
     int cblas_N = (int) Tm->rows;
     int cblas_M = (int) Tm->cols;
-    lcdgemv(CblasRowMajor, CblasNoTrans, Tm->data_space, cl1, buff, cblas_M, cblas_N);
+//    lcdgemv(CblasRowMajor, CblasNoTrans, Tm->data_space, cl1, buff, cblas_M, cblas_N, cblas_N);
+    lcdgemv(CblasColMajor, CblasTrans, Tm->data_space, cl1, buff, cblas_N, cblas_M, cblas_N);
     
     if (Sm->cols >= l) {
         /* update permut */
@@ -335,7 +336,7 @@ void LBFGS::updateLBFGS(const double* const w, const double* const w_prev,
         }
         
         /* permuting buff */
-        lcdgemv(CblasColMajor, CblasNoTrans, permut_mx, buff, buff2, (int)l, (int)l);
+        lcdgemv(CblasColMajor, CblasNoTrans, permut_mx, buff, buff2, (int)l, (int)l, (int)l);
         
         
         Lm->insertRow(buff2);
@@ -355,11 +356,12 @@ void LBFGS::updateLBFGS(const double* const w, const double* const w_prev,
     cl1 = Sm->data[Sm->cols-1];
     cblas_N = (int) Sm->rows;
     cblas_M = (int) Sm->cols;
-    lcdgemv(CblasRowMajor, CblasNoTrans, Sm->data_space, cl1, buff, cblas_M, cblas_N);
+//    lcdgemv(CblasRowMajor, CblasNoTrans, Sm->data_space, cl1, buff, cblas_M, cblas_N, cblas_N);
+    lcdgemv(CblasColMajor, CblasTrans, Sm->data_space, cl1, buff, cblas_N, cblas_M, cblas_N);
     
     if (Sm->cols >= l) {
         /* permuting buff */
-        lcdgemv(CblasColMajor, CblasNoTrans, permut_mx, buff, buff2, (int)l, (int)l);
+        lcdgemv(CblasColMajor, CblasNoTrans, permut_mx, buff, buff2, (int)l, (int)l, (int)l);
         
         memset(permut_mx, 0, l*l*sizeof(double));        
         

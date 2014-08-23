@@ -7,17 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D468136E183DB92200C17532 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D468136D183DB92200C17532 /* Accelerate.framework */; };
-		D491142017360E0E00F75EAD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D491141F17360E0E00F75EAD /* CoreFoundation.framework */; };
-		D49D5B8118AB24F100D832AD /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D468136D183DB92200C17532 /* Accelerate.framework */; };
-		D49D5B8218AB24F600D832AD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D491141F17360E0E00F75EAD /* CoreFoundation.framework */; };
 		D4A664911916A7B1009EADB2 /* drive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4A664831916A7B1009EADB2 /* drive.cpp */; };
 		D4A664931916A7B1009EADB2 /* Lbfgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4A664841916A7B1009EADB2 /* Lbfgs.cpp */; };
 		D4A664941916A7B1009EADB2 /* Lbfgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4A664841916A7B1009EADB2 /* Lbfgs.cpp */; };
 		D4A664951916A7B1009EADB2 /* Lbfgs.h in Headers */ = {isa = PBXBuildFile; fileRef = D4A664851916A7B1009EADB2 /* Lbfgs.h */; };
 		D4A664971916A7B1009EADB2 /* lhac-mex-gen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4A664871916A7B1009EADB2 /* lhac-mex-gen.cpp */; };
 		D4A6649A1916A7B1009EADB2 /* lhac.h in Headers */ = {isa = PBXBuildFile; fileRef = D4A664891916A7B1009EADB2 /* lhac.h */; };
-		D4A6649B1916A7B1009EADB2 /* liblapack.h in Headers */ = {isa = PBXBuildFile; fileRef = D4A6648A1916A7B1009EADB2 /* liblapack.h */; };
+		D4A6649B1916A7B1009EADB2 /* linalg.h in Headers */ = {isa = PBXBuildFile; fileRef = D4A6648A1916A7B1009EADB2 /* linalg.h */; };
 		D4A6649C1916A7B1009EADB2 /* LogReg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4A6648B1916A7B1009EADB2 /* LogReg.cpp */; };
 		D4A6649D1916A7B1009EADB2 /* LogReg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4A6648B1916A7B1009EADB2 /* LogReg.cpp */; };
 		D4A6649E1916A7B1009EADB2 /* LogReg.h in Headers */ = {isa = PBXBuildFile; fileRef = D4A6648C1916A7B1009EADB2 /* LogReg.h */; };
@@ -40,15 +36,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		D468136D183DB92200C17532 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
-		D491141F17360E0E00F75EAD /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		D421E2EB19A86640000AC75E /* Shared.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Shared.xcconfig; path = src/Shared.xcconfig; sourceTree = "<group>"; };
 		D49D5B7418AB248F00D832AD /* l1log-mex.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "l1log-mex.mexmaci64"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4A664831916A7B1009EADB2 /* drive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = drive.cpp; path = src/drive.cpp; sourceTree = SOURCE_ROOT; };
 		D4A664841916A7B1009EADB2 /* Lbfgs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Lbfgs.cpp; path = src/Lbfgs.cpp; sourceTree = SOURCE_ROOT; };
 		D4A664851916A7B1009EADB2 /* Lbfgs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Lbfgs.h; path = src/Lbfgs.h; sourceTree = SOURCE_ROOT; };
 		D4A664871916A7B1009EADB2 /* lhac-mex-gen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "lhac-mex-gen.cpp"; path = "src/lhac-mex-gen.cpp"; sourceTree = SOURCE_ROOT; };
 		D4A664891916A7B1009EADB2 /* lhac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lhac.h; path = src/lhac.h; sourceTree = SOURCE_ROOT; };
-		D4A6648A1916A7B1009EADB2 /* liblapack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = liblapack.h; path = src/liblapack.h; sourceTree = SOURCE_ROOT; };
+		D4A6648A1916A7B1009EADB2 /* linalg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = linalg.h; path = src/linalg.h; sourceTree = SOURCE_ROOT; };
 		D4A6648B1916A7B1009EADB2 /* LogReg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LogReg.cpp; path = src/LogReg.cpp; sourceTree = SOURCE_ROOT; };
 		D4A6648C1916A7B1009EADB2 /* LogReg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LogReg.h; path = src/LogReg.h; sourceTree = SOURCE_ROOT; };
 		D4A6648D1916A7B1009EADB2 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = src/Makefile; sourceTree = SOURCE_ROOT; };
@@ -64,8 +59,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D49D5B8218AB24F600D832AD /* CoreFoundation.framework in Frameworks */,
-				D49D5B8118AB24F100D832AD /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -73,8 +66,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D468136E183DB92200C17532 /* Accelerate.framework in Frameworks */,
-				D491142017360E0E00F75EAD /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,8 +75,7 @@
 		D4FBD17116AD90C6006E7958 = {
 			isa = PBXGroup;
 			children = (
-				D468136D183DB92200C17532 /* Accelerate.framework */,
-				D491141F17360E0E00F75EAD /* CoreFoundation.framework */,
+				D421E2EB19A86640000AC75E /* Shared.xcconfig */,
 				D4FBD17F16AD90C7006E7958 /* LHAC_v1 */,
 				D4FBD17D16AD90C7006E7958 /* Products */,
 			);
@@ -110,7 +100,7 @@
 				D4A664851916A7B1009EADB2 /* Lbfgs.h */,
 				D4A664871916A7B1009EADB2 /* lhac-mex-gen.cpp */,
 				D4A664891916A7B1009EADB2 /* lhac.h */,
-				D4A6648A1916A7B1009EADB2 /* liblapack.h */,
+				D4A6648A1916A7B1009EADB2 /* linalg.h */,
 				D4A6648B1916A7B1009EADB2 /* LogReg.cpp */,
 				D4A6648C1916A7B1009EADB2 /* LogReg.h */,
 				D4A6648D1916A7B1009EADB2 /* Makefile */,
@@ -132,7 +122,7 @@
 				D4A664A31916A7B1009EADB2 /* Objective.h in Headers */,
 				D4A6649E1916A7B1009EADB2 /* LogReg.h in Headers */,
 				D4A664A41916A7B1009EADB2 /* timing.h in Headers */,
-				D4A6649B1916A7B1009EADB2 /* liblapack.h in Headers */,
+				D4A6649B1916A7B1009EADB2 /* linalg.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -273,6 +263,7 @@
 		};
 		D4FBD18416AD90C7006E7958 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D421E2EB19A86640000AC75E /* Shared.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -316,6 +307,7 @@
 		};
 		D4FBD18516AD90C7006E7958 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D421E2EB19A86640000AC75E /* Shared.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -352,6 +344,7 @@
 		};
 		D4FBD18716AD90C7006E7958 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D421E2EB19A86640000AC75E /* Shared.xcconfig */;
 			buildSettings = {
 				LD_DYLIB_INSTALL_NAME = "";
 				LD_RUNPATH_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
@@ -363,6 +356,7 @@
 		};
 		D4FBD18816AD90C7006E7958 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D421E2EB19A86640000AC75E /* Shared.xcconfig */;
 			buildSettings = {
 				LD_DYLIB_INSTALL_NAME = "";
 				LD_RUNPATH_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;

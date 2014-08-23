@@ -18,7 +18,7 @@ class LogReg : public Objective<LogReg>
 public:
     unsigned long getDims() const;
     
-    double computeObject(const double* wnew);
+    double computeObject(double* wnew);
     
     void computeGradient(const double* wnew, double* const df);
     

@@ -1,0 +1,18 @@
+//
+//  Shared.xcconfig
+//  LHAC_v1
+//
+//  Created by Xiaocheng Tang on 8/22/14.
+//  Copyright (c) 2014 Xiaocheng Tang. All rights reserved.
+//
+MATLAB_ROOT = /Applications/MATLAB_R2013a.app
+//OTHER_CFLAGS=-DUSE_ACCELERATE
+OTHER_LDFLAGS=-framework Accelerate -framework CoreFoundation
+//OTHER_LDFLAGS=-lmex -lmx -lmat -lmwblas -lmwlapack -undefined error
+//HEADER_SEARCH_PATHS = $(MATLAB_ROOT)/extern/include $(MATLAB_ROOT)/simulink/include
+//LIBRARY_SEARCH_PATHS = $(MATLAB_ROOT)/bin/maci64
+
+// mex file does not need rpath, but command line tool does
+//LD_RUNPATH_SEARCH_PATHS=$(MATLAB_ROOT)/bin/maci64
+//EXECUTABLE_EXTENSION = mexmaci64
+//EXECUTABLE_PREFIX =

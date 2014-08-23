@@ -8,7 +8,10 @@
 
 #include "LogReg.h"
 #include <math.h>
-#include "liblapack.h"
+#include "linalg.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define MAX_LINE_LEN 1024
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
@@ -293,14 +296,14 @@ unsigned long LogReg::getDims() const
     return p;
 }
 
-double LogReg::computeObject(const double* wnew)
+double LogReg::computeObject(double* wnew)
 {
     double fval = 0;
     
     double alpha = 1.0;
     double beta = 0.0;
-    cblas_dgemv(CblasColMajor, CblasNoTrans, (int)N, (int)p, alpha, X, (int)N, wnew, 1, beta, e_ywx, 1);
-    //    lcdgemv(CblasColMajor, CblasNoTrans, X, wnew, e_ywx, (int)N, (int)p);
+//    cblas_dgemv(CblasColMajor, CblasNoTrans, (int)N, (int)p, alpha, X, (int)N, wnew, 1, beta, e_ywx, 1);
+    lcdgemv(CblasColMajor, CblasNoTrans, X, wnew, e_ywx, (int)N, (int)p, (int)N);
     for (unsigned long i = 0; i < N; i++) {
         double nc1;
         double nc2;
@@ -325,8 +328,8 @@ void LogReg::computeGradient(const double* wnew, double* df)
     for (unsigned long i = 0; i < N; i++) {
         B[i] = -y[i]/(1+e_ywx[i]);
     }
-    cblas_dgemv(CblasColMajor, CblasTrans, (int)N, (int)p, 1.0, X, (int)N, B, 1, 0.0, df, 1);
-    //    lcdgemv(CblasColMajor, CblasNoTrans, X, B, df, (int)N, (int)p);
+//    cblas_dgemv(CblasColMajor, CblasTrans, (int)N, (int)p, 1.0, X, (int)N, B, 1, 0.0, df, 1);
+    lcdgemv(CblasColMajor, CblasTrans, X, B, df, (int)N, (int)p, (int)N);
     return;
 }
 
