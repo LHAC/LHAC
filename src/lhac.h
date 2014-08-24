@@ -12,7 +12,9 @@
 #include "Lbfgs.h"
 #include "Objective.h"
 #include <math.h>
-#include <Accelerate/Accelerate.h>
+#include "linalg.h"
+#include "timing.h"
+//#include <Accelerate/Accelerate.h>
 
 
 #define MAX_LENS 1024
@@ -428,7 +430,7 @@ private:
         const double lmd = param->lmd;
         const unsigned long l = param->l;
         
-        const double* Q = lR->Q;
+        double* Q = lR->Q;
         const double* Q_bar = lR->Q_bar;
         const unsigned short m = lR->m;
         const double gama = lR->gama;
@@ -467,7 +469,8 @@ private:
                     unsigned long idx_Q = permut[rii];
                     unsigned long Q_idx_m = idx_Q*m;
                     
-                    Qd_bar = cblas_ddot(m, &Q[Q_idx_m], 1, d_bar, 1);
+//                    Qd_bar = cblas_ddot(m, &Q[Q_idx_m], 1, d_bar, 1);
+                    Qd_bar = lcddot(m, &Q[Q_idx_m], 1, d_bar, 1);
                     Hd_j = gama_scale*D[idx] - Qd_bar;
                     
                     Hii = H_diag[idx_Q] + dH_diag;
@@ -508,7 +511,8 @@ private:
             double f_trial = mdl->computeObject(w);
             double g_trial = computeReg(w);
             double obj_trial = f_trial + g_trial;
-            double order1 = cblas_ddot((int)p, D, 1, L_grad, 1);
+//            double order1 = cblas_ddot((int)p, D, 1, L_grad, 1);
+            double order1 = lcddot((int)p, D, 1, L_grad, 1);
             double order2 = 0;
             
             double* buffer = lR->buff;
@@ -516,7 +520,8 @@ private:
             int cblas_M = (int) work_set->numActive;
             int cblas_N = (int) m;
             
-            cblas_dgemv(CblasRowMajor, CblasNoTrans, cblas_M, cblas_N, 1.0, Q, cblas_N, d_bar, 1, 0.0, buffer, 1);
+//            cblas_dgemv(CblasColMajor, CblasTrans, cblas_N, cblas_M, 1.0, Q, cblas_N, d_bar, 1, 0.0, buffer, 1);
+            lcdgemv(CblasColMajor, CblasTrans, Q, d_bar, buffer, cblas_N, cblas_M, cblas_N);
             
             double vp = 0;
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
@@ -525,7 +530,8 @@ private:
                 vp += D[idx]*buffer[idx_Q];
             }
             
-            order2 = mu*gama*cblas_ddot((int)p, D, 1, D, 1)-vp;
+//            order2 = mu*gama*cblas_ddot((int)p, D, 1, D, 1)-vp;
+            order2 = mu*gama*lcddot((int)p, D, 1, D, 1)-vp;
             order2 = order2*0.5;
             
             f_mdl = obj->f + order1 + order2 + g_trial;

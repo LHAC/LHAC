@@ -14,6 +14,6 @@ param.i = 3000;
 
 datafile = [pwd, '/', fname{1}, ext];
 
-[w iter fval t] = LHACl1log(datafile, param.lmd, param);
+[w, iter, fval, t] = LHACl1log(datafile, param.lmd, param);
 
 
