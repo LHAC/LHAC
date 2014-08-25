@@ -11,17 +11,31 @@
 
 #define MAX_SY_PAIRS 100
 
-//#ifdef __APPLE__
-#ifdef  USE_ACCELERATE
-#include <Accelerate/Accelerate.h>
-#define INTT int
-#else
-#include <stddef.h>
-#include "lapack.h"
-#include "blas.h"
 enum CBLAS_ORDER {CblasRowMajor=101, CblasColMajor=102 };
 enum CBLAS_TRANSPOSE {CblasNoTrans=111, CblasTrans=112, CblasConjTrans=113,
 	AtlasConj=114};
+
+//#ifdef __APPLE__
+#ifdef USE_CBLAS
+//#include <Accelerate/Accelerate.h>
+#define INTT int
+extern "C" {
+    double cblas_ddot(const int N, const double *X, const int incX, const double *Y, const int incY);
+    void cblas_dgemv(const enum CBLAS_ORDER Order,
+                     const enum CBLAS_TRANSPOSE TransA, const int M, const int N,
+                     const double alpha, const double *A, const int lda,
+                     const double *X, const int incX, const double beta,
+                     double *Y, const int incY);
+    void cblas_dgemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
+                     const enum CBLAS_TRANSPOSE TransB, const int M, const int N,
+                     const int K, const double alpha, const double *A,
+                     const int lda, const double *B, const int ldb,
+                     const double beta, double *C, const int ldc);
+}
+#else
+#include <stddef.h>
+//#include "lapack.h"
+#include "blas.h"
 static char CBLAS_TRANSPOSE_CHAR[] = {'N', 'T', 'C'};
 inline char *blas_transpose(CBLAS_TRANSPOSE TransA)
 {
@@ -36,6 +50,13 @@ inline char *blas_transpose(CBLAS_TRANSPOSE TransA)
 }
 #define INTT ptrdiff_t
 #endif
+
+extern "C" {
+    int dpotrf_(char *uplo, INTT *n, double *a, INTT *lda, INTT *info);
+    int dpotri_(char *uplo, INTT *n, double *a, INTT *lda, INTT *info);
+    int dgetrf_(INTT *m, INTT *n, double *a, INTT *lda, INTT *ipiv, INTT *info);
+    int dgetri_(INTT *n, double *a, INTT *lda, INTT *ipiv, double *work, INTT *lwork, INTT *info);
+}
 
 
 inline void lcdpotrf_(double* w, const unsigned long n, int* _info) {
@@ -70,7 +91,7 @@ inline int inverse(double*w, const int _n) {
 
 inline double lcddot(const int n, double* dx, const int incx,
                      double* dy, const int incy) {
-#ifdef USE_ACCELERATE
+#ifdef USE_CBLAS
     return cblas_ddot(n, dx, incx, dy, incy);
 #else
     INTT _n = (INTT) n;
@@ -86,11 +107,11 @@ inline void lcdgemv(const enum CBLAS_ORDER Order,
                     double* A, double* b, double* c,
                     const int m, const int n, const int lda)
 {
-#ifdef USE_ACCELERATE
+#ifdef USE_CBLAS
     cblas_dgemv(Order, TransA, m, n, 1.0, A, lda, b, 1, 0.0, c, 1);
 #else
-    double one = 1.0;
-    double zero = 0.0;
+    static double one = 1.0;
+    static double zero = 0.0;
     INTT one_int = 1;
     INTT blas_m = (INTT) m;
     INTT blas_n = (INTT) n;
@@ -101,13 +122,13 @@ inline void lcdgemv(const enum CBLAS_ORDER Order,
 
 inline void lcdgemm(double* A, double* B, double* C,
                     const int mA, const int nB) {
-#ifdef USE_ACCELERATE
+#ifdef USE_CBLAS
     cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, mA, nB, mA, 1.0, A, mA, B, mA, 0.0, C, mA);
 #else
     INTT _mA = (INTT) mA;
     INTT _nB = (INTT) nB;
-    double one = 1.0;
-    double zero = 0.0;
+    static double one = 1.0;
+    static double zero = 0.0;
     dgemm_((char*) "N", (char*) "N", &_mA, &_nB, &_mA, &one, A, &_mA, B, &_mA, &zero, C, &_mA);
 #endif
 }

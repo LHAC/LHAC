@@ -14,7 +14,6 @@
 #include <math.h>
 #include "linalg.h"
 #include "timing.h"
-//#include <Accelerate/Accelerate.h>
 
 
 #define MAX_LENS 1024
@@ -353,11 +352,7 @@ private:
     double computeReg(const double* wnew)
     {
         double gval = 0.0;
-        
-        for (unsigned long i = 0; i < p; i++) {
-            gval += lmd*fabs(wnew[i]);
-        }
-        
+        for (unsigned long i = 0; i < p; i++) gval += lmd*fabs(wnew[i]);
         return gval;
     }
 

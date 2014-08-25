@@ -300,8 +300,8 @@ double LogReg::computeObject(double* wnew)
 {
     double fval = 0;
     
-    double alpha = 1.0;
-    double beta = 0.0;
+//    double alpha = 1.0;
+//    double beta = 0.0;
 //    cblas_dgemv(CblasColMajor, CblasNoTrans, (int)N, (int)p, alpha, X, (int)N, wnew, 1, beta, e_ywx, 1);
     lcdgemv(CblasColMajor, CblasNoTrans, X, wnew, e_ywx, (int)N, (int)p, (int)N);
     for (unsigned long i = 0; i < N; i++) {

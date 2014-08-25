@@ -9,17 +9,22 @@ CXX=g++
 
 ifeq ($(USE_ACCELERATE), true)
 	# CXXFLAGS = -Wall -fpic  -fno-omit-frame-pointer -D_FILE_OFFSET_BITS=64 -std=c++0x -DUSE_ACCELERATE
-	CXXFLAGS = -Wall -fpic  -fno-omit-frame-pointer -std=c++0x -DUSE_ACCELERATE
-	LDFLAGS = -framework Accelerate -framework CoreFoundation
+	CXXBLAS =  -DUSE_CBLAS
+	LDBLAS = -framework Accelerate -framework CoreFoundation
 else
-	CXXFLAGS = -Wall -fpic  -fno-omit-frame-pointer -std=c++0x $(MATLAB_INCLUDE)
-	LDFLAGS = -lmwlapack -lmwblas -Wl,-rpath,$(MATLAB_ROOT)/bin/maci64 -L$(MATLAB_ROOT)/bin/maci64 
+	CXXBLAS = $(MATLAB_INCLUDE)
+	LDBLAS = -lmwlapack -lmwblas -Wl,-rpath,$(MATLAB_ROOT)/bin/maci64 -L$(MATLAB_ROOT)/bin/maci64 
+endif
+
+ifeq ($(USE_OPENBLAS), true)
+	CXXBLAS =  -DUSE_CBLAS
+	LDBLAS = -llapack -lopenblas -L/usr/local/opt/openblas/lib	
 endif
 
 
-CXXOPTFLAGS = -O3 -DNDEBUG $(CXXFLAGS)
+CXXOPTFLAGS = -Wall -fpic  -fno-omit-frame-pointer -std=c++0x -O3 -DNDEBUG $(CXXBLAS)
 CXXMEXFLAGS = -O3 -DNDEBUG -std=c++0x $(MATLAB_INCLUDE)
-LDMEXFLAGS = -Wall -shared -m64 -lmex -lmx  -lmat -lm -Wl,-exported_symbols_list,$(MATLAB_ROOT)/extern/lib/maci64/mexFunction.map -Wl,-rpath,$(MATLAB_ROOT)/bin/maci64 $(LDFLAGS) -L$(MATLAB_ROOT)/bin/maci64 
+LDMEXFLAGS = -Wall -shared -m64 -lmex -lmx  -lmat -lm -Wl,-exported_symbols_list,$(MATLAB_ROOT)/extern/lib/maci64/mexFunction.map -Wl,-rpath,$(MATLAB_ROOT)/bin/maci64 $(LDBLAS) -L$(MATLAB_ROOT)/bin/maci64 
 
 
 all: LHACl1log.mexmaci64 LHACl1log.cmd
@@ -28,7 +33,7 @@ all: LHACl1log.mexmaci64 LHACl1log.cmd
 	$(CXX) $(LDMEXFLAGS) $^ -o $@	
 
 %.cmd: Lbfgs.o LogReg.o drive.o
-	$(CXX) $(LDFLAGS) $^ -o $@	
+	$(CXX) $(LDBLAS) $^ -o $@	
 
 lhac-mex-gen.o: lhac-mex-gen.cpp
 	$(CXX) $(CXXMEXFLAGS) -m64 -c $< -o $@
