@@ -315,7 +315,6 @@ private:
     
     void istaStep() {
         memcpy(w_prev, w, p*sizeof(double));
-        
         double x1;
         double x2 = ista_size*lmd;
         while (1) {
@@ -333,8 +332,6 @@ private:
                 order1 += L_grad[i]*D[i];
                 order2 += D[i] * D[i];
             }
-            
-
             double f_trial = mdl->computeObject(w);
             double g_trial = computeReg(w);
             if (f_trial + g_trial > obj->f + order1 + 0.5*(1/ista_size)*order2) {
@@ -342,24 +339,20 @@ private:
                 printf("st = %f\n", ista_size);
                 continue;
             }
-            
             obj->add(f_trial, g_trial);
             return;
         }
     }
 
     /* may generalize to other regularizations beyond l1 */
-    double computeReg(const double* wnew)
-    {
+    double computeReg(const double* wnew) {
         double gval = 0.0;
         for (unsigned long i = 0; i < p; i++) gval += lmd*fabs(wnew[i]);
         return gval;
     }
 
-    double computeSubgradient()
-    {
+    double computeSubgradient() {
         double subgrad = 0.0;
-        
         for (unsigned long i = 0; i < p; i++) {
             double g = L_grad[i];
             if (w[i] != 0.0 || (fabs(g) > lmd)) {
@@ -372,15 +365,12 @@ private:
                 subgrad += fabs(g);
             }
         }
-        
         return subgrad;
     }
 
-    void computeWorkSet()
-    {
+    void computeWorkSet() {
         ushort_pair_t* &idxs = work_set->idxs;
         unsigned long numActive = 0;
-        
         /*** select rule 2 ***/
         for (unsigned long j = 0; j < p; j++) {
             double g = L_grad[j];
@@ -390,9 +380,7 @@ private:
                 numActive++;
             }
         }
-        
         work_set->numActive = numActive;
-        
         /* reset permutation */
         for (unsigned long j = 0; j < work_set->numActive; j++) {
             work_set->permut[j] = j;
@@ -401,13 +389,11 @@ private:
     }
 
 
-    void suffcientDecrease()
-    {
+    void suffcientDecrease() {
         int max_sd_iters = 20;
         double mu = 1.0;
         double rho = param->rho;
         int msgFlag = param->verbose;
-        
         double z = 0.0;
         double Hd_j;
         double Hii;
@@ -419,27 +405,19 @@ private:
         double Qd_bar;
         double f_mdl;
         double rho_trial;
-        
         memcpy(w_prev, w, p*sizeof(double));
-        
         const double lmd = param->lmd;
         const unsigned long l = param->l;
-        
         double* Q = lR->Q;
         const double* Q_bar = lR->Q_bar;
         const unsigned short m = lR->m;
         const double gama = lR->gama;
-        
         memset(D, 0, p*sizeof(double));
         memset(d_bar, 0, 2*l*sizeof(double));
-        
-        
         for (unsigned long k = 0, i = 0; i < work_set->numActive; i++, k += m) {
             H_diag[i] = gama;
-            for (unsigned long j = 0; j < m; j++)
-                H_diag[i] = H_diag[i] - Q_bar[k+j]*Q[k+j];
+            for (unsigned long j = 0; j < m; j++) H_diag[i] -= Q_bar[k+j]*Q[k+j];
         }
-        
         //    unsigned long max_cd_pass = std::min(1 + iter/3, param->max_inner_iter);
         unsigned long max_cd_pass = 1 + newton_iter / param->cd_rate;
         //    unsigned long max_cd_pass = param->max_inner_iter;
@@ -447,104 +425,76 @@ private:
         ushort_pair_t* idxs = work_set->idxs;
         unsigned long cd_pass;
         int sd_iters;
-        
         for (sd_iters = 0; sd_iters < max_sd_iters; sd_iters++) {
-            
-            
             double gama_scale = mu*gama;
             double dH_diag = gama_scale-gama;
-            
             for (cd_pass = 1; cd_pass <= max_cd_pass; cd_pass++) {
                 double diffd = 0;
                 double normd = 0;
-                
                 for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
                     unsigned long rii = ii;
                     unsigned long idx = idxs[rii].j;
                     unsigned long idx_Q = permut[rii];
                     unsigned long Q_idx_m = idx_Q*m;
-                    
 //                    Qd_bar = cblas_ddot(m, &Q[Q_idx_m], 1, d_bar, 1);
                     Qd_bar = lcddot(m, &Q[Q_idx_m], 1, d_bar, 1);
                     Hd_j = gama_scale*D[idx] - Qd_bar;
-                    
                     Hii = H_diag[idx_Q] + dH_diag;
                     G = Hd_j + L_grad[idx];
                     Gp = G + lmd;
                     Gn = G - lmd;
                     wpd = w_prev[idx] + D[idx];
                     Hwd = Hii * wpd;
-                    
                     z = -wpd;
-                    if (Gp <= Hwd)
-                        z = -Gp/Hii;
-                    if (Gn >= Hwd)
-                        z = -Gn/Hii;
-                    
+                    if (Gp <= Hwd) z = -Gp/Hii;
+                    if (Gn >= Hwd) z = -Gn/Hii;
                     D[idx] = D[idx] + z;
-                    
                     for (unsigned long k = Q_idx_m, j = 0; j < m; j++)
-                        d_bar[j] = d_bar[j] + z*Q_bar[k+j];
-                    
+                        d_bar[j] += z*Q_bar[k+j];
                     diffd += fabs(z);
                     normd += fabs(D[idx]);
-                    
                 }
-                
                 if (msgFlag >= LHAC_MSG_CD) {
                     printf("\t\t Coordinate descent pass %ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
                            cd_pass, diffd, normd);
                 }
-                
                 //            shuffle( work_set );
             }
             
             for (unsigned long i = 0; i < p; i++) {
                 w[i] = w_prev[i] + D[i];
             }
-            
             double f_trial = mdl->computeObject(w);
             double g_trial = computeReg(w);
             double obj_trial = f_trial + g_trial;
 //            double order1 = cblas_ddot((int)p, D, 1, L_grad, 1);
             double order1 = lcddot((int)p, D, 1, L_grad, 1);
             double order2 = 0;
-            
             double* buffer = lR->buff;
-            
             int cblas_M = (int) work_set->numActive;
             int cblas_N = (int) m;
-            
 //            cblas_dgemv(CblasColMajor, CblasTrans, cblas_N, cblas_M, 1.0, Q, cblas_N, d_bar, 1, 0.0, buffer, 1);
             lcdgemv(CblasColMajor, CblasTrans, Q, d_bar, buffer, cblas_N, cblas_M, cblas_N);
-            
             double vp = 0;
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
                 unsigned long idx = idxs[ii].j;
                 unsigned long idx_Q = permut[ii];
                 vp += D[idx]*buffer[idx_Q];
             }
-            
 //            order2 = mu*gama*cblas_ddot((int)p, D, 1, D, 1)-vp;
             order2 = mu*gama*lcddot((int)p, D, 1, D, 1)-vp;
             order2 = order2*0.5;
-            
             f_mdl = obj->f + order1 + order2 + g_trial;
-            
             rho_trial = (obj_trial-obj->val)/(f_mdl-obj->val);
-            
             if (msgFlag >= LHAC_MSG_SD) {
                 printf("\t \t \t # of line searches = %3d; model quality: %+.3f\n", sd_iters, rho_trial);
             }
-            
             if (rho_trial > rho) {
                 obj->add(f_trial, g_trial);
                 break;
             }
             mu = 2*mu;
-            
         }
-        
         return;
     }
 };

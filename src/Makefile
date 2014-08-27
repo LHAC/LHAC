@@ -5,20 +5,20 @@ MATLAB_ROOT = /Applications/MATLAB_R2013a.app
 
 MATLAB_INCLUDE = -I$(MATLAB_ROOT)/extern/include
 
+OPENBLAS_LINK = /usr/local/opt/openblas/lib
+
 CXX=g++
 
+CXXBLAS = $(MATLAB_INCLUDE)
+LDBLAS = -lmwlapack -lmwblas -Wl,-rpath,$(MATLAB_ROOT)/bin/maci64 -L$(MATLAB_ROOT)/bin/maci64 
+
 ifeq ($(USE_ACCELERATE), true)
-	# CXXFLAGS = -Wall -fpic  -fno-omit-frame-pointer -D_FILE_OFFSET_BITS=64 -std=c++0x -DUSE_ACCELERATE
 	CXXBLAS =  -DUSE_CBLAS
 	LDBLAS = -framework Accelerate -framework CoreFoundation
-else
-	CXXBLAS = $(MATLAB_INCLUDE)
-	LDBLAS = -lmwlapack -lmwblas -Wl,-rpath,$(MATLAB_ROOT)/bin/maci64 -L$(MATLAB_ROOT)/bin/maci64 
-endif
-
+endif	
 ifeq ($(USE_OPENBLAS), true)
 	CXXBLAS =  -DUSE_CBLAS
-	LDBLAS = -llapack -lopenblas -L/usr/local/opt/openblas/lib	
+	LDBLAS = -llapack -lopenblas -L$(OPENBLAS_LINK)
 endif
 
 
@@ -29,17 +29,14 @@ LDMEXFLAGS = -Wall -shared -m64 -lmex -lmx  -lmat -lm -Wl,-exported_symbols_list
 
 all: LHACl1log.mexmaci64 LHACl1log.cmd
 
-%.mexmaci64: Lbfgs.o LogReg.o lhac-mex-gen.o
+%.mexmaci64: LogReg.o lhac-mex-gen.o
 	$(CXX) $(LDMEXFLAGS) $^ -o $@	
 
-%.cmd: Lbfgs.o LogReg.o drive.o
+%.cmd: LogReg.o drive.o
 	$(CXX) $(LDBLAS) $^ -o $@	
 
 lhac-mex-gen.o: lhac-mex-gen.cpp
 	$(CXX) $(CXXMEXFLAGS) -m64 -c $< -o $@
-
-Lbfgs.o: Lbfgs.cpp
-	$(CXX) $(CXXOPTFLAGS) -m64 -c $< -o $@
 
 LogReg.o: LogReg.cpp
 	$(CXX) $(CXXOPTFLAGS) -m64 -c $< -o $@	

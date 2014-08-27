@@ -35,7 +35,25 @@ extern "C" {
 #else
 #include <stddef.h>
 //#include "lapack.h"
-#include "blas.h"
+//#include "blas.h"
+#if defined(_WIN32) || defined(__hpux)
+#define FORTRAN_WRAPPER(x) x
+#else
+#define FORTRAN_WRAPPER(x) x ## _
+#endif
+#define INTT ptrdiff_t
+#define dgemm FORTRAN_WRAPPER(dgemm)
+#define dgemv FORTRAN_WRAPPER(dgemv)
+#define ddot FORTRAN_WRAPPER(ddot)
+extern "C" {
+    double ddot(INTT *n, double *dx, INTT *incx, double *dy, INTT *incy);
+    void dgemm(char   *transa, char   *transb, INTT *m, INTT *n, INTT *k,
+               double *alpha, double *a, INTT *lda, double *b, INTT *ldb,
+               double *beta, double *c, INTT *ldc);
+    void dgemv(char   *trans, INTT *m, INTT *n, double *alpha, double *a,
+               INTT *lda, double *x, INTT *incx, double *beta, double *y,
+               INTT *incy);
+}
 static char CBLAS_TRANSPOSE_CHAR[] = {'N', 'T', 'C'};
 inline char *blas_transpose(CBLAS_TRANSPOSE TransA)
 {
@@ -48,7 +66,7 @@ inline char *blas_transpose(CBLAS_TRANSPOSE TransA)
 	}
 	return NULL;
 }
-#define INTT ptrdiff_t
+
 #endif
 
 extern "C" {
@@ -116,7 +134,7 @@ inline void lcdgemv(const enum CBLAS_ORDER Order,
     INTT blas_m = (INTT) m;
     INTT blas_n = (INTT) n;
     INTT blas_lda = (INTT) lda;
-    dgemv_(blas_transpose(TransA), &blas_m, &blas_n, &one, A, &blas_lda, b, &one_int, &zero, c, &one_int);
+    dgemv(blas_transpose(TransA), &blas_m, &blas_n, &one, A, &blas_lda, b, &one_int, &zero, c, &one_int);
 #endif
 }
 
@@ -129,7 +147,7 @@ inline void lcdgemm(double* A, double* B, double* C,
     INTT _nB = (INTT) nB;
     static double one = 1.0;
     static double zero = 0.0;
-    dgemm_((char*) "N", (char*) "N", &_mA, &_nB, &_mA, &one, A, &_mA, B, &_mA, &zero, C, &_mA);
+    dgemm((char*) "N", (char*) "N", &_mA, &_nB, &_mA, &one, A, &_mA, B, &_mA, &zero, C, &_mA);
 #endif
 }
 
