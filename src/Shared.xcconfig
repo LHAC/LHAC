@@ -1,0 +1,14 @@
+//
+//  Shared.xcconfig
+//  pepper
+//
+//  Created by Xiaocheng Tang on 8/24/14.
+//  Copyright (c) 2014 Xiaocheng Tang. All rights reserved.
+//
+MATLAB_ROOT = /Applications/MATLAB_R2013a.app
+//OTHER_CFLAGS=-DUSE_ACCELERATE
+OTHER_CFLAGS=-DUSE_CBLAS
+OTHER_LDFLAGS=-framework Accelerate -framework CoreFoundation -lmex -lmx -lmat -undefined error
+HEADER_SEARCH_PATHS = $(MATLAB_ROOT)/extern/include $(MATLAB_ROOT)/simulink/include
+LIBRARY_SEARCH_PATHS = $(MATLAB_ROOT)/bin/maci64
+LD_RUNPATH_SEARCH_PATHS=$(MATLAB_ROOT)/bin/maci64

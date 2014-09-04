@@ -64,37 +64,6 @@ inline void releaseSolution(solution* sols)
     return;
 }
 
-typedef struct {
-    unsigned long i;
-    unsigned long j;
-    double vlt;
-} ushort_pair_t;
-
-inline int cmp_by_vlt(const void *a, const void *b)
-{
-    const ushort_pair_t *ia = (ushort_pair_t *)a;
-    const ushort_pair_t *ib = (ushort_pair_t *)b;
-    
-    if (ib->vlt - ia->vlt > 0) {
-        return 1;
-    }
-    else if (ib->vlt - ia->vlt < 0){
-        return -1;
-    }
-    else
-        return 0;
-    
-    //    return (int)(ib->vlt - ia->vlt);
-}
-
-typedef struct {
-    ushort_pair_t* idxs; //p*(p+1)/2
-    unsigned long* idxs_vec_l; // vectorized lower
-    unsigned long* idxs_vec_u; // vectorized upper
-    unsigned long* permut; //p*(p+1)/2
-    unsigned long numActive;
-    unsigned long _p_sics_;
-} work_set_struct;
 
 typedef struct {
     char* fileName;

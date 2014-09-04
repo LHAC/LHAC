@@ -12,7 +12,7 @@
 #include <algorithm>
 
 
-#include "liblapack.h"
+#include "linalg.h"
 #include "timing.h"
 #include "Lbfgs.h"
 #include "sics_lhac.h"
@@ -374,7 +374,8 @@ static inline double computeModelValue(double* D, double* L_grad, double* d_bar,
     /* Q in row major */
     int cblas_M = (int) work_set->numActive + (int) p_sics;
     int cblas_N = (int) m;
-    lcdgemv(CblasRowMajor, CblasNoTrans, Q, d_bar, buffer, cblas_M, cblas_N);
+//    lcdgemv(CblasRowMajor, CblasNoTrans, Q, d_bar, buffer, cblas_M, cblas_N);
+    lcdgemv(CblasColMajor, CblasTrans, Q, d_bar, buffer, cblas_N, cblas_M, cblas_N);
     
     
     double vp1 = 0;
