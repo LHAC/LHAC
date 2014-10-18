@@ -323,6 +323,7 @@ double LogReg::computeObject(double* wnew)
     return fval;
 }
 
+// always computed after computeObject
 void LogReg::computeGradient(const double* wnew, double* df)
 {
     for (unsigned long i = 0; i < N; i++) {
