@@ -26,6 +26,9 @@ public:
 //    Lasso(const char *filename, bool isCached=false);
     Lasso(Parameter* param);
     
+    Lasso(Parameter* param, double* X, double* y,
+          unsigned long N, unsigned long p);
+    
     ~Lasso();
     
 private:

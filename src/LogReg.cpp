@@ -25,23 +25,39 @@ LogReg::LogReg(Parameter* param)
     transformToDenseFormat(Dset, Dset_sp);
     delete Dset_sp;
     
-    p = Dset->p;
-    N = Dset->N;
+    _p = Dset->p;
+    _N = Dset->N;
     
-    X = new double[p*N];
-    y = new double[N];
+    _X = new double[_p*_N];
+    _y = new double[_N];
     
-    memcpy(X, Dset->X, sizeof(double)*p*N);
-    memcpy(y, Dset->y, sizeof(double)*N);
+    memcpy(_X, Dset->X, sizeof(double)*_p*_N);
+    memcpy(_y, Dset->y, sizeof(double)*_N);
     
-    e_ywx = new double[N]; // N
-    B = new double[N]; // N
+    _e_ywx = new double[_N]; // N
+    _B = new double[_N]; // N
     
+}
+
+LogReg::LogReg(Parameter* param, double* X, double* y,
+      unsigned long N, unsigned long p)
+{
+    _p = p;
+    _N = N;
+    
+    _X = new double[_p*_N];
+    _y = new double[_N];
+    
+    memcpy(_X, X, sizeof(double)*_p*_N);
+    memcpy(_y, y, sizeof(double)*_N);
+    
+    _e_ywx = new double[_N]; // N
+    _B = new double[_N]; // N
 }
 
 unsigned long LogReg::getDims() const
 {
-    return p;
+    return _p;
 }
 
 double LogReg::computeObject(double* wnew)
@@ -51,14 +67,14 @@ double LogReg::computeObject(double* wnew)
 //    double alpha = 1.0;
 //    double beta = 0.0;
 //    cblas_dgemv(CblasColMajor, CblasNoTrans, (int)N, (int)p, alpha, X, (int)N, wnew, 1, beta, e_ywx, 1);
-    lcdgemv(CblasColMajor, CblasNoTrans, X, wnew, e_ywx, (int)N, (int)p, (int)N);
-    for (unsigned long i = 0; i < N; i++) {
+    lcdgemv(CblasColMajor, CblasNoTrans, _X, wnew, _e_ywx, (int)_N, (int)_p, (int)_N);
+    for (unsigned long i = 0; i < _N; i++) {
         double nc1;
         double nc2;
-        nc1 = e_ywx[i]*y[i];
-        e_ywx[i] = exp(nc1);
+        nc1 = _e_ywx[i]*_y[i];
+        _e_ywx[i] = exp(nc1);
         if (nc1 <= 0) {
-            nc2 = e_ywx[i];
+            nc2 = _e_ywx[i];
             fval += log((1+nc2))-nc1;
         }
         else {
@@ -74,20 +90,20 @@ double LogReg::computeObject(double* wnew)
 // always computed after computeObject
 void LogReg::computeGradient(const double* wnew, double* df)
 {
-    for (unsigned long i = 0; i < N; i++) {
-        B[i] = -y[i]/(1+e_ywx[i]);
+    for (unsigned long i = 0; i < _N; i++) {
+        _B[i] = -_y[i]/(1+_e_ywx[i]);
     }
 //    cblas_dgemv(CblasColMajor, CblasTrans, (int)N, (int)p, 1.0, X, (int)N, B, 1, 0.0, df, 1);
-    lcdgemv(CblasColMajor, CblasTrans, X, B, df, (int)N, (int)p, (int)N);
+    lcdgemv(CblasColMajor, CblasTrans, _X, _B, df, (int)_N, (int)_p, (int)_N);
     return;
 }
 
 LogReg::~LogReg()
 {
-    delete [] X;
-    delete [] y;
-    delete [] e_ywx;
-    delete [] B;
+    delete [] _X;
+    delete [] _y;
+    delete [] _e_ywx;
+    delete [] _B;
 }
 
 

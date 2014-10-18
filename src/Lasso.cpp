@@ -27,21 +27,46 @@ Lasso::Lasso(Parameter* param)
     
     _p = Dset->p;
     _N = Dset->N;
+    double* X = Dset->X;
+    double* y = Dset->y;
     
     _aTb = new double[_p];
-    lcdgemv(CblasColMajor, CblasTrans, Dset->X, Dset->y, _aTb, (int)_N, (int)_p, (int)_N);
-    _bTb = lcddot((int)_N, Dset->y, 1, Dset->y, 1);
+    lcdgemv(CblasColMajor, CblasTrans, X, y, _aTb, (int)_N, (int)_p, (int)_N);
+    _bTb = lcddot((int)_N, y, 1, y, 1);
     if (_isCached) {
         _aTa = new double[_p*_p];
         _aTax = new double[_p];
         lcgdgemm(CblasTrans, CblasNoTrans, (int)_p, (int)_p, (int)_N,
-                 1.0, Dset->X, (int)_N, Dset->X, (int)_N, 0.0, _aTa, (int)_p);
+                 1.0, X, (int)_N, X, (int)_N, 0.0, _aTa, (int)_p);
 
     }
     else {
         _A = new double[_p*_N];
         _Ax = new double[_N];
-        memcpy(_A, Dset->X, sizeof(double)*_p*_N);
+        memcpy(_A, X, sizeof(double)*_p*_N);
+    }
+}
+
+Lasso::Lasso(Parameter* param, double* X, double* y,
+             unsigned long N, unsigned long p)
+{
+    _p = p;
+    _N = N;
+    
+    _aTb = new double[_p];
+    lcdgemv(CblasColMajor, CblasTrans, X, y, _aTb, (int)_N, (int)_p, (int)_N);
+    _bTb = lcddot((int)_N, y, 1, y, 1);
+    if (_isCached) {
+        _aTa = new double[_p*_p];
+        _aTax = new double[_p];
+        lcgdgemm(CblasTrans, CblasNoTrans, (int)_p, (int)_p, (int)_N,
+                 1.0, X, (int)_N, X, (int)_N, 0.0, _aTa, (int)_p);
+        
+    }
+    else {
+        _A = new double[_p*_N];
+        _Ax = new double[_N];
+        memcpy(_A, X, sizeof(double)*_p*_N);
     }
 }
 

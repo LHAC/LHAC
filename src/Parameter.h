@@ -9,7 +9,7 @@
 #ifndef LHAC_v1_Parameter_h
 #define LHAC_v1_Parameter_h
 
-enum loss_t {  LOG= 123, SQUARE };
+enum loss_t {  LOG= 123, SQUARE, UNKNOWN };
 
 struct Parameter {
     char* fileName;

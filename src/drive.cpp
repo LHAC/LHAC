@@ -76,7 +76,7 @@ void parse_command_line(int argc, const char * argv[],
                 
             case 'l':
                 if (strcmp(argv[i],"square")==0) param->loss = SQUARE;
-                if (strcmp(argv[i],"log")==0) param->loss = LOG;
+                else if (strcmp(argv[i],"log")==0) param->loss = LOG;
                 break;
                 
             case 'a':

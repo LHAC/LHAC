@@ -25,16 +25,19 @@ public:
     /* data input file name */
     LogReg(Parameter* param);
     
+    LogReg(Parameter* param, double* X, double* y,
+          unsigned long N, unsigned long p);
+    
     ~LogReg();
     
 private:
-    unsigned long p;
-    unsigned long N;
+    unsigned long _p;
+    unsigned long _N;
     
-    double* X;
-    double* y;
-    double* e_ywx; // N
-    double* B; // N
+    double* _X;
+    double* _y;
+    double* _e_ywx; // N
+    double* _B; // N
     
 };
 
