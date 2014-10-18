@@ -138,6 +138,22 @@ inline void lcdgemv(const enum CBLAS_ORDER Order,
 #endif
 }
 
+inline void lcgdgemm(const enum CBLAS_TRANSPOSE TransA,
+                     const enum CBLAS_TRANSPOSE TransB,
+                     const int M, const int N,
+                     const int K, const double alpha, const double *A,
+                     const int lda, const double *B, const int ldb,
+                     const double beta, double *C, const int ldc) {
+#ifdef USE_CBLAS
+    cblas_dgemm(CblasColMajor, TransA, TransB, M, N, K,
+                alpha, A, lda, B, ldb, beta, C, ldc);
+#else
+    void dgemm(blas_transpose(TransA), blas_transpose(TransB),
+               (INTT*)&M, (INTT*)&N,(INTT*)&K, &alpha, A, (INTT*)&lda,
+               B, (INTT*)&ldb, &beta, C, (INTT*)&ldc);
+#endif
+}
+
 inline void lcdgemm(double* A, double* B, double* C,
                     const int mA, const int nB) {
 #ifdef USE_CBLAS

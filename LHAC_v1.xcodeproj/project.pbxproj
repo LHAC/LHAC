@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D43D4F2519F22B6E009B2504 /* Lasso.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D43D4F2319F22B6E009B2504 /* Lasso.cpp */; };
+		D43D4F2619F22B6E009B2504 /* Lasso.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D43D4F2319F22B6E009B2504 /* Lasso.cpp */; };
+		D43D4F2719F22B6E009B2504 /* Lasso.h in Headers */ = {isa = PBXBuildFile; fileRef = D43D4F2419F22B6E009B2504 /* Lasso.h */; };
 		D4A664911916A7B1009EADB2 /* drive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4A664831916A7B1009EADB2 /* drive.cpp */; };
 		D4A664951916A7B1009EADB2 /* Lbfgs.h in Headers */ = {isa = PBXBuildFile; fileRef = D4A664851916A7B1009EADB2 /* Lbfgs.h */; };
 		D4A664971916A7B1009EADB2 /* lhac-mex-gen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4A664871916A7B1009EADB2 /* lhac-mex-gen.cpp */; };
@@ -35,6 +38,8 @@
 
 /* Begin PBXFileReference section */
 		D421E2EB19A86640000AC75E /* Shared.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Shared.xcconfig; path = src/Shared.xcconfig; sourceTree = "<group>"; };
+		D43D4F2319F22B6E009B2504 /* Lasso.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Lasso.cpp; path = src/Lasso.cpp; sourceTree = SOURCE_ROOT; };
+		D43D4F2419F22B6E009B2504 /* Lasso.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Lasso.h; path = src/Lasso.h; sourceTree = SOURCE_ROOT; };
 		D49D5B7418AB248F00D832AD /* l1log-mex.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "l1log-mex.mexmaci64"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4A664831916A7B1009EADB2 /* drive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = drive.cpp; path = src/drive.cpp; sourceTree = SOURCE_ROOT; };
 		D4A664851916A7B1009EADB2 /* Lbfgs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Lbfgs.h; path = src/Lbfgs.h; sourceTree = SOURCE_ROOT; };
@@ -99,6 +104,8 @@
 				D4A6648A1916A7B1009EADB2 /* linalg.h */,
 				D4A6648B1916A7B1009EADB2 /* LogReg.cpp */,
 				D4A6648C1916A7B1009EADB2 /* LogReg.h */,
+				D43D4F2319F22B6E009B2504 /* Lasso.cpp */,
+				D43D4F2419F22B6E009B2504 /* Lasso.h */,
 				D4A6648D1916A7B1009EADB2 /* Makefile */,
 				D4A6648F1916A7B1009EADB2 /* Objective.h */,
 				D4A664901916A7B1009EADB2 /* timing.h */,
@@ -113,6 +120,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D43D4F2719F22B6E009B2504 /* Lasso.h in Headers */,
 				D4A6649A1916A7B1009EADB2 /* lhac.h in Headers */,
 				D4A664951916A7B1009EADB2 /* Lbfgs.h in Headers */,
 				D4A664A31916A7B1009EADB2 /* Objective.h in Headers */,
@@ -191,6 +199,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D43D4F2619F22B6E009B2504 /* Lasso.cpp in Sources */,
 				D4A664A01916A7B1009EADB2 /* Makefile in Sources */,
 				D4A6649D1916A7B1009EADB2 /* LogReg.cpp in Sources */,
 				D4A664971916A7B1009EADB2 /* lhac-mex-gen.cpp in Sources */,
@@ -201,6 +210,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D43D4F2519F22B6E009B2504 /* Lasso.cpp in Sources */,
 				D4A6649F1916A7B1009EADB2 /* Makefile in Sources */,
 				D4A6649C1916A7B1009EADB2 /* LogReg.cpp in Sources */,
 				D4A664911916A7B1009EADB2 /* drive.cpp in Sources */,
