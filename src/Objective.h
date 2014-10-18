@@ -9,6 +9,7 @@
 #ifndef __LHAC_v1__Objective__
 #define __LHAC_v1__Objective__
 
+
 template <typename Derived>
 class Objective
 {
@@ -24,6 +25,8 @@ public:
     inline void computeGradient(const double* wnew, double* df) {
         static_cast<Derived*>(this)->computeGradient(wnew, df);
     };
+    
+    virtual ~Objective() {};
     
 };
 

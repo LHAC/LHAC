@@ -10,7 +10,7 @@
 #define __LHAC_v1__LogReg__
 
 #include "Objective.h"
-
+#include "Parameter.h"
 
 /* implements l1log reg objective */
 class LogReg : public Objective<LogReg>
@@ -23,7 +23,7 @@ public:
     void computeGradient(const double* wnew, double* const df);
     
     /* data input file name */
-    LogReg(const char *filename);
+    LogReg(Parameter* param);
     
     ~LogReg();
     

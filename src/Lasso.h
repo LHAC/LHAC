@@ -10,6 +10,7 @@
 #define __LHAC_v1__Lasso__
 
 #include "Objective.h"
+#include "Parameter.h"
 
 class Lasso : public Objective<Lasso>
 {
@@ -22,7 +23,8 @@ public:
     
     /* data input file name */
     /* by default compute a^a */
-    Lasso(const char *filename, bool isCached=true);
+//    Lasso(const char *filename, bool isCached=false);
+    Lasso(Parameter* param);
     
     ~Lasso();
     

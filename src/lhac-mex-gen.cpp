@@ -13,6 +13,19 @@
 #include <stdint.h>
 #include "lhac.h"
 #include "LogReg.h"
+#include "Lasso.h"
+
+template <typename Derived>
+Solution* optimize(Parameter* param) {
+    Objective<Derived>* obj = new Derived(param);
+    //    Solution* sols = lhac(obj, param);
+    LHAC<Derived>* Alg = new LHAC<Derived>(obj, param);
+    Solution* sols = Alg->solve();
+    delete obj;
+    delete Alg;
+    
+    return sols;
+}
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -67,6 +80,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     unsigned long work_size = 300;
     // active set strategy -- standard (default)
     unsigned long active_set = STD;
+    int loss = LOG;
+    char* loss_str;
+    bool isCached;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);
@@ -99,6 +115,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (tf) {
         active_set = mxGetScalar(tf);
     }
+    tf = mxGetField(prhs[argIdx], 0, "loss");
+    if (tf) {
+        mxGetString(tf,loss_str,20);
+        if (strcmp(loss_str,"square")==0) loss = SQUARE;
+        if (strcmp(loss_str,"log")==0) loss = LOG;
+    }
+    tf = mxGetField(prhs[argIdx], 0, "cached");
+    if (tf) {
+        int b = mxGetScalar(tf);
+        if (b!=0) isCached = true;
+        else isCached = false;
+    }
     
     
     Parameter* param = new Parameter;
@@ -119,12 +147,29 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     param->rho = 0.01;
     param->cd_rate = cd_rate;
     param->active_set = active_set;
+    param->loss = loss;
+    param->isCached = isCached;
     
-    
-    LogReg* obj = new LogReg(param->fileName);
-    
-    LHAC<LogReg>* Alg = new LHAC<LogReg>(obj, param);
-    Solution* sols = Alg->solve();
+    Solution* sols = NULL;
+    switch (param->loss) {
+        case SQUARE:
+            printf("L1 - square\n");
+            sols = optimize<Lasso>(param);
+            break;
+            
+        case LOG:
+            printf("L1 - logistic\n");
+            sols = optimize<LogReg>(param);
+            break;
+            
+        default:
+            printf("Unknown loss: logistic or square!\n");
+            return;
+    }
+//    LogReg* obj = new LogReg(param->fileName);
+//    
+//    LHAC<LogReg>* Alg = new LHAC<LogReg>(obj, param);
+//    Solution* sols = Alg->solve();
     
     double* w = NULL;
     double* fval = NULL;
@@ -177,8 +222,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     
     
-    delete Alg;
-    delete obj;
     delete sols;
     return;
 }
