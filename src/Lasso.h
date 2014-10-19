@@ -24,9 +24,9 @@ public:
     /* data input file name */
     /* by default compute a^a */
 //    Lasso(const char *filename, bool isCached=false);
-    Lasso(Parameter* param);
+    Lasso(const Parameter* param);
     
-    Lasso(Parameter* param, double* X, double* y,
+    Lasso(const Parameter* param, double* X, double* y,
           unsigned long N, unsigned long p);
     
     ~Lasso();

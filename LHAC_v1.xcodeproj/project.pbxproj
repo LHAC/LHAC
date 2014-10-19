@@ -9,11 +9,15 @@
 /* Begin PBXBuildFile section */
 		D43D4F2619F22B6E009B2504 /* Lasso.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D43D4F2319F22B6E009B2504 /* Lasso.cpp */; };
 		D43D4F2A19F309A8009B2504 /* Lasso.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D43D4F2319F22B6E009B2504 /* Lasso.cpp */; };
-		D43D4F2E19F335D4009B2504 /* timing.h in Headers */ = {isa = PBXBuildFile; fileRef = D4A664901916A7B1009EADB2 /* timing.h */; };
-		D43D4F2F19F335D8009B2504 /* Objective.h in Headers */ = {isa = PBXBuildFile; fileRef = D4A6648F1916A7B1009EADB2 /* Objective.h */; };
-		D43D4F3019F335DB009B2504 /* utils.h in Headers */ = {isa = PBXBuildFile; fileRef = D43D4F2919F30910009B2504 /* utils.h */; };
-		D43D4F3119F335E1009B2504 /* lhac.h in Headers */ = {isa = PBXBuildFile; fileRef = D4A664891916A7B1009EADB2 /* lhac.h */; };
-		D43D4F3219F335E8009B2504 /* Lbfgs.h in Headers */ = {isa = PBXBuildFile; fileRef = D4A664851916A7B1009EADB2 /* Lbfgs.h */; };
+		D43D4F2E19F335D4009B2504 /* timing.h in Sources */ = {isa = PBXBuildFile; fileRef = D4A664901916A7B1009EADB2 /* timing.h */; };
+		D43D4F2F19F335D8009B2504 /* Objective.h in Sources */ = {isa = PBXBuildFile; fileRef = D4A6648F1916A7B1009EADB2 /* Objective.h */; };
+		D43D4F3019F335DB009B2504 /* utils.h in Sources */ = {isa = PBXBuildFile; fileRef = D43D4F2919F30910009B2504 /* utils.h */; };
+		D43D4F3119F335E1009B2504 /* lhac.h in Sources */ = {isa = PBXBuildFile; fileRef = D4A664891916A7B1009EADB2 /* lhac.h */; };
+		D43D4F3219F335E8009B2504 /* Lbfgs.h in Sources */ = {isa = PBXBuildFile; fileRef = D4A664851916A7B1009EADB2 /* Lbfgs.h */; };
+		D44F870619F352A5007BBFA2 /* Parameter.h in Sources */ = {isa = PBXBuildFile; fileRef = D43D4F2819F2D7BF009B2504 /* Parameter.h */; };
+		D44F870719F352AD007BBFA2 /* linalg.h in Sources */ = {isa = PBXBuildFile; fileRef = D4A6648A1916A7B1009EADB2 /* linalg.h */; };
+		D44F870819F352B1007BBFA2 /* LogReg.h in Sources */ = {isa = PBXBuildFile; fileRef = D4A6648C1916A7B1009EADB2 /* LogReg.h */; };
+		D44F870919F352B4007BBFA2 /* Lasso.h in Sources */ = {isa = PBXBuildFile; fileRef = D43D4F2419F22B6E009B2504 /* Lasso.h */; };
 		D4A664911916A7B1009EADB2 /* drive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4A664831916A7B1009EADB2 /* drive.cpp */; };
 		D4A664971916A7B1009EADB2 /* lhac-mex-gen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4A664871916A7B1009EADB2 /* lhac-mex-gen.cpp */; };
 		D4A6649C1916A7B1009EADB2 /* LogReg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4A6648B1916A7B1009EADB2 /* LogReg.cpp */; };
@@ -120,11 +124,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D43D4F3119F335E1009B2504 /* lhac.h in Headers */,
-				D43D4F3019F335DB009B2504 /* utils.h in Headers */,
-				D43D4F2F19F335D8009B2504 /* Objective.h in Headers */,
-				D43D4F3219F335E8009B2504 /* Lbfgs.h in Headers */,
-				D43D4F2E19F335D4009B2504 /* timing.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -200,6 +199,15 @@
 				D43D4F2619F22B6E009B2504 /* Lasso.cpp in Sources */,
 				D4A6649D1916A7B1009EADB2 /* LogReg.cpp in Sources */,
 				D4A664971916A7B1009EADB2 /* lhac-mex-gen.cpp in Sources */,
+				D44F870719F352AD007BBFA2 /* linalg.h in Sources */,
+				D44F870619F352A5007BBFA2 /* Parameter.h in Sources */,
+				D43D4F3119F335E1009B2504 /* lhac.h in Sources */,
+				D44F870919F352B4007BBFA2 /* Lasso.h in Sources */,
+				D43D4F3019F335DB009B2504 /* utils.h in Sources */,
+				D43D4F2F19F335D8009B2504 /* Objective.h in Sources */,
+				D43D4F3219F335E8009B2504 /* Lbfgs.h in Sources */,
+				D44F870819F352B1007BBFA2 /* LogReg.h in Sources */,
+				D43D4F2E19F335D4009B2504 /* timing.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,8 +242,25 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(MATLAB_ROOT)/extern/include",
+					"$(MATLAB_ROOT)/simulink/include",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "$(MATLAB_ROOT)/bin/maci64";
+				LIBRARY_SEARCH_PATHS = "$(MATLAB_ROOT)/bin/maci64";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_LDFLAGS = (
+					"-lmex",
+					"-lmx",
+					"-lmat",
+					"-undefined",
+					error,
+					"-framework",
+					Accelerate,
+					"-framework",
+					CoreFoundation,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -255,8 +280,25 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(MATLAB_ROOT)/extern/include",
+					"$(MATLAB_ROOT)/simulink/include",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "$(MATLAB_ROOT)/bin/maci64";
+				LIBRARY_SEARCH_PATHS = "$(MATLAB_ROOT)/bin/maci64";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_LDFLAGS = (
+					"-lmex",
+					"-lmx",
+					"-lmat",
+					"-undefined",
+					error,
+					"-framework",
+					Accelerate,
+					"-framework",
+					CoreFoundation,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -286,21 +328,15 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/extern/include;
+				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = "";
 				LD_DYLIB_INSTALL_NAME = "";
-				LD_RUNPATH_SEARCH_PATHS = "/Applications/MATLAB_R2012a.app/bin/maci64 /Applications/MATLAB_R2010a.app/bin/maci64";
-				LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
+				LD_RUNPATH_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"-lmex",
-					"-lmx",
-					"-lmat",
-					"-undefined",
-					error,
-				);
+				OTHER_LDFLAGS = "";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -324,31 +360,24 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/extern/include;
+				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = "";
 				LD_DYLIB_INSTALL_NAME = "";
-				LD_RUNPATH_SEARCH_PATHS = "/Applications/MATLAB_R2012a.app/bin/maci64 /Applications/MATLAB_R2010a.app/bin/maci64";
-				LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
+				LD_RUNPATH_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				OTHER_LDFLAGS = (
-					"-lmex",
-					"-lmx",
-					"-lmat",
-					"-undefined",
-					error,
-				);
+				OTHER_LDFLAGS = "";
 				SDKROOT = macosx;
 			};
 			name = Release;
 		};
 		D4FBD18716AD90C7006E7958 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D421E2EB19A86640000AC75E /* Shared.xcconfig */;
 			buildSettings = {
 				LD_DYLIB_INSTALL_NAME = "";
-				LD_RUNPATH_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
-				LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
+				LD_RUNPATH_SEARCH_PATHS = "$(MATLAB_ROOT)/bin/maci64";
+				LIBRARY_SEARCH_PATHS = "$(MATLAB_ROOT)/bin/maci64";
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -356,11 +385,10 @@
 		};
 		D4FBD18816AD90C7006E7958 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D421E2EB19A86640000AC75E /* Shared.xcconfig */;
 			buildSettings = {
 				LD_DYLIB_INSTALL_NAME = "";
-				LD_RUNPATH_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
-				LIBRARY_SEARCH_PATHS = /Applications/MATLAB_R2012a.app/bin/maci64;
+				LD_RUNPATH_SEARCH_PATHS = "$(MATLAB_ROOT)/bin/maci64";
+				LIBRARY_SEARCH_PATHS = "$(MATLAB_ROOT)/bin/maci64";
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

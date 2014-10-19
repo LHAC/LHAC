@@ -11,7 +11,7 @@
 #include "utils.h"
 
 
-LogReg::LogReg(Parameter* param)
+LogReg::LogReg(const Parameter* param)
 {
     
     // sparse format
@@ -39,7 +39,7 @@ LogReg::LogReg(Parameter* param)
     
 }
 
-LogReg::LogReg(Parameter* param, double* X, double* y,
+LogReg::LogReg(const Parameter* param, double* X, double* y,
       unsigned long N, unsigned long p)
 {
     _p = p;

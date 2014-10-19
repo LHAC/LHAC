@@ -10,7 +10,7 @@
 #include "linalg.h"
 #include "utils.h"
 
-Lasso::Lasso(Parameter* param)
+Lasso::Lasso(const Parameter* param)
 {
     _isCached = param->isCached;
     
@@ -47,9 +47,11 @@ Lasso::Lasso(Parameter* param)
     }
 }
 
-Lasso::Lasso(Parameter* param, double* X, double* y,
+Lasso::Lasso(const Parameter* param, double* X, double* y,
              unsigned long N, unsigned long p)
 {
+    _isCached = param->isCached;
+    
     _p = p;
     _N = N;
     

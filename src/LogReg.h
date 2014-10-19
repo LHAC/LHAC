@@ -23,9 +23,9 @@ public:
     void computeGradient(const double* wnew, double* const df);
     
     /* data input file name */
-    LogReg(Parameter* param);
+    LogReg(const Parameter* param);
     
-    LogReg(Parameter* param, double* X, double* y,
+    LogReg(const Parameter* param, double* X, double* y,
           unsigned long N, unsigned long p);
     
     ~LogReg();

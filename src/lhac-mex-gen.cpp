@@ -15,25 +15,26 @@
 #include "LogReg.h"
 #include "Lasso.h"
 
-#define MAX_STR_LEN 20
+#define MAX_STR_LEN 200
 #define NONE "none"
 
 template <typename Derived>
-Solution* optimize(Parameter* param, double* X, double* y, uint32_t N, uint32_t p) {
-    Objective<Derived>* obj = new Derived(param);
-    //    Solution* sols = lhac(obj, param);
+Solution* optimize(const Parameter* param, double* X, double* y, uint32_t N, uint32_t p) {
+    Objective<Derived>* obj = NULL;
+    if (X == NULL || y == NULL) obj = new Derived(param);
+    else obj = new Derived(param, X, y, N, p);
     LHAC<Derived>* Alg = new LHAC<Derived>(obj, param);
     Solution* sols = Alg->solve();
     delete obj;
     delete Alg;
-    
+
     return sols;
 }
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    if (nrhs != 3 || nrhs != 1) {
+    if (nrhs != 3 && nrhs != 1) {
         mexErrMsgIdAndTxt("LHAC:arguments",
                           "Wrong arguments, please specify\n"
                           "             param - the options struct,\n"
@@ -190,26 +191,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     param->loss = loss;
     param->isCached = isCached;
     
-    Solution* sols = NULL;
-    switch (param->loss) {
-        case SQUARE:
-            printf("L1 - square\n");
-            sols = optimize<Lasso>(param, X, y, N, p);
-            break;
-            
-        case LOG:
-            printf("L1 - logistic\n");
-            sols = optimize<LogReg>(param, X, y, N, p);
-            break;
-            
-        default:
-            printf("Unknown loss: logistic or square!\n");
-            return;
-    }
-//    LogReg* obj = new LogReg(param->fileName);
-//    
-//    LHAC<LogReg>* Alg = new LHAC<LogReg>(obj, param);
-//    Solution* sols = Alg->solve();
+   Solution* sols = NULL;
+   switch (param->loss) {
+       case SQUARE:
+           printf("L1 - square\n");
+           sols = optimize<Lasso>(param, X, y, N, p);
+           break;
+           
+       case LOG:
+           printf("L1 - logistic\n");
+           sols = optimize<LogReg>(param, X, y, N, p);
+           break;
+           
+       default:
+           printf("Unknown loss: logistic or square!\n");
+           return;
+   }
     
     double* w = NULL;
     double* fval = NULL;

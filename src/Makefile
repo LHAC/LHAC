@@ -29,14 +29,17 @@ LDMEXFLAGS = -Wall -shared -m64 -lmex -lmx  -lmat -lm -Wl,-exported_symbols_list
 
 all: LHACl1log.mexmaci64 LHACl1log.cmd
 
-%.mexmaci64: LogReg.o lhac-mex-gen.o
+%.mexmaci64: LogReg.o lhac-mex-gen.o Lasso.o
 	$(CXX) $(LDMEXFLAGS) $^ -o $@	
 
-%.cmd: LogReg.o drive.o
+%.cmd: LogReg.o drive.o Lasso.o
 	$(CXX) $(LDBLAS) $^ -o $@	
 
 lhac-mex-gen.o: lhac-mex-gen.cpp
 	$(CXX) $(CXXMEXFLAGS) -m64 -c $< -o $@
+
+Lasso.o: Lasso.cpp
+	$(CXX) $(CXXOPTFLAGS) -m64 -c $< -o $@
 
 LogReg.o: LogReg.cpp
 	$(CXX) $(CXXOPTFLAGS) -m64 -c $< -o $@	
