@@ -14,6 +14,7 @@
 #include <math.h>
 #include "linalg.h"
 #include "timing.h"
+#include "Parameter.h"
 
 
 #define MAX_LENS 1024
@@ -25,6 +26,8 @@ enum { LHAC_MSG_NO=0, LHAC_MSG_NEWTON, LHAC_MSG_SD, LHAC_MSG_CD, LHAC_MSG_MAX };
 
 
 enum{  GREEDY= 1, STD };
+
+
 
 struct Func {
     double f;
@@ -101,41 +104,6 @@ struct Solution {
     };
 };
 
-
-struct Parameter {
-    char* fileName;
-    unsigned long work_size;
-    unsigned short max_iter;
-    unsigned long max_inner_iter;
-    double lmd;
-    double opt_inner_tol;
-    double opt_outer_tol;
-    /**** line search ****/
-    double bbeta;
-    double ssigma;
-    unsigned long max_linesearch_iter;
-    
-    unsigned long l; // lbfgs sy pair number <= MAX_SY_PAIRS
-    int verbose;
-    
-    /* line search */
-    int sd_flag; // 1 = sufficient decrease; 0 = line search
-    
-    /* gama in lbfgs */
-    double shrink; // gama = gama/shrink
-    
-    double rho;
-    
-    unsigned long cd_rate;
-    
-    // active set stragety
-    unsigned long active_set;
-    
-    ~Parameter() {
-        delete [] fileName;
-    }
-    
-};
 
 
 template <typename Derived>

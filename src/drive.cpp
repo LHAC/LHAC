@@ -13,6 +13,7 @@
 #include <string.h>
 #include "lhac.h"
 #include "LogReg.h"
+#include "Lasso.h"
 
 
 
@@ -38,6 +39,8 @@ void parse_command_line(int argc, const char * argv[],
     param->rho = 0.01;
     param->cd_rate = 5;
     param->active_set = STD;
+    param->loss = SQUARE;
+    param->isCached = true;
     
     // parse options
     int i;
@@ -71,6 +74,16 @@ void parse_command_line(int argc, const char * argv[],
                 param->shrink = atof(argv[i]);
                 break;
                 
+            case 'l':
+                if (strcmp(argv[i],"square")==0) param->loss = SQUARE;
+                else if (strcmp(argv[i],"log")==0) param->loss = LOG;
+                break;
+                
+            case 'a':
+                if (atoi(argv[i])!=0) param->isCached = true;
+                else param->isCached = false;
+                break;
+                
             /* solving precision */
             case 'e':
                 param->opt_outer_tol = atof(argv[i]);
@@ -91,22 +104,43 @@ void parse_command_line(int argc, const char * argv[],
 
 }
 
+template <typename Derived>
+Solution* optimize(Parameter* param) {
+    Objective<Derived>* obj = new Derived(param);
+    //    Solution* sols = lhac(obj, param);
+    LHAC<Derived>* Alg = new LHAC<Derived>(obj, param);
+    Solution* sols = Alg->solve();
+    delete obj;
+    delete Alg;
+
+    return sols;
+}
+
 
 
 int main(int argc, const char * argv[])
 {
     Parameter* param = new Parameter;
     parse_command_line(argc, argv, param);
-    
-    LogReg* obj = new LogReg(param->fileName);
-//    Solution* sols = lhac(obj, param);
-    LHAC<LogReg>* Alg = new LHAC<LogReg>(obj, param);
-    Solution* sols = Alg->solve();
+    Solution* sols = NULL;
     
     
-    delete obj;
-    delete Alg;
-    delete param;
-    delete sols;
+    switch (param->loss) {
+        case SQUARE:
+            printf("L1 - square\n");
+            sols = optimize<Lasso>(param);
+            delete sols;
+            break;
+            
+        case LOG:
+            printf("L1 - logistic\n");
+            sols = optimize<LogReg>(param);
+            delete sols;
+            break;
+            
+        default:
+            printf("Unknown loss: logistic or square!\n");
+            break;
+    }
     exit( 0 );
 }

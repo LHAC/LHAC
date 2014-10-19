@@ -13,36 +13,67 @@
 #include <stdint.h>
 #include "lhac.h"
 #include "LogReg.h"
+#include "Lasso.h"
+
+#define MAX_STR_LEN 200
+#define NONE "none"
+
+template <typename Derived>
+Solution* optimize(const Parameter* param, double* X, double* y, uint32_t N, uint32_t p) {
+    Objective<Derived>* obj = NULL;
+    if (X == NULL || y == NULL) obj = new Derived(param);
+    else obj = new Derived(param, X, y, N, p);
+    LHAC<Derived>* Alg = new LHAC<Derived>(obj, param);
+    Solution* sols = Alg->solve();
+    delete obj;
+    delete Alg;
+
+    return sols;
+}
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    if (nrhs < 2) {
+    if (nrhs != 3 && nrhs != 1) {
         mexErrMsgIdAndTxt("LHAC:arguments",
-                          "Missing arguments, please specify\n"
-                          "             S - the empirical covariance matrix, and\n"
-                          "             L - the regularization parameter.");
+                          "Wrong arguments, please specify\n"
+                          "             param - the options struct,\n"
+                          "             X - data matrix (optional when reading from param.fileName), and\n"
+                          "             y - label matrix (optional when reading from param.fileName)");
     }
-    
     
     long argIdx = 0;
     
-    // data file name
-    char* filename = NULL;
-    // first input is the name of the data file
-    if ( mxIsChar(prhs[argIdx]) != 1)
-        mexErrMsgIdAndTxt( "LHAC:inputNotString",
-                          "Input must be a string.");
-    filename = mxArrayToString(prhs[argIdx]);
-    argIdx++;
-    
-    // Regularization parameter:
-    if (!mxIsDouble(prhs[argIdx]))
-        mexErrMsgIdAndTxt("LHAC:type",
-                          "Expected a double matrix. (Arg. %d)",
-                          argIdx + 1);
-    double lambda = mxGetPr(prhs[argIdx])[0];
-    argIdx++;
+    double* X = NULL;
+    double* y = NULL;
+    uint32_t N = 0;
+    uint32_t p = 0;
+    if (nrhs == 3) {
+        argIdx = 2;
+        if (!mxIsDouble(prhs[argIdx]))
+            mexErrMsgIdAndTxt("LHAC:type",
+                              "Expected a double matrix. (Arg. %d)",
+                              argIdx + 1);
+        X = mxGetPr(prhs[argIdx]);
+        p = (uint32_t) mxGetN(prhs[argIdx]);
+        N = (uint32_t) mxGetM(prhs[argIdx]);
+        argIdx--;
+        if (!mxIsDouble(prhs[argIdx]))
+            mexErrMsgIdAndTxt("LHAC:type",
+                              "Expected a double matrix. (Arg. %d)",
+                              argIdx + 1);
+        y = mxGetPr(prhs[argIdx]);
+        uint32_t my = (uint32_t) mxGetM(prhs[argIdx]);
+        uint32_t ny = (uint32_t) mxGetN(prhs[argIdx]);
+        uint32_t maxy = (my > ny) ? my : ny;
+        uint32_t miny = (my < ny) ? my : ny;
+        if (N != maxy || miny != 1) {
+            mexErrMsgIdAndTxt("LHAC:type",
+                              "Expected a vector of length %d. (Arg. %d)",
+                              N, argIdx + 1);
+        }
+        argIdx--;
+    }
     
     // Parameter struct
     if (!mxIsStruct(prhs[argIdx])) {
@@ -51,6 +82,23 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                           argIdx + 1);
     }
     mxArray* tf;
+    char* fileName = new char[MAX_STR_LEN];
+    tf = mxGetField(prhs[argIdx], 0, "filename");
+    if (!tf && nrhs == 1) {
+        mexErrMsgIdAndTxt("LHAC:arguments",
+                            "Wrong arguments, please specify\n"
+                            "             param - the options struct,\n"
+                            "             X - data matrix (optional when reading from param.fileName), and\n"
+                            "             y - label matrix (optional when reading from param.fileName)");
+    }
+    if (tf) {
+        mxGetString(tf,fileName,MAX_STR_LEN);
+    }
+    else {
+        /* dont read from file */
+        /* data pass from memory */
+        strcpy(fileName, NONE);
+    }
     // verbose
     int verbose = 2;
     // precision
@@ -67,6 +115,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     unsigned long work_size = 300;
     // active set strategy -- standard (default)
     unsigned long active_set = STD;
+    int loss = LOG;
+    char loss_str[MAX_STR_LEN];
+    bool isCached = true;
+    double lambda = 1;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);
@@ -99,6 +151,23 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (tf) {
         active_set = mxGetScalar(tf);
     }
+    tf = mxGetField(prhs[argIdx], 0, "loss");
+    if (tf) {
+        mxGetString(tf,loss_str,MAX_STR_LEN);
+        if (strcmp(loss_str,"square")==0) loss = SQUARE;
+        else if (strcmp(loss_str,"log")==0) loss = LOG;
+        else loss = UNKNOWN;
+    }
+    tf = mxGetField(prhs[argIdx], 0, "cached");
+    if (tf) {
+        int b = mxGetScalar(tf);
+        if (b!=0) isCached = true;
+        else isCached = false;
+    }
+    tf = mxGetField(prhs[argIdx], 0, "lambda");
+    if (tf) {
+        lambda = (double) mxGetScalar(tf);
+    }
     
     
     Parameter* param = new Parameter;
@@ -115,16 +184,29 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     param->verbose = verbose;
     param->sd_flag = sd_flag;
     param->shrink = shrink;
-    param->fileName = filename;
+    param->fileName = fileName;
     param->rho = 0.01;
     param->cd_rate = cd_rate;
     param->active_set = active_set;
+    param->loss = loss;
+    param->isCached = isCached;
     
-    
-    LogReg* obj = new LogReg(param->fileName);
-    
-    LHAC<LogReg>* Alg = new LHAC<LogReg>(obj, param);
-    Solution* sols = Alg->solve();
+   Solution* sols = NULL;
+   switch (param->loss) {
+       case SQUARE:
+           printf("L1 - square\n");
+           sols = optimize<Lasso>(param, X, y, N, p);
+           break;
+           
+       case LOG:
+           printf("L1 - logistic\n");
+           sols = optimize<LogReg>(param, X, y, N, p);
+           break;
+           
+       default:
+           printf("Unknown loss: logistic or square!\n");
+           return;
+   }
     
     double* w = NULL;
     double* fval = NULL;
@@ -177,8 +259,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     
     
-    delete Alg;
-    delete obj;
     delete sols;
     return;
 }
