@@ -374,6 +374,7 @@
 		};
 		D4FBD18716AD90C7006E7958 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D421E2EB19A86640000AC75E /* Shared.xcconfig */;
 			buildSettings = {
 				LD_DYLIB_INSTALL_NAME = "";
 				LD_RUNPATH_SEARCH_PATHS = "$(MATLAB_ROOT)/bin/maci64";
@@ -385,6 +386,7 @@
 		};
 		D4FBD18816AD90C7006E7958 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D421E2EB19A86640000AC75E /* Shared.xcconfig */;
 			buildSettings = {
 				LD_DYLIB_INSTALL_NAME = "";
 				LD_RUNPATH_SEARCH_PATHS = "$(MATLAB_ROOT)/bin/maci64";

@@ -15,7 +15,6 @@ param.loss = 'square';
 param.cached = 0;
 param.filename = [pwd, '/', fname{1}, ext];
 
-% [w, iter, fval, t] = LHACl1log(datafile, param.lmd, param);
-[w, iter, fval, t] = l1log(param);
+[w, iter, fval, t] = LHACl1log(param);
 
 
