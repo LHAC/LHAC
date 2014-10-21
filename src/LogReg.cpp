@@ -33,6 +33,10 @@ LogReg::LogReg(const Parameter* param)
     
     memcpy(_X, Dset->X, sizeof(double)*_p*_N);
     memcpy(_y, Dset->y, sizeof(double)*_N);
+    if (param->posweight != 1.0)
+        for (unsigned long i = 0; i < _N; i++)
+            if (_y[i] >= 0) _y[i] *= param->posweight;
+
     
     _e_ywx = new double[_N]; // N
     _B = new double[_N]; // N

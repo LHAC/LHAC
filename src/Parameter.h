@@ -41,8 +41,8 @@ struct Parameter {
     
     // active set stragety
     unsigned long active_set;
-    
     bool isCached; // lasso cache aTa
+    double posweight; // weight for pos samples
     
     ~Parameter() {
         delete [] fileName;

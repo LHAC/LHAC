@@ -335,6 +335,23 @@ private:
         }
         return subgrad;
     }
+    
+    static int _cmp_by_vlt(const void *a, const void *b)
+    {
+        const ushort_pair_t *ia = (ushort_pair_t *)a;
+        const ushort_pair_t *ib = (ushort_pair_t *)b;
+        
+//        if (ib->vlt - ia->vlt > 0) {
+//            return 1;
+//        }
+//        else if (ib->vlt - ia->vlt < 0){
+//            return -1;
+//        }
+//        else
+//            return 0;
+        
+        return (int)(ib->vlt - ia->vlt);
+    }
 
 //    void computeWorkSet() {
 //        ushort_pair_t* &idxs = work_set->idxs;
@@ -372,8 +389,6 @@ private:
                 stdSelector();
                 break;
         }
-        
-        
         /* reset permutation */
         for (unsigned long j = 0; j < work_set->numActive; j++) {
             work_set->permut[j] = j;
@@ -404,7 +419,6 @@ private:
         unsigned long numActive = 0;
         unsigned long work_size = param->work_size;
         unsigned long zeroActive = 0;
-        
         for (unsigned long j = 0; j < p; j++) {
             double g = L_grad[j];
             if (w[j] != 0.0 || (fabs(g) > lmd)) {
@@ -413,26 +427,16 @@ private:
                 g = fabs(g) - lmd;
                 idxs[numActive].vlt = fabs(g);
                 numActive++;
-                
-                if (w[j] == 0.0) {
-                    zeroActive++;
-                }
+                if (w[j] == 0.0) zeroActive++;
             }
         }
-        
-        
-        qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), cmp_by_vlt);
-        
+        qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), _cmp_by_vlt);
         //    numActive = (numActive<work_size)?numActive:work_size;
-        
         // zerosActive small means found the nonzeros subspace
         numActive = (zeroActive<10)?numActive:numActive / work_size;
         printf("zero active = %ld\n", zeroActive);
         printf("num active = %ld\n", numActive);
-        
         work_set->numActive = numActive;
-        
-        return;
     }
 
 

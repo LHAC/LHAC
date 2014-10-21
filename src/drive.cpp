@@ -23,7 +23,7 @@ void parse_command_line(int argc, const char * argv[],
     
     // default value
     param->l = 10;
-    param->work_size = 1;
+    param->work_size = 10;
     param->max_iter = 500;
     param->lmd = 1;
     param->max_inner_iter = 100;
@@ -38,9 +38,10 @@ void parse_command_line(int argc, const char * argv[],
     param->fileName = new char[MAX_LENS];
     param->rho = 0.01;
     param->cd_rate = 5;
-    param->active_set = STD;
+    param->active_set = GREEDY;
     param->loss = LOG;
     param->isCached = true;
+    param->posweight = 1.0;
     
     // parse options
     int i;
@@ -87,6 +88,10 @@ void parse_command_line(int argc, const char * argv[],
             /* solving precision */
             case 'e':
                 param->opt_outer_tol = atof(argv[i]);
+                break;
+                
+            case 's':
+                param->posweight = atof(argv[i]);
                 break;
                 
 			default:
