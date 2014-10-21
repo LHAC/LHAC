@@ -39,7 +39,7 @@ void parse_command_line(int argc, const char * argv[],
     param->rho = 0.01;
     param->cd_rate = 5;
     param->active_set = STD;
-    param->loss = SQUARE;
+    param->loss = LOG;
     param->isCached = true;
     
     // parse options
