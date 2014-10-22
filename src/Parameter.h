@@ -8,11 +8,12 @@
 
 #ifndef LHAC_v1_Parameter_h
 #define LHAC_v1_Parameter_h
-
+#include <stdio.h>
 enum loss_t {  LOG= 123, SQUARE, UNKNOWN };
 
 struct Parameter {
     char* fileName;
+    char* pfile;
     unsigned long work_size;
     unsigned short max_iter;
     unsigned long max_inner_iter;
@@ -46,6 +47,7 @@ struct Parameter {
     
     ~Parameter() {
         delete [] fileName;
+        if (pfile != NULL) delete [] pfile;
     }
     
 };

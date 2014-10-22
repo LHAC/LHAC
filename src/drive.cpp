@@ -14,6 +14,7 @@
 #include "lhac.h"
 #include "LogReg.h"
 #include "Lasso.h"
+#include "utils.h"
 
 
 
@@ -24,7 +25,7 @@ void parse_command_line(int argc, const char * argv[],
     // default value
     param->l = 10;
     param->work_size = 10;
-    param->max_iter = 500;
+    param->max_iter = 1000;
     param->lmd = 1;
     param->max_inner_iter = 100;
     param->opt_inner_tol = 5*1e-6;
@@ -36,9 +37,10 @@ void parse_command_line(int argc, const char * argv[],
     param->sd_flag = 1; // default using suffcient decrease
     param->shrink = 4;
     param->fileName = new char[MAX_LENS];
+    param->pfile = NULL;
     param->rho = 0.01;
     param->cd_rate = 5;
-    param->active_set = GREEDY;
+    param->active_set = STD;
     param->loss = LOG;
     param->isCached = true;
     param->posweight = 1.0;
@@ -94,6 +96,11 @@ void parse_command_line(int argc, const char * argv[],
                 param->posweight = atof(argv[i]);
                 break;
                 
+            case 'p':
+                param->pfile = new char[MAX_LENS];
+                strcpy(param->pfile, argv[i]);
+                break;
+                
 			default:
 				printf("unknown option: -%c\n", argv[i-1][1]);
 				break;
@@ -110,7 +117,7 @@ void parse_command_line(int argc, const char * argv[],
 }
 
 template <typename Derived>
-Solution* optimize(Parameter* param) {
+const Solution* optimize(Parameter* param) {
     Objective<Derived>* obj = new Derived(param);
     //    Solution* sols = lhac(obj, param);
     LHAC<Derived>* Alg = new LHAC<Derived>(obj, param);
@@ -121,31 +128,101 @@ Solution* optimize(Parameter* param) {
     return sols;
 }
 
+void predict(const Solution* sols, const Parameter* param) {
+    if (param->pfile == NULL) return;
+    double* w = sols->w;
+    unsigned long p = sols->p;
+    char* line = new char[MAX_LINE_LEN];
+    FILE *fp = fopen(param->pfile,"r");
+    if(fp == NULL)
+    {
+        printf("can't open input file %s\n",param->pfile);
+        exit(1);
+    }
+    unsigned long N = 0;
+    unsigned long posN = 0;
+    max_line_len = MAX_LINE_LEN;
+    while(readline(fp, line)!=NULL) {
+        N++;
+        char* label = strtok(line," \t\n");
+        char* endptr;
+        
+        double y_true = strtod(label,&endptr);
+        char *idx, *val;
+        int index;
+        double value;
+        double wx = 0.0;
+        while(1)
+        {
+            idx = strtok(NULL,":");
+            val = strtok(NULL," \t");
+            
+            if(val == NULL)
+                break;
+            
+            index = (int) strtol(idx,&endptr,10);
+            value = strtod(val,&endptr);
+            
+            if (index > p) {
+                printf("wrong input format:"
+                       "w dimension: %ld, data index: %d\n",
+                       p, index);
+                exit(1);
+            }
+            wx += w[index-1]*value;
+        }
+        if (y_true*wx > 0) posN++;
+    }
+    printf("w\t");
+    for (unsigned long i = 0; i < p-1; i++) {
+        printf("%f,", w[i]);
+    }
+    printf("%f\n", w[p-1]);
+    printf("accuracy\t%f\n", (double) posN / N);
+    delete [] line;
+}
+
 
 
 int main(int argc, const char * argv[])
 {
     Parameter* param = new Parameter;
     parse_command_line(argc, argv, param);
-    Solution* sols = NULL;
+    const Solution* sols = NULL;
     
     
     switch (param->loss) {
         case SQUARE:
             printf("L1 - square\n");
             sols = optimize<Lasso>(param);
-            delete sols;
             break;
             
         case LOG:
             printf("L1 - logistic\n");
             sols = optimize<LogReg>(param);
-            delete sols;
             break;
             
         default:
             printf("Unknown loss: logistic or square!\n");
             break;
     }
+    if (sols != NULL && param != NULL) {
+        predict(sols, param);
+        delete sols;
+        delete param;
+    }
+    
     exit( 0 );
 }
+
+
+
+
+
+
+
+
+
+
+
+

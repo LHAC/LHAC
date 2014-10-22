@@ -13,10 +13,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define MAX_LINE_LEN 1024
+#define MAX_LINE_LEN 2024
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
-static char *line = NULL;
+//static char *line = NULL;
 static int max_line_len;
 
 typedef struct {
@@ -52,7 +52,7 @@ typedef struct training_set_strct {
 } training_set;
 
 
-static char* readline(FILE *input)
+static char* readline(FILE *input, char* line)
 {
     int len;
     
@@ -146,8 +146,8 @@ static void read_problem(const char *filename, training_set_sp* Dset)
     Dset->N = 0;
     elements = 0;
     max_line_len = MAX_LINE_LEN;
-    line = Malloc(char,max_line_len);
-    while(readline(fp)!=NULL)
+    char* line = Malloc(char,max_line_len);
+    while(readline(fp, line)!=NULL)
     {
         char *p = strtok(line," \t"); // label
         
@@ -175,7 +175,7 @@ static void read_problem(const char *filename, training_set_sp* Dset)
     for(i=0;i<Dset->N;i++)
     {
         inst_max_index = 0; // strtol gives 0 if wrong format
-        readline(fp);
+        readline(fp, line);
         Dset->X[i] = &x_space[j];
         label = strtok(line," \t\n");
         //		if(label == NULL) // empty line
