@@ -16,7 +16,7 @@
 #define MAX_LINE_LEN 2024
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
-//static char *line = NULL;
+static char *line = NULL;
 static int max_line_len;
 
 typedef struct {
@@ -52,7 +52,7 @@ typedef struct training_set_strct {
 } training_set;
 
 
-static char* readline(FILE *input, char* line)
+static char* readline(FILE *input)
 {
     int len;
     
@@ -146,8 +146,8 @@ static void read_problem(const char *filename, training_set_sp* Dset)
     Dset->N = 0;
     elements = 0;
     max_line_len = MAX_LINE_LEN;
-    char* line = Malloc(char,max_line_len);
-    while(readline(fp, line)!=NULL)
+    line = Malloc(char,max_line_len);
+    while(readline(fp)!=NULL)
     {
         char *p = strtok(line," \t"); // label
         
@@ -175,7 +175,7 @@ static void read_problem(const char *filename, training_set_sp* Dset)
     for(i=0;i<Dset->N;i++)
     {
         inst_max_index = 0; // strtol gives 0 if wrong format
-        readline(fp, line);
+        readline(fp);
         Dset->X[i] = &x_space[j];
         label = strtok(line," \t\n");
         //		if(label == NULL) // empty line
@@ -235,7 +235,7 @@ static void transformToDenseFormat(training_set* Dset, training_set_sp* Dset_sp)
     memcpy(y, Dset_sp->y, N*sizeof(double));
     
     unsigned long num = 0;
-    unsigned long nnz = 0;
+//    unsigned long nnz = 0;
     for (unsigned long i = 0; i < p; i++) {
         feature_node* xnode = Dset_sp->X[i];
         int ind = xnode->index-1;
@@ -247,13 +247,13 @@ static void transformToDenseFormat(training_set* Dset, training_set_sp* Dset_sp)
             }
             else {
                 X[num] = 0.0;
-                nnz++;
+//                nnz++;
             }
             num++;
         }
     }
     
-    printf(" nnz = %ld\n", nnz);
+//    printf(" nnz = %ld\n", nnz);
     
     Dset->X = X;
     Dset->y = y;

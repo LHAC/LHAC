@@ -132,7 +132,7 @@ void predict(const Solution* sols, const Parameter* param) {
     if (param->pfile == NULL) return;
     double* w = sols->w;
     unsigned long p = sols->p;
-    char* line = new char[MAX_LINE_LEN];
+//    char* line = new char[MAX_LINE_LEN];
     FILE *fp = fopen(param->pfile,"r");
     if(fp == NULL)
     {
@@ -141,9 +141,12 @@ void predict(const Solution* sols, const Parameter* param) {
     }
     unsigned long N = 0;
     unsigned long posN = 0;
+    unsigned long negN = 0;
     max_line_len = MAX_LINE_LEN;
-    while(readline(fp, line)!=NULL) {
-        N++;
+    if (line == NULL) {
+        line = Malloc(char,max_line_len);
+    }
+    while(readline(fp)!=NULL) {
         char* label = strtok(line," \t\n");
         char* endptr;
         
@@ -163,23 +166,28 @@ void predict(const Solution* sols, const Parameter* param) {
             index = (int) strtol(idx,&endptr,10);
             value = strtod(val,&endptr);
             
-            if (index > p) {
-                printf("wrong input format:"
-                       "w dimension: %ld, data index: %d\n",
-                       p, index);
-                exit(1);
-            }
+            /* index is not included in training set */
+            /* treat w[index] as zero  */
+            if (index > p) continue;
             wx += w[index-1]*value;
         }
-        if (y_true*wx > 0) posN++;
+        if (y_true > 0) {
+            N++;
+            if (y_true*wx > 0) posN++;
+            else negN++;
+        }
+        
     }
     printf("w\t");
     for (unsigned long i = 0; i < p-1; i++) {
         printf("%f,", w[i]);
     }
     printf("%f\n", w[p-1]);
-    printf("accuracy\t%f\n", (double) posN / N);
-    delete [] line;
+    printf("total pos\t%ld\n", N);
+    printf("neg\t%f\n", (double) negN / N);
+    printf("pos\t%f\n", (double) posN / N);
+//    delete [] line;
+    free(line);
 }
 
 
