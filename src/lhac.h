@@ -25,7 +25,7 @@
 enum { LHAC_MSG_NO=0, LHAC_MSG_NEWTON, LHAC_MSG_SD, LHAC_MSG_CD, LHAC_MSG_MAX };
 
 
-enum{  GREEDY= 1, STD };
+enum{  GREEDY= 1, STD, GREEDY_CUTZERO, GREEDY_CUTGRAD, GREEDY_ADDZERO, STD_CUTGRAD, STD_CUTGRAD_AGGRESSIVE };
 
 
 
@@ -341,16 +341,28 @@ private:
         const ushort_pair_t *ia = (ushort_pair_t *)a;
         const ushort_pair_t *ib = (ushort_pair_t *)b;
         
-//        if (ib->vlt - ia->vlt > 0) {
-//            return 1;
-//        }
-//        else if (ib->vlt - ia->vlt < 0){
-//            return -1;
-//        }
-//        else
-//            return 0;
-        
-        return (int)(ib->vlt - ia->vlt);
+        if (ib->vlt - ia->vlt > 0) {
+            return 1;
+        }
+        else if (ib->vlt - ia->vlt < 0){
+            return -1;
+        }
+        else
+            return 0;
+    }
+    
+    static int _cmp_by_vlt_reverse(const void *a, const void *b)
+    {
+        const ushort_pair_t *ia = (ushort_pair_t *)a;
+        const ushort_pair_t *ib = (ushort_pair_t *)b;
+        if (ib->vlt - ia->vlt > 0) {
+            return -1;
+        }
+        else if (ib->vlt - ia->vlt < 0){
+            return 1;
+        }
+        else
+            return 0;
     }
 
 //    void computeWorkSet() {
@@ -385,6 +397,26 @@ private:
                 stdSelector();
                 break;
                 
+            case STD_CUTGRAD:
+                stdSelector_cutgrad();
+                break;
+                
+            case STD_CUTGRAD_AGGRESSIVE:
+                stdSelector_cutgrad_aggressive();
+                break;
+            
+            case GREEDY_CUTGRAD:
+                greedySelector();
+                break;
+                
+            case GREEDY_CUTZERO:
+                greedySelector_cutzero();
+                break;
+                
+            case GREEDY_ADDZERO:
+                greedySelector_addzero();
+                break;
+                
             default:
                 stdSelector();
                 break;
@@ -413,7 +445,86 @@ private:
         return;
     }
     
+    void stdSelector_cutgrad()
+    {
+        ushort_pair_t* &idxs = work_set->idxs;
+        unsigned long numActive = 0;
+        /*** select rule 2 ***/
+        for (unsigned long j = 0; j < p; j++) {
+            double g = L_grad[j];
+            if (w[j] != 0.0 || (fabs(g) > lmd + 0.01)) {
+                idxs[numActive].i = (unsigned short) j;
+                idxs[numActive].j = (unsigned short) j;
+                numActive++;
+            }
+        }
+        work_set->numActive = numActive;
+        return;
+    }
+    
+    void stdSelector_cutgrad_aggressive()
+    {
+        ushort_pair_t* &idxs = work_set->idxs;
+        unsigned long numActive = 0;
+        /*** select rule 2 ***/
+        for (unsigned long j = 0; j < p; j++) {
+            double g = L_grad[j];
+            if (w[j] != 0.0 || (fabs(g) > lmd + 0.5)) {
+                idxs[numActive].i = (unsigned short) j;
+                idxs[numActive].j = (unsigned short) j;
+                numActive++;
+            }
+        }
+        work_set->numActive = numActive;
+        return;
+    }
+    
     void greedySelector()
+    {
+        ushort_pair_t* &idxs = work_set->idxs;
+        unsigned long numActive = 0;
+        unsigned long work_size = param->work_size;
+        unsigned long zeroActive = 0;
+        for (unsigned long j = 0; j < p; j++) {
+            double g = L_grad[j];
+            if (w[j] != 0.0 || (fabs(g) > lmd)) {
+                idxs[numActive].i = (unsigned short) j;
+                idxs[numActive].j = (unsigned short) j;
+                g = fabs(g) - lmd;
+                idxs[numActive].vlt = fabs(g);
+                numActive++;
+                if (w[j] == 0.0) zeroActive++;
+            }
+        }
+        qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), _cmp_by_vlt);
+        //        numActive = (numActive<work_size)?numActive:work_size;
+        work_set->numActive = numActive;
+    }
+    
+    
+    void greedySelector_cutgrad()
+    {
+        ushort_pair_t* &idxs = work_set->idxs;
+        unsigned long numActive = 0;
+        unsigned long work_size = param->work_size;
+        unsigned long zeroActive = 0;
+        for (unsigned long j = 0; j < p; j++) {
+            double g = L_grad[j];
+            if (w[j] != 0.0 || (fabs(g) > lmd + 0.01)) {
+                idxs[numActive].i = (unsigned short) j;
+                idxs[numActive].j = (unsigned short) j;
+                g = fabs(g) - lmd;
+                idxs[numActive].vlt = fabs(g);
+                numActive++;
+                if (w[j] == 0.0) zeroActive++;
+            }
+        }
+        qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), _cmp_by_vlt);
+//        numActive = (numActive<work_size)?numActive:work_size;
+        work_set->numActive = numActive;
+    }
+    
+    void greedySelector_cutzero()
     {
         ushort_pair_t* &idxs = work_set->idxs;
         unsigned long numActive = 0;
@@ -433,9 +544,91 @@ private:
         qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), _cmp_by_vlt);
 //        numActive = (numActive<work_size)?numActive:work_size;
         // zerosActive small means found the nonzeros subspace
-//        numActive = (zeroActive<10)?numActive:numActive / work_size;
+        numActive = (zeroActive<100)?numActive:(numActive-zeroActive);
 //        printf("zero active = %ld\n", zeroActive);
 //        printf("num active = %ld\n", numActive);
+        work_set->numActive = numActive;
+    }
+    
+    void insert_(unsigned short idx, double vlt, unsigned long n)
+    {
+        ushort_pair_t* &idxs = work_set->idxs;
+        
+        unsigned long end = p-1-n;
+        unsigned long j;
+        
+        for (j = p-1; j > end; j--) {
+            if (idxs[j].vlt >= vlt) continue;
+            else {
+                for (unsigned long k = j; k >= end; k--) {
+                    // swap
+                    unsigned long tmpj = idxs[k].j;
+                    double tmpv = idxs[k].vlt;
+                    idxs[k].j = idx;
+                    idxs[k].i = idx;
+                    idxs[k].vlt = vlt;
+                    vlt = tmpv;
+                    idx = tmpj;
+                }
+                break;
+            }
+        }
+        if (j == end) {
+            idxs[end].j = idx;
+            idxs[end].i = idx;
+            idxs[end].vlt = vlt;
+        }
+    }
+    
+    void greedySelector_addzero()
+    {
+        ushort_pair_t* &idxs = work_set->idxs;
+        unsigned long numActive = 0;
+        unsigned long work_size = param->work_size;
+        unsigned long zeroActive = 0;
+        unsigned long nzeroActive = 0;
+        for (unsigned long j = 0; j < p; j++) {
+            double g = L_grad[j];
+            if (fabs(g) > lmd) {
+                g = fabs(g) - lmd;
+                insert_((unsigned short)j, fabs(g), zeroActive);
+//                unsigned long end = p-1-zeroActive;
+//                idxs[end].j = (unsigned short) j;
+//                idxs[end].i = (unsigned short) j;
+//                idxs[end].vlt = g;
+                zeroActive++;
+            }
+            else if (w[j] != 0.0) {
+                idxs[nzeroActive].i = (unsigned short) j;
+                idxs[nzeroActive].j = (unsigned short) j;
+                nzeroActive++;
+            }
+        }
+        printf("zero active = %ld\n", zeroActive);
+        printf("nonzero active = %ld\n", nzeroActive);
+//        unsigned long pos = p - zeroActive;
+//        qsort((void *)(idxs+pos), (size_t) zeroActive, sizeof(ushort_pair_t), _cmp_by_vlt_reverse);
+//        for (unsigned long j = p-1; j >= pos; j--) {
+//            printf("%f, %d\n", idxs[j].vlt, j);
+//        }
+//        printf("\n");
+
+//        work_size = (work_size<zeroActive)?work_size:zeroActive;
+        work_size = (work_size<zeroActive)?work_size:zeroActive;
+        work_size = (zeroActive>2*nzeroActive)?work_size:zeroActive;
+        numActive = nzeroActive;
+        unsigned long end = p-work_size;
+        for (unsigned long j = p-1; j >= end; j--) {
+            idxs[numActive].i = idxs[j].i;
+            idxs[numActive].j = idxs[j].j;
+//            printf("%f, ", idxs[j].vlt);
+            numActive++;
+        }
+//        printf("\n");
+        //        numActive = (numActive<work_size)?numActive:work_size;
+        // zerosActive small means found the nonzeros subspace
+//        numActive = (zeroActive<100)?numActive:(numActive-zeroActive);
+
         work_set->numActive = numActive;
     }
 

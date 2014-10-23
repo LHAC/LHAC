@@ -112,7 +112,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // max_cdpass = 1 + iter / cdrate
     unsigned long cd_rate = 6;
     // for greedy active set
-    unsigned long work_size = 300;
+    unsigned long work_size = 500;
     // active set strategy -- standard (default)
     unsigned long active_set = STD;
     int loss = LOG;
