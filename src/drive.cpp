@@ -24,7 +24,7 @@ void parse_command_line(int argc, const char * argv[],
     
     // default value
     param->l = 10;
-    param->work_size = 10;
+    param->work_size = 100;
     param->max_iter = 1000;
     param->lmd = 1;
     param->max_inner_iter = 100;
@@ -40,7 +40,7 @@ void parse_command_line(int argc, const char * argv[],
     param->pfile = NULL;
     param->rho = 0.01;
     param->cd_rate = 5;
-    param->active_set = STD;
+    param->active_set = GREEDY;
     param->loss = LOG;
     param->isCached = true;
     param->posweight = 1.0;

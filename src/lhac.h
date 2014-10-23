@@ -431,9 +431,9 @@ private:
             }
         }
         qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), _cmp_by_vlt);
-        //    numActive = (numActive<work_size)?numActive:work_size;
+//        numActive = (numActive<work_size)?numActive:work_size;
         // zerosActive small means found the nonzeros subspace
-        numActive = (zeroActive<10)?numActive:numActive / work_size;
+//        numActive = (zeroActive<10)?numActive:numActive / work_size;
 //        printf("zero active = %ld\n", zeroActive);
 //        printf("num active = %ld\n", numActive);
         work_set->numActive = numActive;
