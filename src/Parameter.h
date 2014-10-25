@@ -13,7 +13,7 @@ enum loss_t {  LOG= 123, SQUARE, UNKNOWN };
 
 struct Parameter {
     char* fileName;
-    char* pfile;
+    char* pfile = NULL;
     unsigned long work_size;
     unsigned short max_iter;
     unsigned long max_inner_iter;

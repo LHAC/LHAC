@@ -16,7 +16,7 @@
 //#include <stdio.h>
 
 typedef struct {
-    unsigned long i;
+    unsigned long i; // not used
     unsigned long j;
     double vlt;
 } ushort_pair_t;

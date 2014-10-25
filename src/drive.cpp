@@ -37,11 +37,10 @@ void parse_command_line(int argc, const char * argv[],
     param->sd_flag = 1; // default using suffcient decrease
     param->shrink = 4;
     param->fileName = new char[MAX_LENS];
-    param->pfile = NULL;
     param->rho = 0.01;
     param->cd_rate = 5;
-    param->active_set = STD;
-//    param->active_set = GREEDY_ADDZERO;
+//    param->active_set = STD;
+    param->active_set = GREEDY_ADDZERO;
     param->loss = LOG;
     param->isCached = true;
     param->posweight = 1.0;
@@ -96,7 +95,8 @@ void parse_command_line(int argc, const char * argv[],
             case 's':
                 param->posweight = atof(argv[i]);
                 break;
-                
+            
+            /* testing file */
             case 'p':
                 param->pfile = new char[MAX_LENS];
                 strcpy(param->pfile, argv[i]);
@@ -128,6 +128,7 @@ const Solution* optimize(Parameter* param) {
 
     return sols;
 }
+
 
 void predict(const Solution* sols, const Parameter* param) {
     if (param->pfile == NULL) return;
@@ -175,8 +176,9 @@ void predict(const Solution* sols, const Parameter* param) {
         if (y_true > 0) {
             N++;
             if (y_true*wx > 0) posN++;
-            else negN++;
         }
+        else
+            if (wx > 0) negN++;
         
     }
     printf("w\t");

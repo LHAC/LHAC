@@ -33,11 +33,11 @@ LogReg::LogReg(const Parameter* param)
     
     memcpy(_X, Dset->X, sizeof(double)*_p*_N);
     memcpy(_y, Dset->y, sizeof(double)*_N);
-    if (param->posweight != 1.0)
-        for (unsigned long i = 0; i < _N; i++)
-            if (_y[i] >= 0) _y[i] *= param->posweight;
+//    if (param->posweight != 1.0)
+//        for (unsigned long i = 0; i < _N; i++)
+//            if (_y[i] >= 0) _y[i] *= param->posweight;
 
-    
+    _posweight = param->posweight;
     _e_ywx = new double[_N]; // N
     _B = new double[_N]; // N
     
@@ -75,14 +75,17 @@ double LogReg::computeObject(double* wnew)
     for (unsigned long i = 0; i < _N; i++) {
         double nc1;
         double nc2;
+//        double weight = (_y[i]>0)?_posweight:1;
         nc1 = _e_ywx[i]*_y[i];
         _e_ywx[i] = exp(nc1);
         if (nc1 <= 0) {
             nc2 = _e_ywx[i];
-            fval += log((1+nc2))-nc1;
+            fval += (log((1+nc2))-nc1);
+//            fval += weight*(log((1+nc2))-nc1);
         }
         else {
             nc2 = exp(-nc1);
+//            fval += weight*log((1+nc2));
             fval += log((1+nc2));
         }
         
@@ -95,6 +98,8 @@ double LogReg::computeObject(double* wnew)
 void LogReg::computeGradient(const double* wnew, double* df)
 {
     for (unsigned long i = 0; i < _N; i++) {
+//        double weight = (_y[i]>0)?_posweight:1;
+//        _B[i] = -weight*_y[i]/(1+_e_ywx[i]);
         _B[i] = -_y[i]/(1+_e_ywx[i]);
     }
 //    cblas_dgemv(CblasColMajor, CblasTrans, (int)N, (int)p, 1.0, X, (int)N, B, 1, 0.0, df, 1);

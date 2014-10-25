@@ -34,6 +34,7 @@ private:
     unsigned long _p;
     unsigned long _N;
     
+    double _posweight=1;
     
     double* _X;
     double* _y;

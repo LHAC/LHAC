@@ -430,6 +430,11 @@ private:
     
     void stdSelector()
     {
+        unsigned long nzero = 0;
+        unsigned long nzero_pos = 0;
+        unsigned long zero = 0;
+        unsigned long zero_pos = 0;
+        
         ushort_pair_t* &idxs = work_set->idxs;
         unsigned long numActive = 0;
         /*** select rule 2 ***/
@@ -439,8 +444,23 @@ private:
                 idxs[numActive].i = (unsigned short) j;
                 idxs[numActive].j = (unsigned short) j;
                 numActive++;
+                
+                if (w[j] == 0.0) {
+                    zero_pos++;
+                }
+                else if (fabs(g) > lmd)
+                    nzero_pos++;
             }
+            
+            if (w[j] != 0.0) {
+                nzero++;
+            }
+            else
+                zero++;
         }
+        printf("%ld\n", numActive);
+        
+//        printf("%ld, %ld, %ld, %ld\n", nzero, nzero_pos, zero, zero_pos);
         work_set->numActive = numActive;
         return;
     }
@@ -533,8 +553,8 @@ private:
         for (unsigned long j = 0; j < p; j++) {
             double g = L_grad[j];
             if (w[j] != 0.0 || (fabs(g) > lmd)) {
-                idxs[numActive].i = (unsigned short) j;
-                idxs[numActive].j = (unsigned short) j;
+                idxs[numActive].i = j;
+                idxs[numActive].j = j;
                 g = fabs(g) - lmd;
                 idxs[numActive].vlt = fabs(g);
                 numActive++;
@@ -550,7 +570,7 @@ private:
         work_set->numActive = numActive;
     }
     
-    void insert_(unsigned short idx, double vlt, unsigned long n)
+    void _insert(unsigned long idx, double vlt, unsigned long n)
     {
         ushort_pair_t* &idxs = work_set->idxs;
         
@@ -565,7 +585,6 @@ private:
                     unsigned long tmpj = idxs[k].j;
                     double tmpv = idxs[k].vlt;
                     idxs[k].j = idx;
-                    idxs[k].i = idx;
                     idxs[k].vlt = vlt;
                     vlt = tmpv;
                     idx = tmpj;
@@ -575,9 +594,92 @@ private:
         }
         if (j == end) {
             idxs[end].j = idx;
-            idxs[end].i = idx;
             idxs[end].vlt = vlt;
         }
+    }
+    
+    double _vlt(unsigned long j)
+    {
+        double g = L_grad[j];
+        if (w[j] > 0) g += lmd;
+        else if (w[j] < 0) g -= lmd;
+        else g = fabs(g) - lmd;
+        return g;
+    }
+    
+    
+    /* not converging on a9a */
+    void greedySelector_addzero_no()
+    {
+        ushort_pair_t* &idxs = work_set->idxs;
+        unsigned long numActive = 0;
+        unsigned long work_size = param->work_size;
+        unsigned long zeroActive = 0;
+        unsigned long nzeroActive = 0;
+        for (unsigned long j = 0; j < p; j++) {
+            double g = fabs(L_grad[j]) - lmd;
+            if (g > 0) {
+                //                _insert(j, g, zeroActive);
+                unsigned long end = p-1-zeroActive;
+                idxs[end].j = j;
+                idxs[end].vlt = g;
+                zeroActive++;
+            }
+            else if (w[j] != 0.0) {
+                idxs[nzeroActive].j = j;
+                //                idxs[nzeroActive].vlt = g;
+                nzeroActive++;
+            }
+        }
+        
+        //        unsigned long pos = p - zeroActive;
+        //        qsort((void *)(idxs+pos), (size_t) zeroActive, sizeof(ushort_pair_t), _cmp_by_vlt_reverse);
+        //        for (unsigned long j = p-1; j >= pos; j--) {
+        //            printf("%f, %d\n", idxs[j].vlt, j);
+        //        }
+        //        printf("\n");
+        
+        //        printf("zero active = %ld\n", zeroActive);
+        //        printf("nonzero active = %ld\n", nzeroActive);
+        
+        if (zeroActive>2*nzeroActive) {
+            unsigned long pos = p - zeroActive;
+            qsort((void *)(idxs+pos), (size_t) zeroActive, sizeof(ushort_pair_t), _cmp_by_vlt_reverse);
+            work_size = (nzeroActive<10)?zeroActive/3:nzeroActive;
+            //            printf("zero active = %ld\n", zeroActive);
+//            for (int j = p-1; j >= 0; j--) {
+//                printf("%f, %d\n", idxs[j].vlt, j);
+//            }
+//            printf("\n");
+        }
+        else
+            work_size = zeroActive;
+        
+        
+        //        printf("%ld, %ld\n", (idxs+3)[0].j, idxs[3].j);
+        
+        numActive = nzeroActive;
+        unsigned long end = p-work_size;
+        for (unsigned long j = p-1; j >= end; j--) {
+            idxs[numActive].j = idxs[j].j;
+            //            idxs[numActive].vlt = idxs[j].vlt;
+            //            printf("%f, ", idxs[j].vlt);
+            numActive++;
+        }
+        
+//        static int _iter = 1;
+//        printf("%ld, %d\n", numActive, _iter++);
+        
+        //        for (int j = p-1; j >= 0; j--) {
+        //            printf("%f, %d\n", idxs[j].vlt, j);
+        //        }
+        //        printf("\n");
+        //        printf("\n");
+        //        numActive = (numActive<work_size)?numActive:work_size;
+        // zerosActive small means found the nonzeros subspace
+        //        numActive = (zeroActive<100)?numActive:(numActive-zeroActive);
+        
+        work_set->numActive = numActive;
     }
     
     void greedySelector_addzero()
@@ -588,48 +690,86 @@ private:
         unsigned long zeroActive = 0;
         unsigned long nzeroActive = 0;
         for (unsigned long j = 0; j < p; j++) {
-            double g = L_grad[j];
-            if (fabs(g) > lmd) {
-                g = fabs(g) - lmd;
-                insert_((unsigned short)j, fabs(g), zeroActive);
+            double g = fabs(L_grad[j]) - lmd;
+            if (g > 0) {
+                _insert(j, g, zeroActive);
 //                unsigned long end = p-1-zeroActive;
-//                idxs[end].j = (unsigned short) j;
-//                idxs[end].i = (unsigned short) j;
+//                idxs[end].j = j;
 //                idxs[end].vlt = g;
                 zeroActive++;
             }
             else if (w[j] != 0.0) {
-                idxs[nzeroActive].i = (unsigned short) j;
-                idxs[nzeroActive].j = (unsigned short) j;
+                idxs[nzeroActive].j = j;
+//                idxs[nzeroActive].vlt = g;
                 nzeroActive++;
             }
         }
-        printf("zero active = %ld\n", zeroActive);
-        printf("nonzero active = %ld\n", nzeroActive);
+
 //        unsigned long pos = p - zeroActive;
 //        qsort((void *)(idxs+pos), (size_t) zeroActive, sizeof(ushort_pair_t), _cmp_by_vlt_reverse);
 //        for (unsigned long j = p-1; j >= pos; j--) {
 //            printf("%f, %d\n", idxs[j].vlt, j);
 //        }
 //        printf("\n");
+        
+//        printf("zero active = %ld\n", zeroActive);
+//        printf("nonzero active = %ld\n", nzeroActive);
 
 //        work_size = (work_size<zeroActive)?work_size:zeroActive;
-        work_size = (work_size<zeroActive)?work_size:zeroActive;
+        work_size = (nzeroActive<10)?zeroActive/2:nzeroActive;
         work_size = (zeroActive>2*nzeroActive)?work_size:zeroActive;
+
+
+//        printf("%ld, %ld\n", (idxs+3)[0].j, idxs[3].j);
+        
         numActive = nzeroActive;
         unsigned long end = p-work_size;
         for (unsigned long j = p-1; j >= end; j--) {
-            idxs[numActive].i = idxs[j].i;
             idxs[numActive].j = idxs[j].j;
+//            idxs[numActive].vlt = idxs[j].vlt;
 //            printf("%f, ", idxs[j].vlt);
             numActive++;
         }
+        
+
+        
+//        for (int j = p-1; j >= 0; j--) {
+//            printf("%f, %d\n", idxs[j].vlt, j);
+//        }
+//        printf("\n");
 //        printf("\n");
         //        numActive = (numActive<work_size)?numActive:work_size;
         // zerosActive small means found the nonzeros subspace
 //        numActive = (zeroActive<100)?numActive:(numActive-zeroActive);
 
         work_set->numActive = numActive;
+    }
+    
+    static inline void shuffle( work_set_struct* work_set )
+    {
+        unsigned long lens = work_set->numActive;
+        ushort_pair_t* idxs = work_set->idxs;
+        unsigned long* permut = work_set->permut;
+
+        for (unsigned long i = 0; i < lens; i++) {
+            unsigned long j = i + rand()%(lens - i);
+            unsigned short k1 = idxs[i].i;
+            unsigned short k2 = idxs[i].j;
+            double vlt = idxs[i].vlt;
+            idxs[i].i = idxs[j].i;
+            idxs[i].j = idxs[j].j;
+            idxs[i].vlt = idxs[j].vlt;
+            idxs[j].i = k1;
+            idxs[j].j = k2;
+            idxs[j].vlt = vlt;
+
+            /* update permutation */
+            unsigned long tmp = permut[i];
+            permut[i] = permut[j];
+            permut[j] = tmp;
+        }
+        
+        return;
     }
 
 
@@ -702,7 +842,7 @@ private:
                     printf("\t\t Coordinate descent pass %ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
                            cd_pass, diffd, normd);
                 }
-                //            shuffle( work_set );
+//                shuffle(work_set);
             }
             
             for (unsigned long i = 0; i < p; i++) {
