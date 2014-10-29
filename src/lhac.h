@@ -619,7 +619,6 @@ private:
         for (unsigned long j = 0; j < p; j++) {
             double g = fabs(L_grad[j]) - lmd;
             if (g > 0) {
-                //                _insert(j, g, zeroActive);
                 unsigned long end = p-1-zeroActive;
                 idxs[end].j = j;
                 idxs[end].vlt = g;
@@ -692,7 +691,13 @@ private:
         for (unsigned long j = 0; j < p; j++) {
             double g = fabs(L_grad[j]) - lmd;
             if (g > 0) {
-                _insert(j, g, zeroActive);
+//                if (w[j] > 0) {
+//                    g = L_grad[j] + lmd;
+//                }
+//                else if (w[j] < 0) {
+//                    g = L_grad[j] - lmd;
+//                }
+                _insert(j, fabs(g), zeroActive);
 //                unsigned long end = p-1-zeroActive;
 //                idxs[end].j = j;
 //                idxs[end].vlt = g;
@@ -718,6 +723,9 @@ private:
 //        work_size = (work_size<zeroActive)?work_size:zeroActive;
         work_size = (nzeroActive<10)?zeroActive/2:nzeroActive;
         work_size = (zeroActive>2*nzeroActive)?work_size:zeroActive;
+//        work_size = (zeroActive - nzeroActive) / 3;
+//        work_size = (zeroActive>2*nzeroActive)?work_size:zeroActive;
+
 
 
 //        printf("%ld, %ld\n", (idxs+3)[0].j, idxs[3].j);

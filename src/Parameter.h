@@ -44,6 +44,7 @@ struct Parameter {
     unsigned long active_set;
     bool isCached; // lasso cache aTa
     double posweight=1; // weight for pos samples
+    int mdlexist = 0;
     
     ~Parameter() {
         delete [] fileName;

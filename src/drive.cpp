@@ -102,6 +102,10 @@ void parse_command_line(int argc, const char * argv[],
                 strcpy(param->pfile, argv[i]);
                 break;
                 
+            case 'm':
+                param->mdlexist = atoi(argv[i]);
+                break;
+                
 			default:
 				printf("unknown option: -%c\n", argv[i-1][1]);
 				break;
@@ -130,10 +134,10 @@ const Solution* optimize(Parameter* param) {
 }
 
 
-void predict(const Solution* sols, const Parameter* param) {
+void predict(const double* w, const unsigned long p, const Parameter* param) {
     if (param->pfile == NULL) return;
-    double* w = sols->w;
-    unsigned long p = sols->p;
+//    double* w = sols->w;
+//    unsigned long p = sols->p;
 //    char* line = new char[MAX_LINE_LEN];
     FILE *fp = fopen(param->pfile,"r");
     if(fp == NULL)
@@ -194,6 +198,52 @@ void predict(const Solution* sols, const Parameter* param) {
 }
 
 
+void read_problem(double* &w, unsigned long &p, Parameter* param) {
+    FILE *fp = fopen(param->fileName,"r");
+    if(fp == NULL)
+    {
+        printf("can't open model file %s\n",param->fileName);
+        exit(1);
+    }
+    max_line_len = MAX_LINE_LEN;
+    if (line == NULL) {
+        line = Malloc(char,max_line_len);
+    }
+    bool foundw = false;
+    p = 0;
+    while(readline(fp)!=NULL) {
+        char* label = strtok(line," \t\n");
+        if (strcmp(label, "w")) continue;
+        foundw = true;
+        char* val;
+        while (1) {
+            val = strtok(NULL," ,");
+            if (val != NULL) p++;
+                else break;
+        }
+    }
+    if (!foundw) {
+        printf("error: model not found in %s!\n", param->fileName);
+        exit(1);
+    }
+    rewind(fp);
+    w = new double[p];
+    while(readline(fp)!=NULL) {
+        char* endptr;
+        char* label = strtok(line," \t\n");
+        if (strcmp(label, "w")) continue;
+        char* val;
+        unsigned long i = 0;
+        while (1) {
+            val = strtok(NULL," ,");
+            if (val == NULL) break;
+            w[i++] = strtod(val,&endptr);
+        }
+    }
+    return;
+
+}
+
 
 int main(int argc, const char * argv[])
 {
@@ -201,6 +251,13 @@ int main(int argc, const char * argv[])
     parse_command_line(argc, argv, param);
     const Solution* sols = NULL;
     
+    if (param->mdlexist) {
+        double* w = NULL;
+        unsigned long p = 0;
+        read_problem(w, p, param);
+        predict(w, p, param);
+        exit(0);
+    }
     
     switch (param->loss) {
         case SQUARE:
@@ -218,7 +275,8 @@ int main(int argc, const char * argv[])
             break;
     }
     if (sols != NULL && param != NULL) {
-        predict(sols, param);
+//        predict(sols, param);
+        predict(sols->w, sols->p, param);
         delete sols;
         delete param;
     }
