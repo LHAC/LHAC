@@ -24,6 +24,7 @@ struct Parameter {
     double bbeta;
     double ssigma;
     unsigned long max_linesearch_iter;
+    int dense = 1;
     
     int loss; // logistic or lasso
     

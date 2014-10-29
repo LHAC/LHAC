@@ -44,6 +44,8 @@ void parse_command_line(int argc, const char * argv[],
     param->loss = LOG;
     param->isCached = true;
     param->posweight = 1.0;
+    param->dense = 1;
+    param->mdlexist = 0;
     
     // parse options
     int i;
@@ -104,6 +106,10 @@ void parse_command_line(int argc, const char * argv[],
                 
             case 'm':
                 param->mdlexist = atoi(argv[i]);
+                break;
+                
+            case 'd':
+                param->dense = atoi(argv[i]);
                 break;
                 
 			default:
@@ -198,7 +204,7 @@ void predict(const double* w, const unsigned long p, const Parameter* param) {
 }
 
 
-void read_problem(double* &w, unsigned long &p, Parameter* param) {
+void read_model(double* &w, unsigned long &p, Parameter* param) {
     FILE *fp = fopen(param->fileName,"r");
     if(fp == NULL)
     {
@@ -213,6 +219,7 @@ void read_problem(double* &w, unsigned long &p, Parameter* param) {
     p = 0;
     while(readline(fp)!=NULL) {
         char* label = strtok(line," \t\n");
+        // find the line starting with w
         if (strcmp(label, "w")) continue;
         foundw = true;
         char* val;
@@ -254,7 +261,7 @@ int main(int argc, const char * argv[])
     if (param->mdlexist) {
         double* w = NULL;
         unsigned long p = 0;
-        read_problem(w, p, param);
+        read_model(w, p, param);
         predict(w, p, param);
         exit(0);
     }

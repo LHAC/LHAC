@@ -11,6 +11,11 @@
 
 #include "Objective.h"
 #include "Parameter.h"
+#include "utils.h"
+
+enum {SPARSE, DENSE};
+
+enum SPARSE_TRANSPOSE {SparseNoTrans=12, SparseTrans=13};
 
 /* implements l1log reg objective */
 class LogReg : public Objective<LogReg>
@@ -35,11 +40,20 @@ private:
     unsigned long _N;
     
     double _posweight=1;
+    int format=DENSE;
+    
+    training_set_sp* _Dset_sp_row;
+    training_set_sp* _Dset_sp_col;
+    training_set* _Dset;
+    feature_node** _xcols;
+    feature_node** _xrows;
     
     double* _X;
     double* _y;
     double* _e_ywx; // N
     double* _B; // N
+    
+    void sparseVectorProduct(const SPARSE_TRANSPOSE trans, double* b, double* c);
     
 };
 
