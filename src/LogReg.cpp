@@ -71,15 +71,13 @@ LogReg::LogReg(const Parameter* param)
 LogReg::LogReg(const Parameter* param, double* X, double* y,
       unsigned long N, unsigned long p)
 {
+    format = DENSE;
     _p = p;
     _N = N;
-    
     _X = new double[_p*_N];
     _y = new double[_N];
-    
     memcpy(_X, X, sizeof(double)*_p*_N);
     memcpy(_y, y, sizeof(double)*_N);
-    
     _e_ywx = new double[_N]; // N
     _B = new double[_N]; // N
 }
@@ -89,7 +87,8 @@ unsigned long LogReg::getDims() const
     return _p;
 }
 
-void LogReg::sparseVectorProduct(const SPARSE_TRANSPOSE trans, double* b, double* c)
+void LogReg::sparseVectorProduct(const SPARSE_TRANSPOSE trans,
+                                 const double* b, double* c)
 {
     switch (trans) {
         case SparseNoTrans:
@@ -176,7 +175,6 @@ void LogReg::computeGradient(const double* wnew, double* df)
             sparseVectorProduct(SparseTrans, _B, df);
             break;
     }
-    
     return;
 }
 

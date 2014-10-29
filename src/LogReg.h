@@ -53,7 +53,8 @@ private:
     double* _e_ywx; // N
     double* _B; // N
     
-    void sparseVectorProduct(const SPARSE_TRANSPOSE trans, double* b, double* c);
+    void sparseVectorProduct(const SPARSE_TRANSPOSE trans,
+                             const double* b, double* c);
     
 };
 
