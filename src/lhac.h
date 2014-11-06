@@ -430,10 +430,6 @@ private:
     
     void stdSelector()
     {
-        unsigned long nzero = 0;
-        unsigned long nzero_pos = 0;
-        unsigned long zero = 0;
-        unsigned long zero_pos = 0;
         
         ushort_pair_t* &idxs = work_set->idxs;
         unsigned long numActive = 0;
@@ -444,21 +440,8 @@ private:
                 idxs[numActive].i = (unsigned short) j;
                 idxs[numActive].j = (unsigned short) j;
                 numActive++;
-                
-                if (w[j] == 0.0) {
-                    zero_pos++;
-                }
-                else if (fabs(g) > lmd)
-                    nzero_pos++;
             }
-            
-            if (w[j] != 0.0) {
-                nzero++;
-            }
-            else
-                zero++;
         }
-        printf("%ld\n", numActive);
         
 //        printf("%ld, %ld, %ld, %ld\n", nzero, nzero_pos, zero, zero_pos);
         work_set->numActive = numActive;
@@ -709,6 +692,7 @@ private:
                 nzeroActive++;
             }
         }
+
 
 //        unsigned long pos = p - zeroActive;
 //        qsort((void *)(idxs+pos), (size_t) zeroActive, sizeof(ushort_pair_t), _cmp_by_vlt_reverse);
