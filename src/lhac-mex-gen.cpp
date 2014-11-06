@@ -190,6 +190,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     param->active_set = active_set;
     param->loss = loss;
     param->isCached = isCached;
+    param->dense = 1;
     
    Solution* sols = NULL;
    switch (param->loss) {

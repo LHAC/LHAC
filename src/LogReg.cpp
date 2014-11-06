@@ -13,7 +13,7 @@
 LogReg::LogReg(const Parameter* param)
 {
     
-    // sparse format
+    // libsvm (sparse) format
     _Dset_sp_col = new training_set_sp;
     _Dset_sp_row = new training_set_sp;
     // in libsvm format
@@ -27,33 +27,25 @@ LogReg::LogReg(const Parameter* param)
     _N = _Dset_sp_col->N;
     
     if (param->dense > 0) {
-        format = DENSE;
+        _format = DENSE;
         _Dset = new training_set;
         transformToDenseFormat(_Dset, _Dset_sp_col);
         _X = _Dset->X;
         _y = _Dset->y;
     }
     else {
-        format = SPARSE;
+        _format = SPARSE;
         _xcols = _Dset_sp_col->X;
         _xrows = _Dset_sp_row->X;
         _y = _Dset_sp_col->y;
     }
 
-    
-//    _X = new double[_p*_N];
-//    _y = new double[_N];
-//    memcpy(_X, Dset->X, sizeof(double)*_p*_N);
-//    memcpy(_y, Dset->y, sizeof(double)*_N);
-//    if (param->posweight != 1.0)
-//        for (unsigned long i = 0; i < _N; i++)
-//            if (_y[i] >= 0) _y[i] *= param->posweight;
 
     _posweight = param->posweight;
     _e_ywx = new double[_N]; // N
     _B = new double[_N]; // N
     
-    switch (format) {
+    switch (_format) {
         case DENSE:
             delete _Dset_sp_row;
             delete _Dset_sp_col;
@@ -71,7 +63,7 @@ LogReg::LogReg(const Parameter* param)
 LogReg::LogReg(const Parameter* param, double* X, double* y,
       unsigned long N, unsigned long p)
 {
-    format = DENSE;
+    _format = DENSE;
     _p = p;
     _N = N;
     _X = new double[_p*_N];
@@ -125,7 +117,7 @@ double LogReg::computeObject(double* wnew)
 //    double alpha = 1.0;
 //    double beta = 0.0;
 //    cblas_dgemv(CblasColMajor, CblasNoTrans, (int)N, (int)p, alpha, X, (int)N, wnew, 1, beta, e_ywx, 1);
-    switch (format) {
+    switch (_format) {
         case DENSE:
             lcdgemv(CblasColMajor, CblasNoTrans, _X, wnew, _e_ywx, (int)_N, (int)_p, (int)_N);
             break;
@@ -166,7 +158,7 @@ void LogReg::computeGradient(const double* wnew, double* df)
         _B[i] = -_y[i]/(1+_e_ywx[i]);
     }
 //    cblas_dgemv(CblasColMajor, CblasTrans, (int)N, (int)p, 1.0, X, (int)N, B, 1, 0.0, df, 1);
-    switch (format) {
+    switch (_format) {
         case DENSE:
             lcdgemv(CblasColMajor, CblasTrans, _X, _B, df, (int)_N, (int)_p, (int)_N);
             break;

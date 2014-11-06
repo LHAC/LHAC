@@ -40,7 +40,7 @@ private:
     unsigned long _N;
     
     double _posweight=1;
-    int format=DENSE;
+    int _format=DENSE;
     
     training_set_sp* _Dset_sp_row;
     training_set_sp* _Dset_sp_col;
