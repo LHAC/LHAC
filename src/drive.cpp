@@ -199,7 +199,6 @@ void predict(const double* w, const unsigned long p, const Parameter* param) {
     printf("total pos\t%ld\n", N);
     printf("neg\t%f\n", (double) negN / N);
     printf("pos\t%f\n", (double) posN / N);
-//    delete [] line;
     free(line);
 }
 
