@@ -66,12 +66,18 @@ LogReg::LogReg(const Parameter* param, double* X, double* y,
     _format = DENSE;
     _p = p;
     _N = N;
-    _X = new double[_p*_N];
-    _y = new double[_N];
-    memcpy(_X, X, sizeof(double)*_p*_N);
-    memcpy(_y, y, sizeof(double)*_N);
+//    _X = new double[_p*_N];
+//    _y = new double[_N];
+//    memcpy(_X, X, sizeof(double)*_p*_N);
+//    memcpy(_y, y, sizeof(double)*_N);
+    _X = X;
+    _y = y;
     _e_ywx = new double[_N]; // N
     _B = new double[_N]; // N
+    
+    _Dset_sp_row = NULL;
+    _Dset_sp_col = NULL;
+    _Dset = NULL;
 }
 
 unsigned long LogReg::getDims() const

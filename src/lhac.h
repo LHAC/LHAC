@@ -234,8 +234,8 @@ public:
             suffcientDecrease();
             double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
             normsg = computeSubgradient();
-            if (newton_iter == 1 || newton_iter % 30 == 0 )
-                sols->addEntry(obj->val, normsg, elapsedTime, newton_iter, work_set->numActive);
+//            if (newton_iter == 1 || newton_iter % 30 == 0 )
+            sols->addEntry(obj->val, normsg, elapsedTime, newton_iter, work_set->numActive);
             if (msgFlag >= LHAC_MSG_NEWTON)
                 printf("%.4e  iter %3d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
                        elapsedTime, newton_iter, obj->f, normsg, work_set->numActive);
@@ -862,6 +862,7 @@ private:
             order2 = order2*0.5;
             f_mdl = obj->f + order1 + order2 + g_trial;
             rho_trial = (obj_trial-obj->val)/(f_mdl-obj->val);
+//            printf("%f\n", order2*2);
             if (msgFlag >= LHAC_MSG_SD) {
                 printf("\t \t \t # of line searches = %3d; model quality: %+.3f\n", sd_iters, rho_trial);
             }

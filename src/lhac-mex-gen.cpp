@@ -114,7 +114,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // for greedy active set
     unsigned long work_size = 500;
     // active set strategy -- standard (default)
-    unsigned long active_set = STD;
+//    unsigned long active_set = STD;
+    unsigned long active_set = GREEDY_ADDZERO;
     int loss = LOG;
     char loss_str[MAX_STR_LEN];
     bool isCached = true;
