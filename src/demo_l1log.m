@@ -13,6 +13,7 @@ param.lambda = 1;
 param.i = 3000;
 % param.loss = 'square';
 param.loss = 'log';
+% pre-compute ATA in lasso
 param.cached = 0;
 param.filename = [pwd, '/', fname{1}, ext];
 
