@@ -16,6 +16,35 @@
 #include "Lasso.h"
 #include "utils.h"
 
+void exit_with_help()
+{
+    printf(
+           "Usage: lhac [options] training_set_file or model_file (see option m)\n"
+           "options:\n"
+           "-m model_file : model_file existence indicator (default false)\n"
+           "	true  -- read from model_file without training\n"
+           "	false -- train a new model from training_set_file\n"
+           "-p test file: apply model on the testing file\n"
+           "              and output the result to stdout \n"
+           "-d dense format : set matrix format dense or sparse (default 1)\n"
+           "	1  -- dense\n"
+           "	0  -- sparse\n"
+           "-l loss function : set type of loss function (default log)\n"
+           "	log    -- logistic regression\n"
+           "	square -- least square\n"
+           "-c lambda : set the regularization parameter (default 1)\n"
+           "-a : pre-compute A^TA in least sqaure  (default true)\n"
+           "-i : max number of iterations (default 1000)\n"
+           "-e epsilon : set tolerance of termination criterion\n"
+           "             final ista step size <= eps*(initial ista step size)\n"
+           "-v : set the verbose level (default 0)\n"
+           "	0 -- no output\n"
+           "	1 -- outer iteration\n"
+           "	2 -- sufficient decrease iteration\n"
+           "	3 -- coordinate descent iteration\n"
+           );
+    exit(1);
+}
 
 
 void parse_command_line(int argc, const char * argv[],
@@ -33,7 +62,7 @@ void parse_command_line(int argc, const char * argv[],
     param->max_linesearch_iter = 1000;
     param->bbeta = 0.5;
     param->ssigma = 0.001;
-    param->verbose = LHAC_MSG_CD;
+    param->verbose = LHAC_MSG_NO;
     param->sd_flag = 1; // default using suffcient decrease
     param->shrink = 4;
     param->fileName = new char[MAX_LENS];
@@ -54,7 +83,7 @@ void parse_command_line(int argc, const char * argv[],
 		if(argv[i][0] != '-') break;
 		if(++i>=argc) {
             printf("wrong input format\n");
-            exit(1);
+            exit_with_help();
         }
 			
 		switch(argv[i-1][1])
@@ -120,7 +149,7 @@ void parse_command_line(int argc, const char * argv[],
     
     if(i>=argc) {
         printf("wrong input format\n");
-        exit(1);
+        exit_with_help();
     }
     
     strcpy(param->fileName, argv[i]);
@@ -141,6 +170,13 @@ const Solution* optimize(Parameter* param) {
 
 
 void predict(const double* w, const unsigned long p, const Parameter* param) {
+    if (w != NULL) {
+        printf("w\t");
+        for (unsigned long i = 0; i < p-1; i++) {
+            printf("%f,", w[i]);
+        }
+        printf("%f\n", w[p-1]);
+    }
     if (param->pfile == NULL) return;
 //    double* w = sols->w;
 //    unsigned long p = sols->p;
@@ -191,11 +227,6 @@ void predict(const double* w, const unsigned long p, const Parameter* param) {
             if (wx > 0) negN++;
         
     }
-    printf("w\t");
-    for (unsigned long i = 0; i < p-1; i++) {
-        printf("%f,", w[i]);
-    }
-    printf("%f\n", w[p-1]);
     printf("total pos\t%ld\n", N);
     printf("neg\t%f\n", (double) negN / N);
     printf("pos\t%f\n", (double) posN / N);

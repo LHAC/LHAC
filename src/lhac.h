@@ -73,6 +73,18 @@ struct Solution {
         (size)++;
     };
     
+    inline void finalReport() {
+        unsigned long last = size - 1;
+        printf(
+               "=========================== final report ========================\n\n"
+               "Best objective value found %+.6e\n"
+               "In %3d iterations (%.4e seconds)\n"
+               "With a precision of: %+.4e\n\n"
+               "=================================================================\n",
+               fval[last], niter[last], t[last], normgs[last] / normgs[0]
+               );
+    };
+    
     Solution(unsigned long max_iter, unsigned long _p) {
         fval = new double[max_iter];
         normgs = new double[max_iter];
@@ -247,7 +259,7 @@ public:
                 break;
             }
         }
-        
+        sols->finalReport();
         memcpy(sols->w, w, p*sizeof(double));
         return sols;
     };
