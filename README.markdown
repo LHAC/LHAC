@@ -23,6 +23,8 @@ MATLAB_ROOT = /Applications/MATLAB_R2013a.app
 ## on linux this should be $(MATLAB_ROOT)/bin/glnxa64 
 MATLAB_LINK = $(MATLAB_ROOT)/bin/maci64
 ```
+> Note that building command line tool (.cmd) with _openBLAS_ or _Accelerate BLAS_ does not require installing MATLAB
+
 Run the provided Makefile from command line with optional arguments. For example,
 * make mex file (.mexa64) on Linux and link to the MATLAB _BLAS_ library
 ```bash
@@ -104,7 +106,9 @@ If you use LHAC in your research, please cite the following paper:
 
 ## Usage Guide
 
-Refer to the file `demo_l1log.m`
+* MATLAB MEX-file: refer to the file `demo_l1log.m`
+* Command line tool: in Terminal run commands `./lhac.cmd a9a` for example or `./lhac.cmd` for help
+
 
 
 
