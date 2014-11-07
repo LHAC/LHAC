@@ -9,7 +9,7 @@ by Xiaocheng Tang [http://goo.gl/6QuMl]
 where `f(x)` can be any _smooth_ function, i.e., _logistic loss_, _square loss_, etc., and `g(x)` is assumed to be _simple_, i.e., `l1-norm`, `l1/l2-norm`, etc.  In practice, the regularization functions `g(x)` are built into the software for users to choose from, and `f(x)` needs to be provided by users as function evaluation and gradient computation routines. 
 
 ## Example
-As an example,, **Lcc** includes a class named `LogReg` that is derived from the base class `Objective` and implements the `logistic loss` function. The following lines of code demonstrate the use fo **Lcc** for solving _sparse logistic regression_:
+As an example, **Lcc** includes a class named `LogReg` that is derived from the base class `Objective` and implements the `logistic loss` function. The following lines of code demonstrate the use fo **Lcc** for solving _sparse logistic regression_:
 ```c++
 // instantiate a logistic loss object from the data file
 LogReg* obj = new LogReg(param->fileName);
