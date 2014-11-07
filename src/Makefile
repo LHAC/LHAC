@@ -1,8 +1,10 @@
 ## pass it as argument to make, e.g., make USE_ACCELERATE=true
-# USE_ACCELERATE=no
+## USE_ACCELERATE=no
 
+## Contact your administrator if you do not know 
+## where your matlab is installed.
 MATLAB_ROOT = /Applications/MATLAB_R2013a.app
-
+## on linux this should be $(MATLAB_ROOT)/bin/glnxa64 
 MATLAB_LINK = $(MATLAB_ROOT)/bin/maci64
 
 OPENBLAS_LINK = /usr/local/opt/openblas/lib
@@ -25,7 +27,7 @@ endif
 
 
 CXXOPTFLAGS = -Wall -fpic  -fno-omit-frame-pointer -std=c++0x -O3 -DNDEBUG $(CXXBLAS)
-CXXMEXFLAGS = -O3 -DNDEBUG -std=c++0x $(MATLAB_INCLUDE)
+CXXMEXFLAGS = -O3 -fpic -DNDEBUG -std=c++0x $(MATLAB_INCLUDE)
 LDMEXFLAGS = -Wall -shared -m64 -lmex -lmx  -lmat -lm -Wl,-rpath,$(MATLAB_LINK) $(LDBLAS) -L$(MATLAB_LINK) 
 
 
