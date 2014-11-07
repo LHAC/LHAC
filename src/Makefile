@@ -3,14 +3,16 @@
 
 MATLAB_ROOT = /Applications/MATLAB_R2013a.app
 
-MATLAB_INCLUDE = -I$(MATLAB_ROOT)/extern/include
+MATLAB_LINK = $(MATLAB_ROOT)/bin/maci64
 
 OPENBLAS_LINK = /usr/local/opt/openblas/lib
 
 CXX=g++
 
-CXXBLAS = $(MATLAB_INCLUDE)
-LDBLAS = -lmwlapack -lmwblas -Wl,-rpath,$(MATLAB_ROOT)/bin/maci64 -L$(MATLAB_ROOT)/bin/maci64 
+MATLAB_INCLUDE = -I$(MATLAB_ROOT)/extern/include
+
+CXXBLAS = $(MATLAB_INCLUDE) 
+LDBLAS = -lmwlapack -lmwblas -Wl,-rpath,$(MATLAB_LINK) -L$(MATLAB_LINK) 
 
 ifeq ($(USE_ACCELERATE), true)
 	CXXBLAS =  -DUSE_CBLAS
@@ -24,12 +26,15 @@ endif
 
 CXXOPTFLAGS = -Wall -fpic  -fno-omit-frame-pointer -std=c++0x -O3 -DNDEBUG $(CXXBLAS)
 CXXMEXFLAGS = -O3 -DNDEBUG -std=c++0x $(MATLAB_INCLUDE)
-LDMEXFLAGS = -Wall -shared -m64 -lmex -lmx  -lmat -lm -Wl,-exported_symbols_list,$(MATLAB_ROOT)/extern/lib/maci64/mexFunction.map -Wl,-rpath,$(MATLAB_ROOT)/bin/maci64 $(LDBLAS) -L$(MATLAB_ROOT)/bin/maci64 
+LDMEXFLAGS = -Wall -shared -m64 -lmex -lmx  -lmat -lm -Wl,-rpath,$(MATLAB_LINK) $(LDBLAS) -L$(MATLAB_LINK) 
 
 
-all: LHACl1log.mexmaci64 LHACl1log.cmd
+all: lhac.mexmaci64 lhac.cmd
 
 %.mexmaci64: LogReg.o lhac-mex-gen.o Lasso.o
+	$(CXX) $(LDMEXFLAGS) $^ -o $@	
+
+%.mexa64: LogReg.o lhac-mex-gen.o Lasso.o
 	$(CXX) $(LDMEXFLAGS) $^ -o $@	
 
 %.cmd: LogReg.o drive.o Lasso.o
@@ -48,7 +53,7 @@ drive.o: drive.cpp
 	$(CXX) $(CXXOPTFLAGS) -m64 -c $< -o $@
 
 clean :
-	rm -f *.o *.mexmaci64 *.mexglx *.cmd
+	rm -f *.o *.mexmaci64 *.mexglx *.cmd *.mexa64
 
 
 
