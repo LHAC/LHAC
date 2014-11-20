@@ -575,7 +575,7 @@ private:
         for (j = p-1; j > end; j--) {
             if (idxs[j].vlt >= vlt) continue;
             else {
-                for (unsigned long k = j; k >= end; k--) {
+                for (unsigned long i = j+1, k = j; i > end; i--, k--) {
                     // swap
                     unsigned long tmpj = idxs[k].j;
                     double tmpv = idxs[k].vlt;
@@ -855,7 +855,6 @@ private:
             double f_trial = mdl->computeObject(w);
             double g_trial = computeReg(w);
             double obj_trial = f_trial + g_trial;
-//            double order1 = cblas_ddot((int)p, D, 1, L_grad, 1);
             double order1 = lcddot((int)p, D, 1, L_grad, 1);
             double order2 = 0;
             double* buffer = lR->buff;
@@ -869,12 +868,10 @@ private:
                 unsigned long idx_Q = permut[ii];
                 vp += D[idx]*buffer[idx_Q];
             }
-//            order2 = mu*gama*cblas_ddot((int)p, D, 1, D, 1)-vp;
             order2 = mu*gama*lcddot((int)p, D, 1, D, 1)-vp;
             order2 = order2*0.5;
             f_mdl = obj->f + order1 + order2 + g_trial;
             rho_trial = (obj_trial-obj->val)/(f_mdl-obj->val);
-//            printf("%f\n", order2*2);
             if (msgFlag >= LHAC_MSG_SD) {
                 printf("\t \t \t # of line searches = %3d; model quality: %+.3f\n", sd_iters, rho_trial);
             }
