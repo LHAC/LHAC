@@ -376,27 +376,6 @@ private:
         else
             return 0;
     }
-
-//    void computeWorkSet() {
-//        ushort_pair_t* &idxs = work_set->idxs;
-//        unsigned long numActive = 0;
-//        /*** select rule 2 ***/
-//        for (unsigned long j = 0; j < p; j++) {
-//            double g = L_grad[j];
-//            if (w[j] != 0.0 || (fabs(g) > lmd)) {
-//                idxs[numActive].i = (unsigned short) j;
-//                idxs[numActive].j = (unsigned short) j;
-//                numActive++;
-//            }
-//        }
-//        work_set->numActive = numActive;
-//        /* reset permutation */
-//        for (unsigned long j = 0; j < work_set->numActive; j++) {
-//            work_set->permut[j] = j;
-//        }
-//        return;
-//    }
-    
     
     void computeWorkSet()
     {
@@ -454,8 +433,6 @@ private:
                 numActive++;
             }
         }
-        
-//        printf("%ld, %ld, %ld, %ld\n", nzero, nzero_pos, zero, zero_pos);
         work_set->numActive = numActive;
         return;
     }
@@ -498,7 +475,6 @@ private:
     {
         ushort_pair_t* &idxs = work_set->idxs;
         unsigned long numActive = 0;
-        unsigned long work_size = param->work_size;
         unsigned long zeroActive = 0;
         for (unsigned long j = 0; j < p; j++) {
             double g = L_grad[j];
@@ -512,7 +488,6 @@ private:
             }
         }
         qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), _cmp_by_vlt);
-        //        numActive = (numActive<work_size)?numActive:work_size;
         work_set->numActive = numActive;
     }
     
@@ -521,7 +496,6 @@ private:
     {
         ushort_pair_t* &idxs = work_set->idxs;
         unsigned long numActive = 0;
-        unsigned long work_size = param->work_size;
         unsigned long zeroActive = 0;
         for (unsigned long j = 0; j < p; j++) {
             double g = L_grad[j];
@@ -535,7 +509,6 @@ private:
             }
         }
         qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), _cmp_by_vlt);
-//        numActive = (numActive<work_size)?numActive:work_size;
         work_set->numActive = numActive;
     }
     
@@ -543,7 +516,6 @@ private:
     {
         ushort_pair_t* &idxs = work_set->idxs;
         unsigned long numActive = 0;
-        unsigned long work_size = param->work_size;
         unsigned long zeroActive = 0;
         for (unsigned long j = 0; j < p; j++) {
             double g = L_grad[j];
@@ -557,21 +529,16 @@ private:
             }
         }
         qsort((void *)idxs, (size_t) numActive, sizeof(ushort_pair_t), _cmp_by_vlt);
-//        numActive = (numActive<work_size)?numActive:work_size;
         // zerosActive small means found the nonzeros subspace
         numActive = (zeroActive<100)?numActive:(numActive-zeroActive);
-//        printf("zero active = %ld\n", zeroActive);
-//        printf("num active = %ld\n", numActive);
         work_set->numActive = numActive;
     }
     
     void _insert(unsigned long idx, double vlt, unsigned long n)
     {
         ushort_pair_t* &idxs = work_set->idxs;
-        
         unsigned long end = p-1-n;
         unsigned long j;
-        
         for (j = p-1; j > end; j--) {
             if (idxs[j].vlt >= vlt) continue;
             else {
@@ -621,58 +588,21 @@ private:
             }
             else if (w[j] != 0.0) {
                 idxs[nzeroActive].j = j;
-                //                idxs[nzeroActive].vlt = g;
                 nzeroActive++;
             }
         }
-        
-        //        unsigned long pos = p - zeroActive;
-        //        qsort((void *)(idxs+pos), (size_t) zeroActive, sizeof(ushort_pair_t), _cmp_by_vlt_reverse);
-        //        for (unsigned long j = p-1; j >= pos; j--) {
-        //            printf("%f, %d\n", idxs[j].vlt, j);
-        //        }
-        //        printf("\n");
-        
-        //        printf("zero active = %ld\n", zeroActive);
-        //        printf("nonzero active = %ld\n", nzeroActive);
-        
         if (zeroActive>2*nzeroActive) {
             unsigned long pos = p - zeroActive;
             qsort((void *)(idxs+pos), (size_t) zeroActive, sizeof(ushort_pair_t), _cmp_by_vlt_reverse);
             work_size = (nzeroActive<10)?zeroActive/3:nzeroActive;
-            //            printf("zero active = %ld\n", zeroActive);
-//            for (int j = p-1; j >= 0; j--) {
-//                printf("%f, %d\n", idxs[j].vlt, j);
-//            }
-//            printf("\n");
         }
-        else
-            work_size = zeroActive;
-        
-        
-        //        printf("%ld, %ld\n", (idxs+3)[0].j, idxs[3].j);
-        
+        else work_size = zeroActive;
         numActive = nzeroActive;
         unsigned long end = p-work_size;
         for (unsigned long j = p-1; j >= end; j--) {
             idxs[numActive].j = idxs[j].j;
-            //            idxs[numActive].vlt = idxs[j].vlt;
-            //            printf("%f, ", idxs[j].vlt);
             numActive++;
         }
-        
-//        static int _iter = 1;
-//        printf("%ld, %d\n", numActive, _iter++);
-        
-        //        for (int j = p-1; j >= 0; j--) {
-        //            printf("%f, %d\n", idxs[j].vlt, j);
-        //        }
-        //        printf("\n");
-        //        printf("\n");
-        //        numActive = (numActive<work_size)?numActive:work_size;
-        // zerosActive small means found the nonzeros subspace
-        //        numActive = (zeroActive<100)?numActive:(numActive-zeroActive);
-        
         work_set->numActive = numActive;
     }
     
@@ -686,66 +616,22 @@ private:
         for (unsigned long j = 0; j < p; j++) {
             double g = fabs(L_grad[j]) - lmd;
             if (g > 0) {
-//                if (w[j] > 0) {
-//                    g = L_grad[j] + lmd;
-//                }
-//                else if (w[j] < 0) {
-//                    g = L_grad[j] - lmd;
-//                }
-                _insert(j, fabs(g), zeroActive);
-//                unsigned long end = p-1-zeroActive;
-//                idxs[end].j = j;
-//                idxs[end].vlt = g;
+                _insert(j, g, zeroActive);
                 zeroActive++;
             }
             else if (w[j] != 0.0) {
                 idxs[nzeroActive].j = j;
-//                idxs[nzeroActive].vlt = g;
                 nzeroActive++;
             }
         }
-
-
-//        unsigned long pos = p - zeroActive;
-//        qsort((void *)(idxs+pos), (size_t) zeroActive, sizeof(ushort_pair_t), _cmp_by_vlt_reverse);
-//        for (unsigned long j = p-1; j >= pos; j--) {
-//            printf("%f, %d\n", idxs[j].vlt, j);
-//        }
-//        printf("\n");
-        
-//        printf("zero active = %ld\n", zeroActive);
-//        printf("nonzero active = %ld\n", nzeroActive);
-
-//        work_size = (work_size<zeroActive)?work_size:zeroActive;
-        work_size = (nzeroActive<10)?zeroActive/2:nzeroActive;
+        work_size = (nzeroActive<10)?zeroActive:nzeroActive;
         work_size = (zeroActive>2*nzeroActive)?work_size:zeroActive;
-//        work_size = (zeroActive - nzeroActive) / 3;
-//        work_size = (zeroActive>2*nzeroActive)?work_size:zeroActive;
-
-
-
-//        printf("%ld, %ld\n", (idxs+3)[0].j, idxs[3].j);
-        
         numActive = nzeroActive;
         unsigned long end = p-work_size;
-        for (unsigned long j = p-1; j >= end; j--) {
+        for (unsigned long k = p, j = p-1; k > end; k--, j--) {
             idxs[numActive].j = idxs[j].j;
-//            idxs[numActive].vlt = idxs[j].vlt;
-//            printf("%f, ", idxs[j].vlt);
             numActive++;
         }
-        
-
-        
-//        for (int j = p-1; j >= 0; j--) {
-//            printf("%f, %d\n", idxs[j].vlt, j);
-//        }
-//        printf("\n");
-//        printf("\n");
-        //        numActive = (numActive<work_size)?numActive:work_size;
-        // zerosActive small means found the nonzeros subspace
-//        numActive = (zeroActive<100)?numActive:(numActive-zeroActive);
-
         work_set->numActive = numActive;
     }
     
@@ -806,9 +692,7 @@ private:
             H_diag[i] = gama;
             for (unsigned long j = 0; j < m; j++) H_diag[i] -= Q_bar[k+j]*Q[k+j];
         }
-        //    unsigned long max_cd_pass = std::min(1 + iter/3, param->max_inner_iter);
         unsigned long max_cd_pass = 1 + newton_iter / param->cd_rate;
-        //    unsigned long max_cd_pass = param->max_inner_iter;
         unsigned long* permut = work_set->permut;
         ushort_pair_t* idxs = work_set->idxs;
         unsigned long cd_pass;
@@ -824,7 +708,6 @@ private:
                     unsigned long idx = idxs[rii].j;
                     unsigned long idx_Q = permut[rii];
                     unsigned long Q_idx_m = idx_Q*m;
-//                    Qd_bar = cblas_ddot(m, &Q[Q_idx_m], 1, d_bar, 1);
                     Qd_bar = lcddot(m, &Q[Q_idx_m], 1, d_bar, 1);
                     Hd_j = gama_scale*D[idx] - Qd_bar;
                     Hii = H_diag[idx_Q] + dH_diag;
@@ -846,9 +729,7 @@ private:
                     printf("\t\t Coordinate descent pass %ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
                            cd_pass, diffd, normd);
                 }
-//                shuffle(work_set);
             }
-            
             for (unsigned long i = 0; i < p; i++) {
                 w[i] = w_prev[i] + D[i];
             }
@@ -860,7 +741,6 @@ private:
             double* buffer = lR->buff;
             int cblas_M = (int) work_set->numActive;
             int cblas_N = (int) m;
-//            cblas_dgemv(CblasColMajor, CblasTrans, cblas_N, cblas_M, 1.0, Q, cblas_N, d_bar, 1, 0.0, buffer, 1);
             lcdgemv(CblasColMajor, CblasTrans, Q, d_bar, buffer, cblas_N, cblas_M, cblas_N);
             double vp = 0;
             for (unsigned long ii = 0; ii < work_set->numActive; ii++) {
