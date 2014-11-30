@@ -35,6 +35,7 @@ void exit_with_help()
            "-c lambda : set the regularization parameter (default 1)\n"
            "-a : pre-compute A^TA in least sqaure  (default true)\n"
            "-i : max number of iterations (default 1000)\n"
+           "-b : limited memory in L-BFGS (default 10, maximum 20)\n"
            "-e epsilon : set tolerance of termination criterion\n"
            "             final ista step size <= eps*(initial ista step size)\n"
            "-v : set the verbose level (default 0)\n"
@@ -139,6 +140,10 @@ void parse_command_line(int argc, const char * argv[],
                 
             case 'd':
                 param->dense = atoi(argv[i]);
+                break;
+                
+            case 'b':
+                param->l = atoi(argv[i]);
                 break;
                 
 			default:

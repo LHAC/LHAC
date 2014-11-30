@@ -11,9 +11,7 @@
 
 #include "linalg.h"
 
-//#include <math.h>
-//#include <string.h>
-//#include <stdio.h>
+#define MAX_MEMORY 20
 
 typedef struct {
     unsigned long i; // not used
@@ -136,9 +134,11 @@ public:
     
     LBFGS(const unsigned long _p, const unsigned short _l,
           const double _s) : p(_p), l(_l), shrink(_s) {
-//        l = _l;
-//        p = _p;
-//        shrink = _s;
+        if (l > MAX_MEMORY) {
+            l = MAX_MEMORY;
+            printf("WARNING LBFGS: "
+                   "MEMORY PARAMETER RESET TO %d!\n", MAX_MEMORY);
+        }
         tQ = 0;
         tR = 0;
         tQ_bar = 0;
@@ -156,7 +156,7 @@ public:
         Q = new double[2*l*p];
         Q_bar = new double[2*l*p];
         R = new double[4*l*l];
-        buff = new double[p];
+        buff = new double[l>p?l:p];
     };
     
     ~LBFGS() {
