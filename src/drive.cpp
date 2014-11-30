@@ -145,7 +145,7 @@ void parse_command_line(int argc, const char * argv[],
             case 'b':
                 param->l = atoi(argv[i]);
                 break;
-                
+
 			default:
 				printf("unknown option: -%c\n", argv[i-1][1]);
 				break;
