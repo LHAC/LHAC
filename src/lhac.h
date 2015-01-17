@@ -21,7 +21,7 @@
 #define MSG printf
 #endif
 
-#define __MATLAB_API__
+//#define __MATLAB_API__
 
 
 

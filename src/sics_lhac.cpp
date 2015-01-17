@@ -935,14 +935,12 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
         
         /* elapsed time */
         elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
-        if (newton_iter == 1 || newton_iter % 10 == 0 ) {
-            sols->fval[sols->size] = f_current;
-            sols->normgs[sols->size] = normsg;
-            sols->t[sols->size] = elapsedTime;
-            sols->niter[sols->size] = newton_iter;
-            sols->numActive[sols->size] = work_set->numActive;
-            (sols->size)++;
-        }
+        sols->fval[sols->size] = f_current;
+        sols->normgs[sols->size] = normsg;
+        sols->t[sols->size] = elapsedTime;
+        sols->niter[sols->size] = newton_iter;
+        sols->numActive[sols->size] = work_set->numActive;
+        (sols->size)++;
         
         double lbfgs2 = CFAbsoluteTimeGetCurrent();
         lR->updateLBFGS(w, w_prev, L_grad, L_grad_prev);
@@ -953,14 +951,6 @@ solution* sics_lhac(double* S, unsigned long _p, param* prm)
             break;
         }
     }
-    
-    double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
-    sols->fval[sols->size] = f_current;
-    sols->normgs[sols->size] = normsg;
-    sols->t[sols->size] = elapsedTime;
-    sols->niter[sols->size] = newton_iter;
-    sols->numActive[sols->size] = work_set->numActive;
-    (sols->size)++;
     
     sols->w = w;
     sols->p_sics = (int) p_sics;
