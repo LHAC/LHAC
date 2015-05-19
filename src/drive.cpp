@@ -69,10 +69,10 @@ void parse_command_line(int argc, const char * argv[],
     param->fileName = new char[MAX_LENS];
     param->rho = 0.01;
     param->cd_rate = 5;
-//    param->active_set = STD;
-    param->active_set = GREEDY_ADDZERO;
+    param->active_set = STD;
+//    param->active_set = GREEDY_ADDZERO;
     param->loss = LOG;
-    param->isCached = true;
+    param->isCached = false;
     param->posweight = 1.0;
     param->dense = 1;
     param->mdlexist = 0;
