@@ -26,5 +26,6 @@ load a9a
 [w, iter, fval, t] = lhac(param, data.y, full(data.X));
 fprintf('time = %.4e, iter = %d, optimal fval = %.4e\n', t(end), iter(end), fval(end));
 fprintf('test 2 ---- passing data from memory in MATLAB ---- 100%%!\n');
+fprintf('Verify that the optimal objective value is around +1.523911e+04!\n');
 
 
