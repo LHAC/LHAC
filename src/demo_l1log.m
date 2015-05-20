@@ -16,6 +16,7 @@ param.loss = 'log';
 % pre-compute ATA in lasso
 param.cached = 0;
 param.filename = [pwd, '/', fname{1}, ext];
+param.weight = 2;
 
 fprintf('test 1 ---- reading data directly from file ---- 0%%...\n');
 [w] = lhac(param);
