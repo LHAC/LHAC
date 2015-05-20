@@ -66,10 +66,6 @@ LogReg::LogReg(const Parameter* param, double* X, double* y,
     _format = DENSE;
     _p = p;
     _N = N;
-//    _X = new double[_p*_N];
-//    _y = new double[_N];
-//    memcpy(_X, X, sizeof(double)*_p*_N);
-//    memcpy(_y, y, sizeof(double)*_N);
     _X = X;
     _y = y;
     _e_ywx = new double[_N]; // N
@@ -78,6 +74,7 @@ LogReg::LogReg(const Parameter* param, double* X, double* y,
     _Dset_sp_row = NULL;
     _Dset_sp_col = NULL;
     _Dset = NULL;
+    _posweight = param->posweight;
 }
 
 unsigned long LogReg::getDims() const
@@ -120,9 +117,6 @@ double LogReg::computeObject(double* wnew)
 {
     double fval = 0;
     
-//    double alpha = 1.0;
-//    double beta = 0.0;
-//    cblas_dgemv(CblasColMajor, CblasNoTrans, (int)N, (int)p, alpha, X, (int)N, wnew, 1, beta, e_ywx, 1);
     switch (_format) {
         case DENSE:
             lcdgemv(CblasColMajor, CblasNoTrans, _X, wnew, _e_ywx, (int)_N, (int)_p, (int)_N);
@@ -136,18 +130,16 @@ double LogReg::computeObject(double* wnew)
     for (unsigned long i = 0; i < _N; i++) {
         double nc1;
         double nc2;
-//        double weight = (_y[i]>0)?_posweight:1;
+        double weight = (_y[i]>0)?_posweight:1;
         nc1 = _e_ywx[i]*_y[i];
         _e_ywx[i] = exp(nc1);
         if (nc1 <= 0) {
             nc2 = _e_ywx[i];
-            fval += (log((1+nc2))-nc1);
-//            fval += weight*(log((1+nc2))-nc1);
+            fval += weight*(log((1+nc2))-nc1);
         }
         else {
             nc2 = exp(-nc1);
-//            fval += weight*log((1+nc2));
-            fval += log((1+nc2));
+            fval += weight*log((1+nc2));
         }
         
     }
@@ -159,11 +151,9 @@ double LogReg::computeObject(double* wnew)
 void LogReg::computeGradient(const double* wnew, double* df)
 {
     for (unsigned long i = 0; i < _N; i++) {
-//        double weight = (_y[i]>0)?_posweight:1;
-//        _B[i] = -weight*_y[i]/(1+_e_ywx[i]);
-        _B[i] = -_y[i]/(1+_e_ywx[i]);
+        double weight = (_y[i]>0)?_posweight:1;
+        _B[i] = -weight*_y[i]/(1+_e_ywx[i]);
     }
-//    cblas_dgemv(CblasColMajor, CblasTrans, (int)N, (int)p, 1.0, X, (int)N, B, 1, 0.0, df, 1);
     switch (_format) {
         case DENSE:
             lcdgemv(CblasColMajor, CblasTrans, _X, _B, df, (int)_N, (int)_p, (int)_N);
@@ -178,8 +168,6 @@ void LogReg::computeGradient(const double* wnew, double* df)
 
 LogReg::~LogReg()
 {
-//    delete [] _X;
-//    delete [] _y;
     delete [] _e_ywx;
     delete [] _B;
     delete _Dset;

@@ -119,7 +119,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int loss = LOG;
     char loss_str[MAX_STR_LEN];
     bool isCached = true;
-    double lambda = 1;
+    double lambda = 1.0;
+    double posweight = 1.0;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);
@@ -169,6 +170,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (tf) {
         lambda = (double) mxGetScalar(tf);
     }
+    tf = mxGetField(prhs[argIdx], 0, "weight");
+    if (tf) {
+        posweight = (double) mxGetScalar(tf);
+        if (posweight <= 0) {
+            mexErrMsgIdAndTxt("LHAC:arguments",
+                              "Expected a positive number for weight");
+        }
+    }
     
     
     Parameter* param = new Parameter;
@@ -192,6 +201,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     param->loss = loss;
     param->isCached = isCached;
     param->dense = 1;
+    param->posweight = posweight;
     
    Solution* sols = NULL;
    switch (param->loss) {
