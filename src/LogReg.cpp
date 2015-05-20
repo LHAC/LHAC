@@ -56,8 +56,6 @@ LogReg::LogReg(const Parameter* param)
         default:
             break;
     }
-
-    
 }
 
 LogReg::LogReg(const Parameter* param, double* X, double* y,
