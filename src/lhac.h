@@ -664,7 +664,7 @@ private:
 
 
     void suffcientDecrease() {
-        int max_sd_iters = 20;
+        int max_sd_iters = 200;
         double mu = 1.0;
         double rho = param->rho;
         int msgFlag = param->verbose;
