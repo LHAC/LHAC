@@ -73,13 +73,19 @@ struct Solution {
         (size)++;
     };
     
-    inline void finalReport() {
+    inline void finalReport(int error) {
         unsigned long last = size - 1;
         printf(
-               "=========================== final report ========================\n\n"
+               "=========================== final report ========================\n"
+               );
+        if (error)
+            printf("Terminated!\n");
+        else
+            printf("Optimal!\n");
+        printf(
                "Best objective value found %+.6e\n"
                "In %3d iterations (%.4e seconds)\n"
-               "With a precision of: %+.4e\n\n"
+               "With a precision of: %+.4e\n"
                "=================================================================\n",
                fval[last], niter[last], t[last], normgs[last] / normgs[0]
                );
@@ -240,26 +246,29 @@ public:
         memcpy(L_grad_prev, L_grad, p*sizeof(double));
         mdl->computeGradient(w, L_grad);
         lR->initData(w, w_prev, L_grad, L_grad_prev);
+        int error = 0;
         for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
             computeWorkSet();
             lR->computeLowRankApprox_v2(work_set);
-            suffcientDecrease();
             double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
             normsg = computeSubgradient();
-//            if (newton_iter == 1 || newton_iter % 30 == 0 )
-            sols->addEntry(obj->val, normsg, elapsedTime, newton_iter, work_set->numActive);
             if (msgFlag >= LHAC_MSG_NEWTON)
                 printf("%.4e  iter %3d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
                        elapsedTime, newton_iter, obj->f, normsg, work_set->numActive);
+            sols->addEntry(obj->val, normsg, elapsedTime, newton_iter, work_set->numActive);
+            if (normsg <= opt_outer_tol*normsg0) {
+                break;
+            }
+            error = suffcientDecrease();
+            if (error) {
+                break;
+            }
             memcpy(L_grad_prev, L_grad, p*sizeof(double));
             mdl->computeGradient(w, L_grad);
             /* update LBFGS */
             lR->updateLBFGS(w, w_prev, L_grad, L_grad_prev);
-            if (normsg <= opt_outer_tol*normsg0) {
-                break;
-            }
         }
-        sols->finalReport();
+        sols->finalReport(error);
         memcpy(sols->w, w, p*sizeof(double));
         return sols;
     };
@@ -663,8 +672,8 @@ private:
     }
 
 
-    void suffcientDecrease() {
-        int max_sd_iters = 200;
+    int suffcientDecrease() {
+        int max_sd_iters = 1;
         double mu = 1.0;
         double rho = param->rho;
         int msgFlag = param->verbose;
@@ -761,7 +770,11 @@ private:
             }
             mu = 2*mu;
         }
-        return;
+        if (sd_iters == max_sd_iters) {
+            fprintf(stderr, "failed to satisfy sufficient decrease condition.\n");
+            return -1;
+        }
+        return 0;
     }
 };
 
