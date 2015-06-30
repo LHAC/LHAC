@@ -121,6 +121,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     bool isCached = true;
     double lambda = 1.0;
     double posweight = 1.0;
+    // LBFGS limited memory parameter
+    int limited_memory = 10;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);
@@ -153,6 +155,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (tf) {
         active_set = mxGetScalar(tf);
     }
+    tf = mxGetField(prhs[argIdx], 0, "b");
+    if (tf) {
+        limited_memory = mxGetScalar(tf);
+    }
     tf = mxGetField(prhs[argIdx], 0, "loss");
     if (tf) {
         mxGetString(tf,loss_str,MAX_STR_LEN);
@@ -181,7 +187,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     
     Parameter* param = new Parameter;
-    param->l = 10;
+    param->l = limited_memory;
     param->work_size = work_size;
     param->max_iter = max_iter;
     param->lmd = lambda;
