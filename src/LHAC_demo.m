@@ -13,11 +13,13 @@ param.i = 1000;
 % lambda
 param.lmd = 0.5;
 
+param.b = 50;
+
 % use load for other files, e.g., ER_692
 fin = [pdir fname{1} ext];
 % read the data
 S = dlmread(fin);
 
-W = LHAC(S, param.lmd, param);
+W = lhac(S, param.lmd, param);
 
 

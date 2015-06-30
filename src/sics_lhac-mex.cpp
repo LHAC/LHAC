@@ -72,6 +72,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int sd_flag = 1;
     // max_cdpass = 1 + iter / cdrate
     unsigned long cd_rate = 15;
+    // lbfgs memory usage
+    unsigned long l = 10;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);
@@ -100,12 +102,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (tf) {
         cd_rate = mxGetScalar(tf);
     }
+    tf = mxGetField(prhs[argIdx], 0, "b");
+    if (tf) {
+        l = mxGetScalar(tf);
+    }
     
     
     param* _param = new param;
     
     
-    _param->l = 10;
+    _param->l = l;
     _param->work_size = 1000000;
     _param->max_iter = max_iter;
     _param->max_inner_iter = 50;
