@@ -1,4 +1,3 @@
-% .
 clear;
 pdir = './';
 fname = {'a9a'};
