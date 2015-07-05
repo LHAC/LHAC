@@ -331,8 +331,6 @@ private:
                 order1 += D[i]*L_grad[i];
                 order2 += D[i]*D[i];
             }
-//            double order1 = lcddot((int)p, D, 1, L_grad, 1);
-//            double order2 = lcddot((int)p, D, 1, D, 1);
             double f_trial = mdl->computeObject(w);
             if (f_trial > obj->f + order1 + (0.5/ista_size)*order2) {
                 ista_size = ista_size * 0.5;
