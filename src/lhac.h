@@ -315,8 +315,9 @@ private:
         memcpy(w_prev, w, p*sizeof(double));
         for (int backtrack=0; backtrack<200; backtrack++) {
             double t = ista_size*lmd;
+            unsigned long i;
 #pragma omp parallel for private(i)
-            for (unsigned long i = 0; i < p; i++) {
+            for (i = 0; i < p; i++) {
                 double ui = w_prev[i] - ista_size*L_grad[i];
                 if (ui > t)
                     w[i] = ui - t;
