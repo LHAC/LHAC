@@ -123,6 +123,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double posweight = 1.0;
     // LBFGS limited memory parameter
     int limited_memory = 10;
+    int method_flag = 2;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);
@@ -158,6 +159,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     tf = mxGetField(prhs[argIdx], 0, "b");
     if (tf) {
         limited_memory = mxGetScalar(tf);
+    }
+    tf = mxGetField(prhs[argIdx], 0, "q");
+    if (tf) {
+        method_flag = mxGetScalar(tf);
     }
     tf = mxGetField(prhs[argIdx], 0, "loss");
     if (tf) {
@@ -208,6 +213,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     param->isCached = isCached;
     param->dense = 1;
     param->posweight = posweight;
+    param->method_flag = method_flag;
     
    Solution* sols = NULL;
    switch (param->loss) {

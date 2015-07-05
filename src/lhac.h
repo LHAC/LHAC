@@ -176,15 +176,15 @@ public:
     
     Solution* ista() {
         double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
-        obj->add(mdl->computeObject(w), computeReg(w));
-        mdl->computeGradient(w, L_grad);
-        normsg0 = computeSubgradient();
+//        obj->add(mdl->computeObject(w), computeReg(w));
+//        mdl->computeGradient(w, L_grad);
+//        normsg0 = computeSubgradient();
         normsg = normsg0;
-        for (ista_iter = 1; ista_iter <= 25; ista_iter++) {
+        for (ista_iter = 1; ista_iter <= max_iter; ista_iter++) {
             istaStep();
             double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
-            if (newton_iter == 1 || newton_iter % 30 == 0 )
-                sols->addEntry(obj->val, normsg, elapsedTime, newton_iter, work_set->numActive);
+            if (ista_iter == 1 || ista_iter % 30 == 0 )
+                sols->addEntry(obj->val, normsg, elapsedTime, ista_iter, work_set->numActive);
             if (msgFlag >= LHAC_MSG_NEWTON)
                 printf("%.4e  iter %3d:   obj.f = %+.4e    obj.normsg = %+.4e\n",
                        elapsedTime, ista_iter, obj->f, normsg);
@@ -200,11 +200,15 @@ public:
     
     Solution* solve()
     {
-        double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
-        
         obj->add(mdl->computeObject(w), computeReg(w));
         mdl->computeGradient(w, L_grad);
         normsg0 = computeSubgradient();
+        
+        if (param->method_flag == 1) {
+            return ista();
+        }
+        
+        double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
         
         // initial step (only for l1)
         for (unsigned long idx = 0; idx < p; idx++) {
@@ -304,31 +308,26 @@ private:
     
     void istaStep() {
         memcpy(w_prev, w, p*sizeof(double));
-        double x1;
-        double x2 = ista_size*lmd;
         while (1) {
-            double order1=0, order2=0;
+            double t = ista_size*lmd;
             for (unsigned long i = 0; i < p; i++) {
-                x1 = w_prev[i] - ista_size*L_grad[i];
-                if (x1 > x2)
-                    w[i] = x1 - x2;
-                else if (x1 < -x2)
-                    w[i] = x1 + x2;
+                double ui = w_prev[i] - ista_size*L_grad[i];
+                if (ui > t)
+                    w[i] = ui - t;
+                else if (ui < -t)
+                    w[i] = ui + t;
                 else
                     w[i] = 0.0;
-                
                 D[i] = w[i] - w_prev[i];
-                order1 += L_grad[i]*D[i];
-                order2 += D[i] * D[i];
             }
+            double order1 = lcddot((int)p, D, 1, L_grad, 1);
+            double order2 = lcddot((int)p, D, 1, D, 1);
             double f_trial = mdl->computeObject(w);
-            double g_trial = computeReg(w);
-            if (f_trial + g_trial > obj->f + order1 + 0.5*(1/ista_size)*order2) {
+            if (f_trial > obj->f + order1 + (0.5/ista_size)*order2) {
                 ista_size = ista_size * 0.5;
-                printf("st = %f\n", ista_size);
                 continue;
             }
-            obj->add(f_trial, g_trial);
+            obj->add(f_trial, computeReg(w));
             return;
         }
     }

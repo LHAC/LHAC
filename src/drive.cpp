@@ -76,6 +76,7 @@ void parse_command_line(int argc, const char * argv[],
     param->posweight = 1.0;
     param->dense = 1;
     param->mdlexist = 0;
+    param->method_flag = 2;
     
     // parse options
     int i;
@@ -144,6 +145,10 @@ void parse_command_line(int argc, const char * argv[],
                 
             case 'b':
                 param->l = atoi(argv[i]);
+                break;
+                
+            case 'q':
+                param->method_flag = atoi(argv[i]);
                 break;
 
 			default:

@@ -46,6 +46,7 @@ struct Parameter {
     bool isCached; // lasso cache aTa
     double posweight=1; // weight for pos samples
     int mdlexist = 0;
+    int method_flag = 2; // 1 = ISTA; 2 = PQN - proximal quasi-newton
     
     ~Parameter() {
         delete [] fileName;
