@@ -76,7 +76,8 @@ struct Solution {
         (size)++;
     };
     
-    inline void finalReport(int error) {
+    inline void finalReport(const int error, double* wfinal) {
+        memcpy(w, wfinal, p*sizeof(double));
         unsigned long last = size - 1;
         printf(
                "=========================== final report ========================\n"
@@ -179,12 +180,13 @@ public:
     
     Solution* ista() {
         double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
-//        obj->add(mdl->computeObject(w), computeReg(w));
-//        mdl->computeGradient(w, L_grad);
-//        normsg0 = computeSubgradient();
+        int error = 0;
         normsg = normsg0;
         for (ista_iter = 1; ista_iter <= max_iter; ista_iter++) {
-            istaStep();
+            error = istaStep();
+            if (error) {
+                break;
+            }
             double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
             if (ista_iter == 1 || ista_iter % 30 == 0 )
                 sols->addEntry(obj->val, normsg, elapsedTime, ista_iter, work_set->numActive);
@@ -197,7 +199,8 @@ public:
                 break;
             }
         }
-        
+        sols->finalReport(error, w);
+//        memcpy(sols->w, w, p*sizeof(double));
         return sols;
     }
     
@@ -275,8 +278,7 @@ public:
             /* update LBFGS */
             lR->updateLBFGS(w, w_prev, L_grad, L_grad_prev);
         }
-        sols->finalReport(error);
-        memcpy(sols->w, w, p*sizeof(double));
+        sols->finalReport(error, w);
         return sols;
     };
     
@@ -309,9 +311,9 @@ private:
     double* H_diag; // p
     double* d_bar; // 2*l
     
-    void istaStep() {
+    int istaStep() {
         memcpy(w_prev, w, p*sizeof(double));
-        while (1) {
+        for (int backtrack=0; backtrack<200; backtrack++) {
             double t = ista_size*lmd;
 #pragma omp parallel for private(i)
             for (unsigned long i = 0; i < p; i++) {
@@ -332,8 +334,9 @@ private:
                 continue;
             }
             obj->add(f_trial, computeReg(w));
-            return;
+            return 0;
         }
+        return 1;
     }
 
     /* may generalize to other regularizations beyond l1 */
