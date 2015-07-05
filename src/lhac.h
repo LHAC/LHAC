@@ -15,6 +15,9 @@
 #include "linalg.h"
 #include "timing.h"
 #include "Parameter.h"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 
 #define MAX_LENS 1024
@@ -310,6 +313,7 @@ private:
         memcpy(w_prev, w, p*sizeof(double));
         while (1) {
             double t = ista_size*lmd;
+#pragma omp parallel for private(i)
             for (unsigned long i = 0; i < p; i++) {
                 double ui = w_prev[i] - ista_size*L_grad[i];
                 if (ui > t)
