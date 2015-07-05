@@ -200,7 +200,6 @@ public:
             }
         }
         sols->finalReport(error, w);
-//        memcpy(sols->w, w, p*sizeof(double));
         return sols;
     }
     
