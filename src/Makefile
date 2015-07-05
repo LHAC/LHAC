@@ -14,7 +14,7 @@ CXX=g++
 MATLAB_INCLUDE = -I$(MATLAB_ROOT)/extern/include
 
 CXXBLAS = $(MATLAB_INCLUDE) 
-LDBLAS = -lmwlapack -lmwblas -Wl,-rpath,$(MATLAB_LINK) -L$(MATLAB_LINK) 
+LDBLAS = -lmwlapack -lmwblas -Wl,-rpath,$(MATLAB_LINK) -L$(MATLAB_LINK) -fopenmp
 
 ifeq ($(USE_ACCELERATE), true)
 	CXXBLAS =  -DUSE_CBLAS
@@ -26,8 +26,8 @@ ifeq ($(USE_OPENBLAS), true)
 endif
 
 
-CXXOPTFLAGS = -Wall -fpic  -fno-omit-frame-pointer -std=c++0x -O3 -DNDEBUG $(CXXBLAS)
-CXXMEXFLAGS = -O3 -fpic -DNDEBUG -std=c++0x $(MATLAB_INCLUDE)
+CXXOPTFLAGS = -Wall -fpic  -fno-omit-frame-pointer -std=c++0x -O3 -DNDEBUG $(CXXBLAS) -fopenmp
+CXXMEXFLAGS = -O3 -fpic -DNDEBUG -std=c++0x $(MATLAB_INCLUDE) -fopenmp
 LDMEXFLAGS = -Wall -shared -m64 -lmex -lmx  -lmat -lm -Wl,-rpath,$(MATLAB_LINK) $(LDBLAS) -L$(MATLAB_LINK) 
 
 
