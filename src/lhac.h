@@ -317,6 +317,7 @@ private:
             double t = ista_size*lmd;
             double order1 = 0;
             double order2 = 0;
+            
             unsigned long i;
 #pragma omp parallel for private(i)
             for (i = 0; i < p; i++) {
