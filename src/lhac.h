@@ -315,6 +315,8 @@ private:
         memcpy(w_prev, w, p*sizeof(double));
         for (int backtrack=0; backtrack<200; backtrack++) {
             double t = ista_size*lmd;
+            double order1 = 0;
+            double order2 = 0;
             unsigned long i;
 #pragma omp parallel for private(i)
             for (i = 0; i < p; i++) {
@@ -326,9 +328,11 @@ private:
                 else
                     w[i] = 0.0;
                 D[i] = w[i] - w_prev[i];
+                order1 += D[i]*L_grad[i];
+                order2 += D[i]*D[i];
             }
-            double order1 = lcddot((int)p, D, 1, L_grad, 1);
-            double order2 = lcddot((int)p, D, 1, D, 1);
+//            double order1 = lcddot((int)p, D, 1, L_grad, 1);
+//            double order2 = lcddot((int)p, D, 1, D, 1);
             double f_trial = mdl->computeObject(w);
             if (f_trial > obj->f + order1 + (0.5/ista_size)*order2) {
                 ista_size = ista_size * 0.5;
