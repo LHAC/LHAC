@@ -124,6 +124,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // LBFGS limited memory parameter
     int limited_memory = 10;
     int method_flag = 2;
+    double rho = 0.5;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);
@@ -163,6 +164,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     tf = mxGetField(prhs[argIdx], 0, "q");
     if (tf) {
         method_flag = mxGetScalar(tf);
+    }
+    tf = mxGetField(prhs[argIdx], 0, "rho");
+    if (tf) {
+        rho = (double) mxGetScalar(tf);
     }
     tf = mxGetField(prhs[argIdx], 0, "loss");
     if (tf) {
@@ -206,7 +211,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     param->sd_flag = sd_flag;
     param->shrink = shrink;
     param->fileName = fileName;
-    param->rho = 0.01;
+    param->rho = rho;
     param->cd_rate = cd_rate;
     param->active_set = active_set;
     param->loss = loss;
