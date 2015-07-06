@@ -18,13 +18,12 @@ LDBLAS = -lmwlapack -lmwblas -Wl,-rpath,$(MATLAB_LINK) -L$(MATLAB_LINK) -fopenmp
 
 ifeq ($(USE_ACCELERATE), true)
 	CXXBLAS =  -DUSE_CBLAS
-	LDBLAS = -framework Accelerate -framework CoreFoundation
+	LDBLAS = -framework Accelerate -framework CoreFoundation -fopenmp
 endif	
 ifeq ($(USE_OPENBLAS), true)
 	CXXBLAS =  -DUSE_CBLAS
-	LDBLAS = -llapack -lopenblas -L$(OPENBLAS_LINK)
+	LDBLAS = -llapack -lopenblas -L$(OPENBLAS_LINK) -fopenmp
 endif
-
 
 CXXOPTFLAGS = -Wall -fpic  -fno-omit-frame-pointer -std=c++0x -O3 -DNDEBUG $(CXXBLAS) -fopenmp
 CXXMEXFLAGS = -O3 -fpic -DNDEBUG -std=c++0x $(MATLAB_INCLUDE) -fopenmp
