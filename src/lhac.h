@@ -205,47 +205,7 @@ public:
     // proximal inexact quasi-newton
     int piqn() {
         double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
-        
-        // initial step (only for l1)
-        for (unsigned long idx = 0; idx < p; idx++) {
-            double G = L_grad[idx];
-            double Gp = G + lmd;
-            double Gn = G - lmd;
-            double Hwd = 0.0;
-            if (Gp <= Hwd)
-                D[idx] = -Gp;
-            else if (Gn >= Hwd)
-                D[idx] = -Gn;
-            else
-                D[idx] = 0.0;
-        }
-        double a = 1.0;
-        double l1_next = 0.0;
-        double delta = 0.0;
-        for (unsigned long i = 0; i < p; i++) {
-            w[i] += D[i];
-            l1_next += lmd*fabs(w[i]);
-            delta += L_grad[i]*D[i];
-        }
-        delta += l1_next - obj->g;
-        // line search
-        for (unsigned long lineiter = 0; lineiter < 1000; lineiter++) {
-            double f_trial = mdl->computeObject(w);
-            double obj_trial = f_trial + l1_next;
-            if (obj_trial < obj->val + a*0.001*delta) {
-                obj->add(f_trial, l1_next);
-                break;
-            }
-            a = 0.5*a;
-            l1_next = 0;
-            for (unsigned long i = 0; i < p; i++) {
-                w[i] = w_prev[i] + a*D[i];
-                l1_next += lmd*fabs(w[i]);
-            }
-        }
-        memcpy(L_grad_prev, L_grad, p*sizeof(double));
-        mdl->computeGradient(w, L_grad);
-        lR->initData(w, w_prev, L_grad, L_grad_prev);
+        initialStep();
         int error = 0;
         for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
             computeWorkSet();
