@@ -56,7 +56,7 @@ void parse_command_line(int argc, const char * argv[],
     param->l = 10;
     param->work_size = 500;
     param->max_iter = 1000;
-    param->lmd = 1;
+    param->lmd = 0.001;
     param->max_inner_iter = 100;
     param->opt_inner_tol = 5*1e-6;
     param->opt_outer_tol = 1e-7;
