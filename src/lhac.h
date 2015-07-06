@@ -233,10 +233,10 @@ public:
     
     int fpiqn() {
         double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
-        x = new double[p];
         initialStep();
         double t = 1.0;
         int error = 0;
+        double* x = new double[p];
         memcpy(x, w, p*sizeof(double)); // w_1 (y_1) == x_0
         for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
             computeWorkSet();
@@ -254,7 +254,7 @@ public:
             if (error) {
                 break;
             }
-            fistaUpdate(&t);
+            fistaUpdate(&t, x);
             obj->add(mdl->computeObject(w), computeReg(w));
             memcpy(L_grad_prev, L_grad, p*sizeof(double));
             mdl->computeGradient(w, L_grad);
@@ -323,7 +323,6 @@ private:
     double* H_diag; // p
     double* d_bar; // 2*l
     
-    double* x; // for fista step
     
     void initialStep() {
         // initial step (only for l1)
@@ -397,7 +396,7 @@ private:
         return 1;
     }
     
-    void fistaUpdate(double* t) {
+    void fistaUpdate(double* t, double* x) {
         double t_ = *t;
         *t = (1 + sqrt(1+4*t_*t_))*0.5;
         double c = (t_ - 1) / *t;
@@ -405,7 +404,6 @@ private:
             double yi = w[i] + c*(w[i] - x[i]); // x is x_{k-1}
             x[i] = w[i];
             w[i] = yi;
-//            printf("w - w_prev = %f\n", w[i] - w_prev[i]);
         }
     }
 
