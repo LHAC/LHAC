@@ -37,7 +37,7 @@ struct Func {
     double g;
     double val; // f + g
     
-    inline void add(double _f, double _g) {
+    inline void add(const double _f, const double _g) {
         f = _f;
         g = _g;
         val = f + g;
@@ -133,7 +133,7 @@ class LHAC
 {
 public:
     
-    LHAC(Objective<Derived>* _mdl, const Parameter* _param)
+    LHAC(Objective<Derived>* _mdl, const Parameter* const _param)
     : mdl(_mdl), param(_param) {
         p = mdl->getDims();
         obj = new Func;
@@ -396,7 +396,7 @@ private:
         return 1;
     }
     
-    void fistaUpdate(double* t, double* x) {
+    void fistaUpdate(double* const t, double* const x) {
         double t_ = *t;
         *t = (1 + sqrt(1+4*t_*t_))*0.5;
         double c = (t_ - 1) / *t;
@@ -408,7 +408,7 @@ private:
     }
 
     /* may generalize to other regularizations beyond l1 */
-    double computeReg(const double* wnew) {
+    double computeReg(const double* const wnew) {
         double gval = 0.0;
         for (unsigned long i = 0; i < p; i++) gval += lmd*fabs(wnew[i]);
         return gval;
