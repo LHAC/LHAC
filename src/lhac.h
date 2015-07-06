@@ -390,7 +390,7 @@ private:
                 ista_size = ista_size * 0.5;
                 continue;
             }
-            obj->add(f_trial, computeReg(w));
+            obj->add(f_trial, 0);
             return 0;
         }
         return 1;
