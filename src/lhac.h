@@ -178,7 +178,7 @@ public:
         
     }
     
-    Solution* ista() {
+    int ista() {
         double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
         int error = 0;
         normsg = normsg0;
@@ -199,20 +199,11 @@ public:
                 break;
             }
         }
-        sols->finalReport(error, w);
-        return sols;
+        return error;
     }
     
-    Solution* solve()
-    {
-        obj->add(mdl->computeObject(w), computeReg(w));
-        mdl->computeGradient(w, L_grad);
-        normsg0 = computeSubgradient();
-        
-        if (param->method_flag == 1) {
-            return ista();
-        }
-        
+    // proximal inexact quasi-newton
+    int piqn() {
         double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
         
         // initial step (only for l1)
@@ -277,6 +268,58 @@ public:
             /* update LBFGS */
             lR->updateLBFGS(w, w_prev, L_grad, L_grad_prev);
         }
+        return error;
+    }
+    
+    int fpiqn() {
+        double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
+        x = new double[p];
+        initialStep();
+        double t = 1.0;
+        int error = 0;
+        memcpy(x, w, p*sizeof(double)); // w_1 (y_1) == x_0
+        for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
+            computeWorkSet();
+            lR->computeLowRankApprox_v2(work_set);
+            double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
+            normsg = computeSubgradient();
+            if (msgFlag >= LHAC_MSG_NEWTON)
+                printf("%.4e  iter %3d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
+                       elapsedTime, newton_iter, obj->f, normsg, work_set->numActive);
+            sols->addEntry(obj->val, normsg, elapsedTime, newton_iter, work_set->numActive);
+            if (normsg <= opt_outer_tol*normsg0) {
+                break;
+            }
+            error = suffcientDecrease();
+            if (error) {
+                break;
+            }
+            fistaUpdate(&t);
+            obj->add(mdl->computeObject(w), computeReg(w));
+            memcpy(L_grad_prev, L_grad, p*sizeof(double));
+            mdl->computeGradient(w, L_grad);
+            /* update LBFGS */
+            lR->updateLBFGS(w, w_prev, L_grad, L_grad_prev);
+        }
+        return error;
+    }
+    
+    Solution* solve()
+    {
+        obj->add(mdl->computeObject(w), computeReg(w));
+        mdl->computeGradient(w, L_grad);
+        normsg0 = computeSubgradient();
+        int error = 0;
+        if (param->method_flag == 1) {
+            error = ista();
+        }
+        else if (param->method_flag == 2) {
+            error = piqn();
+        }
+        else if (param->method_flag == 3) {
+            error = fpiqn();
+        }
+        
         sols->finalReport(error, w);
         return sols;
     };
@@ -310,6 +353,51 @@ private:
     double* H_diag; // p
     double* d_bar; // 2*l
     
+    double* x; // for fista step
+    
+    void initialStep() {
+        // initial step (only for l1)
+        for (unsigned long idx = 0; idx < p; idx++) {
+            double G = L_grad[idx];
+            double Gp = G + lmd;
+            double Gn = G - lmd;
+            double Hwd = 0.0;
+            if (Gp <= Hwd)
+                D[idx] = -Gp;
+            else if (Gn >= Hwd)
+                D[idx] = -Gn;
+            else
+                D[idx] = 0.0;
+        }
+        double a = 1.0;
+        double l1_next = 0.0;
+        double delta = 0.0;
+        for (unsigned long i = 0; i < p; i++) {
+            w[i] += D[i];
+            l1_next += lmd*fabs(w[i]);
+            delta += L_grad[i]*D[i];
+        }
+        delta += l1_next - obj->g;
+        // line search
+        for (unsigned long lineiter = 0; lineiter < 1000; lineiter++) {
+            double f_trial = mdl->computeObject(w);
+            double obj_trial = f_trial + l1_next;
+            if (obj_trial < obj->val + a*0.001*delta) {
+                obj->add(f_trial, l1_next);
+                break;
+            }
+            a = 0.5*a;
+            l1_next = 0;
+            for (unsigned long i = 0; i < p; i++) {
+                w[i] = w_prev[i] + a*D[i];
+                l1_next += lmd*fabs(w[i]);
+            }
+        }
+        memcpy(L_grad_prev, L_grad, p*sizeof(double));
+        mdl->computeGradient(w, L_grad);
+        lR->initData(w, w_prev, L_grad, L_grad_prev);
+    }
+    
     int istaStep() {
         memcpy(w_prev, w, p*sizeof(double));
         for (int backtrack=0; backtrack<200; backtrack++) {
@@ -337,6 +425,18 @@ private:
             return 0;
         }
         return 1;
+    }
+    
+    void fistaUpdate(double* t) {
+        double t_ = *t;
+        *t = (1 + sqrt(1+4*t_*t_))*0.5;
+        double c = (t_ - 1) / *t;
+        for (unsigned long i = 0; i < p; i++) {
+            double yi = w[i] + c*(w[i] - x[i]); // x is x_{k-1}
+            x[i] = w[i];
+            w[i] = yi;
+//            printf("w - w_prev = %f\n", w[i] - w_prev[i]);
+        }
     }
 
     /* may generalize to other regularizations beyond l1 */

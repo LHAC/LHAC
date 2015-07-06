@@ -142,7 +142,7 @@ double LogReg::computeObject(double* wnew)
         
     }
     
-    return fval;
+    return fval / _N;
 }
 
 // always computed after computeObject
@@ -150,7 +150,7 @@ void LogReg::computeGradient(const double* wnew, double* df)
 {
     for (unsigned long i = 0; i < _N; i++) {
         double weight = (_y[i]>0)?_posweight:1;
-        _B[i] = -weight*_y[i]/(1+_e_ywx[i]);
+        _B[i] = -weight*_y[i]/(1+_e_ywx[i])/_N;
     }
     switch (_format) {
         case DENSE:
