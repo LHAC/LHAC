@@ -270,14 +270,24 @@ public:
         mdl->computeGradient(w, L_grad);
         normsg0 = computeSubgradient();
         int error = 0;
-        if (param->method_flag == 1) {
-            error = ista();
-        }
-        else if (param->method_flag == 2) {
-            error = piqn();
-        }
-        else if (param->method_flag == 3) {
-            error = fpiqn();
+        
+        switch (param->method_flag) {
+            case 1:
+                error = ista();
+                break;
+                
+            case 2:
+                error = piqn();
+                break;
+                
+            case 3:
+                error = fpiqn();
+                break;
+                
+            default:
+                error = 1;
+                fprintf(stderr, "ValueError: flag q only accept value 1 (ISTA), 2 (lhac) or 3 (f-lhac).\n");
+                break;
         }
         
         sols->finalReport(error, w);
