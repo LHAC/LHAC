@@ -104,7 +104,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // precision
     double opt_outer_tol = 1e-6;
     // shrink -> gama = gama / shrink
-    double shrink = 6;
+    double shrink = 4;
     // max iterations
     int max_iter = 5000;
     // sufficient decrease (default) or backtrack
@@ -114,12 +114,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // for greedy active set
     unsigned long work_size = 500;
     // active set strategy -- standard (default)
-//    unsigned long active_set = STD;
-    unsigned long active_set = GREEDY_ADDZERO;
+    unsigned long active_set = STD;
+//    unsigned long active_set = GREEDY_ADDZERO;
     int loss = LOG;
     char loss_str[MAX_STR_LEN];
     bool isCached = true;
-    double lambda = 1.0;
+    double lambda = 0.001;
     double posweight = 1.0;
     // LBFGS limited memory parameter
     int limited_memory = 10;
