@@ -28,10 +28,11 @@ endif
 CXXOPTFLAGS = -Wall -fpic  -fno-omit-frame-pointer -std=c++0x -O3 -DNDEBUG $(CXXBLAS)
 CXXMEXFLAGS = -O3 -fpic -DNDEBUG -std=c++0x $(MATLAB_INCLUDE)
 LDMEXFLAGS = -Wall -shared -m64 -lmex -lmx  -lmat -lm -Wl,-rpath,$(MATLAB_LINK) $(LDBLAS) -L$(MATLAB_LINK) 
-ifeq ($(USE_OPENMP), true)
+ifneq ($(USE_OPENMP), no)
     LDBLAS += -fopenmp
     CXXOPTFLAGS += -fopenmp
     CXXMEXFLAGS += -fopenmp
+    $(info **complied with openmp....)
 endif
 
 all: lhac.mexmaci64 lhac.cmd
