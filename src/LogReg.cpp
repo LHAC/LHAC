@@ -8,6 +8,10 @@
 
 #include "LogReg.h"
 #include "linalg.h"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 
 
 LogReg::LogReg(const Parameter* param)
@@ -148,7 +152,9 @@ double LogReg::computeObject(double* wnew)
 // always computed after computeObject
 void LogReg::computeGradient(const double* wnew, double* df)
 {
-    for (unsigned long i = 0; i < _N; i++) {
+    unsigned long i;
+#pragma omp parallel for private(i)
+    for (i = 0; i < _N; i++) {
         double weight = (_y[i]>0)?_posweight:1;
         _B[i] = -weight*_y[i]/(1+_e_ywx[i])/_N;
     }

@@ -9,7 +9,7 @@ MATLAB_LINK = $(MATLAB_ROOT)/bin/maci64
 
 OPENBLAS_LINK = /usr/local/opt/openblas/lib
 
-CXX=g++
+CXX=g++-4.9
 
 MATLAB_INCLUDE = -I$(MATLAB_ROOT)/extern/include
 

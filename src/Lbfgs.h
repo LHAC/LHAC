@@ -341,12 +341,14 @@ private:
         }
         for (unsigned short i = _cols, k = _cols*_2cols, o = 0; i < _2cols; i++, k += _2cols, o++) {
             cl1 = L[o];
-            for (unsigned short j = 0; j < _cols; j++) R[k+j] = cl1[j];
+            for (unsigned short j = 0; j < _cols; j++)
+                R[k+j] = cl1[j];
         }
         
         for (unsigned short i = _cols, o = 0; i < _2cols; i++, o++) {
             cl1 = L[o];
-            for (unsigned short j = 0, k = 0; j < _cols; j++, k += _2cols) R[k+i] = cl1[j];
+            for (unsigned short j = 0, k = 0; j < _cols; j++, k += _2cols)
+                R[k+i] = cl1[j];
         }
         
         for (unsigned short i = _cols, k = _cols*_2cols, j = 0; i < _2cols; i++, k += _2cols, j++)
