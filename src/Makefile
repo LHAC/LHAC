@@ -14,21 +14,25 @@ CXX=g++-4.9
 MATLAB_INCLUDE = -I$(MATLAB_ROOT)/extern/include
 
 CXXBLAS = $(MATLAB_INCLUDE) 
-LDBLAS = -lmwlapack -lmwblas -Wl,-rpath,$(MATLAB_LINK) -L$(MATLAB_LINK) -fopenmp
+LDBLAS = -lmwlapack -lmwblas -Wl,-rpath,$(MATLAB_LINK) -L$(MATLAB_LINK) 
 
 ifeq ($(USE_ACCELERATE), true)
 	CXXBLAS =  -DUSE_CBLAS
-	LDBLAS = -framework Accelerate -framework CoreFoundation -fopenmp
+	LDBLAS = -framework Accelerate -framework CoreFoundation
 endif	
 ifeq ($(USE_OPENBLAS), true)
 	CXXBLAS =  -DUSE_CBLAS
-	LDBLAS = -llapack -lopenblas -L$(OPENBLAS_LINK) -fopenmp
+	LDBLAS = -llapack -lopenblas -L$(OPENBLAS_LINK)
 endif
 
-CXXOPTFLAGS = -Wall -fpic  -fno-omit-frame-pointer -std=c++0x -O3 -DNDEBUG $(CXXBLAS) -fopenmp
-CXXMEXFLAGS = -O3 -fpic -DNDEBUG -std=c++0x $(MATLAB_INCLUDE) -fopenmp
+CXXOPTFLAGS = -Wall -fpic  -fno-omit-frame-pointer -std=c++0x -O3 -DNDEBUG $(CXXBLAS)
+CXXMEXFLAGS = -O3 -fpic -DNDEBUG -std=c++0x $(MATLAB_INCLUDE)
 LDMEXFLAGS = -Wall -shared -m64 -lmex -lmx  -lmat -lm -Wl,-rpath,$(MATLAB_LINK) $(LDBLAS) -L$(MATLAB_LINK) 
-
+ifeq ($(USE_OPENMP), true)
+    LDBLAS += -fopenmp
+    CXXOPTFLAGS += -fopenmp
+    CXXMEXFLAGS += -fopenmp
+endif
 
 all: lhac.mexmaci64 lhac.cmd
 

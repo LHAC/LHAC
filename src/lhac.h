@@ -410,7 +410,8 @@ private:
     /* may generalize to other regularizations beyond l1 */
     double computeReg(const double* const wnew) {
         double gval = 0.0;
-        for (unsigned long i = 0; i < p; i++) gval += lmd*fabs(wnew[i]);
+        for (unsigned long i = 0; i < p; i++)
+            gval += lmd*fabs(wnew[i]);
         return gval;
     }
 

@@ -89,6 +89,7 @@ void LogReg::sparseVectorProduct(const SPARSE_TRANSPOSE trans,
 {
     switch (trans) {
         case SparseNoTrans:
+#pragma omp parallel for
             for (unsigned long i = 0; i < _N; i++) {
                 feature_node* xnode = _xrows[i];
                 c[i] = 0;
@@ -102,6 +103,7 @@ void LogReg::sparseVectorProduct(const SPARSE_TRANSPOSE trans,
             
         
         case SparseTrans:
+#pragma omp parallel for
             for (unsigned long i = 0; i < _p; i++) {
                 feature_node* xnode = _xcols[i];
                 c[i] = 0;
@@ -128,7 +130,7 @@ double LogReg::computeObject(double* wnew)
             sparseVectorProduct(SparseNoTrans, wnew, _e_ywx);
             break;
     }
-    
+#pragma omp parallel for reduction(+:fval)
     for (unsigned long i = 0; i < _N; i++) {
         double nc1;
         double nc2;
@@ -152,9 +154,8 @@ double LogReg::computeObject(double* wnew)
 // always computed after computeObject
 void LogReg::computeGradient(const double* wnew, double* df)
 {
-    unsigned long i;
-#pragma omp parallel for private(i)
-    for (i = 0; i < _N; i++) {
+#pragma omp parallel for
+    for (unsigned long i = 0; i < _N; i++) {
         double weight = (_y[i]>0)?_posweight:1;
         _B[i] = -weight*_y[i]/(1+_e_ywx[i])/_N;
     }
