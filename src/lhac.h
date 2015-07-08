@@ -128,6 +128,157 @@ struct Solution {
 
 
 
+template <typename InnerSolver>
+class Subproblem
+{
+public:
+    inline void build(LBFGS* lR, double* grad,
+                      work_set_struct* work_set) {
+        return static_cast<InnerSolver*>(this)->build(lR, grad, work_set);
+    };
+    
+    inline double objective_value(const double gama) {
+        return static_cast<InnerSolver*>(this)->objective_value(gama);
+    };
+    
+    inline const double* solve(const double* w_prev,
+                               const unsigned short k,
+                               double gama) {
+        return static_cast<InnerSolver*>(this)->solve(w_prev, k, gama);
+    };
+    
+    virtual ~Subproblem() {};
+    
+};
+
+class CoordinateDescent: public Subproblem<CoordinateDescent>
+{
+public:
+    CoordinateDescent(const Parameter* const _param, unsigned long _p): p(_p) {
+        lmd = _param->lmd;
+        l = _param->l;
+        cd_rate = _param->cd_rate;
+        msgFlag = _param->verbose;
+        D = new double[p];
+        H_diag = new double[p]; // p
+        d_bar = new double[2*l]; // 2*l
+    };
+    
+    ~CoordinateDescent() {
+        delete [] D;
+        delete [] H_diag;
+        delete [] d_bar;
+    };
+    
+    
+    void build(LBFGS* lR, double* grad,
+               work_set_struct* work_set) {
+        Q = lR->Q;
+        Q_bar = lR->Q_bar;
+        m = lR->m;
+        L_grad = grad;
+        permut = work_set->permut;
+        idxs = work_set->idxs;
+        numActive = work_set->numActive;
+        gama0 = lR->gama;
+        buffer = lR->buff;
+        memset(D, 0, p*sizeof(double));
+        memset(d_bar, 0, 2*l*sizeof(double));
+        for (unsigned long k = 0, i = 0; i < work_set->numActive; i++, k += m) {
+            H_diag[i] = gama0;
+            for (unsigned long j = 0; j < m; j++)
+                H_diag[i] -= Q_bar[k+j]*Q[k+j];
+        }
+    };
+    
+    double objective_value(const double gama) {
+        double order1 = lcddot((int)p, D, 1, L_grad, 1);
+        double order2 = 0;
+        int cblas_M = (int) numActive;
+        int cblas_N = (int) m;
+        lcdgemv(CblasColMajor, CblasTrans, Q, d_bar, buffer, cblas_N, cblas_M, cblas_N);
+        double vp = 0;
+        for (unsigned long ii = 0; ii < numActive; ii++) {
+            unsigned long idx = idxs[ii].j;
+            unsigned long idx_Q = permut[ii];
+            vp += D[idx]*buffer[idx_Q];
+        }
+        order2 = gama*lcddot((int)p, D, 1, D, 1)-vp;
+        order2 = order2*0.5;
+        return order1 + order2;
+    }
+    
+    const double* solve(const double* w_prev,
+                        const unsigned short k,
+                        double gama) {
+        double z = 0.0;
+        double Hd_j;
+        double Hii;
+        double G;
+        double Gp;
+        double Gn;
+        double wpd;
+        double Hwd;
+        double Qd_bar;
+        double dH_diag = gama-gama0;
+        unsigned long max_cd_pass = 1 + k / cd_rate;
+        for (unsigned long cd_pass = 1; cd_pass <= max_cd_pass; cd_pass++) {
+            double diffd = 0;
+            double normd = 0;
+            for (unsigned long ii = 0; ii < numActive; ii++) {
+                unsigned long rii = ii;
+                unsigned long idx = idxs[rii].j;
+                unsigned long idx_Q = permut[rii];
+                unsigned long Q_idx_m = idx_Q*m;
+                Qd_bar = lcddot(m, &Q[Q_idx_m], 1, d_bar, 1);
+                Hd_j = gama*D[idx] - Qd_bar;
+                Hii = H_diag[idx_Q] + dH_diag;
+                G = Hd_j + L_grad[idx];
+                Gp = G + lmd;
+                Gn = G - lmd;
+                wpd = w_prev[idx] + D[idx];
+                Hwd = Hii * wpd;
+                z = -wpd;
+                if (Gp <= Hwd) z = -Gp/Hii;
+                if (Gn >= Hwd) z = -Gn/Hii;
+                D[idx] = D[idx] + z;
+                for (unsigned long k = Q_idx_m, j = 0; j < m; j++)
+                    d_bar[j] += z*Q_bar[k+j];
+                diffd += fabs(z);
+                normd += fabs(D[idx]);
+            }
+            if (msgFlag >= LHAC_MSG_CD) {
+                printf("\t\t Coordinate descent pass %ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
+                       cd_pass, diffd, normd);
+            }
+        }
+        return D;
+    };
+    
+private:
+    /* own */
+    double* D;
+    double* d_bar;
+    double* H_diag;
+    
+    double* Q;
+    double* Q_bar;
+    double* L_grad;
+    double* buffer;
+    unsigned long* permut;
+    ushort_pair_t* idxs;
+    double lmd;
+    double gama0;
+    unsigned long cd_rate;
+    unsigned long l;
+    unsigned long numActive;
+    int msgFlag;
+    unsigned long p;
+    unsigned short m;
+    
+};
+
+
 template <typename Derived>
 class LHAC
 {
@@ -231,6 +382,58 @@ public:
         return error;
     }
     
+    template <typename InnerSolver>
+    int piqnGeneral(Subproblem<InnerSolver>* subprob) {
+        double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
+        initialStep();
+        int error = 0;
+        unsigned short max_inner_iter = 200;
+        for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
+            computeWorkSet();
+            lR->computeLowRankApprox_v2(work_set);
+            double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
+            normsg = computeSubgradient();
+            if (msgFlag >= LHAC_MSG_NEWTON)
+                printf("%.4e  iter %3d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
+                       elapsedTime, newton_iter, obj->f, normsg, work_set->numActive);
+            sols->addEntry(obj->val, normsg, elapsedTime, newton_iter, work_set->numActive);
+            if (normsg <= opt_outer_tol*normsg0) {
+                break;
+            }
+            
+            /* inner solver starts*/
+            subprob->build(lR, L_grad, work_set);
+            double gama = lR->gama;
+            double rho_trial = 0.0;
+            memcpy(w_prev, w, p*sizeof(double));
+            unsigned short inner_iter;
+            for (inner_iter = 0; inner_iter < max_inner_iter; inner_iter++) {
+                const double* d = subprob->solve(w_prev, newton_iter, gama);
+                bool good_d = sufficientDecreaseCheck(d, subprob, gama, &rho_trial);
+                if (good_d) {
+                    if (msgFlag >= LHAC_MSG_SD)
+                        printf("\t \t \t # of line searches = %3d; model quality: %+.3f\n", inner_iter, rho_trial);
+                    break;
+                }
+                else
+                    gama *= 2.0;
+                
+            }
+            /* inner solver ends */
+            if (inner_iter >= max_inner_iter) {
+                error = 1;
+                break;
+            }
+
+            memcpy(L_grad_prev, L_grad, p*sizeof(double));
+            mdl->computeGradient(w, L_grad);
+            /* update LBFGS */
+            lR->updateLBFGS(w, w_prev, L_grad, L_grad_prev);
+        }
+        return error;
+    }
+    
+    /* fast proximal inexact quasi-newton */
     int fpiqn() {
         double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
         initialStep();
@@ -282,6 +485,10 @@ public:
                 
             case 3:
                 error = fpiqn();
+                break;
+                
+            case 4:
+                error = piqnGeneral(new CoordinateDescent(param, p));
                 break;
                 
             default:
@@ -844,7 +1051,6 @@ private:
                 break;
             }
             mu = 2*mu;
-            shuffle(work_set);
         }
         if (sd_iters == max_sd_iters) {
             fprintf(stderr, "failed to satisfy sufficient decrease condition.\n");
@@ -852,7 +1058,27 @@ private:
         }
         return 0;
     }
+    
+    template <typename InnerSolver>
+    bool sufficientDecreaseCheck(const double* D, Subproblem<InnerSolver>* const subprob,
+                                 const double gama, double* rho_trial) {
+        for (unsigned long i = 0; i < p; i++) {
+            w[i] = w_prev[i] + D[i];
+        }
+        double f_trial = mdl->computeObject(w);
+        double g_trial = computeReg(w);
+        double obj_trial = f_trial + g_trial;
+        double f_mdl = obj->f + subprob->objective_value(gama) + g_trial;
+        *rho_trial = (obj_trial-obj->val)/(f_mdl-obj->val);
+        if (*rho_trial > param->rho) {
+            obj->add(f_trial, g_trial);
+            return true;
+        }
+        return false;
+
+    }
 };
+
 
 
 
