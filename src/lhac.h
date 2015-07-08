@@ -844,6 +844,7 @@ private:
                 break;
             }
             mu = 2*mu;
+            shuffle(work_set);
         }
         if (sd_iters == max_sd_iters) {
             fprintf(stderr, "failed to satisfy sufficient decrease condition.\n");

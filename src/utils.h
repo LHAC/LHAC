@@ -73,7 +73,7 @@ static char* readline(FILE *input)
 // transpose matrix X from row format to column format
 static void transpose(const training_set_sp* prob, training_set_sp* prob_col)
 {
-    int i;
+    unsigned long i;
     unsigned long l = prob->N;
     unsigned long n = prob->p;
     int nnz = 0;
@@ -130,7 +130,7 @@ static void transpose(const training_set_sp* prob, training_set_sp* prob_col)
 // read in a problem (in libsvm format)
 static void read_problem(const char *filename, training_set_sp* Dset)
 {
-    int max_index, inst_max_index, i;
+    unsigned long max_index, inst_max_index, i;
     long int elements, j;
     FILE *fp = fopen(filename,"r");
     char *endptr;
@@ -235,7 +235,6 @@ static void transformToDenseFormat(training_set* Dset, training_set_sp* Dset_sp)
     memcpy(y, Dset_sp->y, N*sizeof(double));
     
     unsigned long num = 0;
-//    unsigned long nnz = 0;
     for (unsigned long i = 0; i < p; i++) {
         feature_node* xnode = Dset_sp->X[i];
         int ind = xnode->index-1;
