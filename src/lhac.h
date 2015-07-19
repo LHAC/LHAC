@@ -141,9 +141,9 @@ public:
         return static_cast<InnerSolver*>(this)->objective_value(gama);
     };
     
-    inline const double* solve(const double* w_prev,
+    inline const double* solve(const double* const w_prev,
                                const unsigned short k,
-                               double gama) {
+                               const double gama) {
         return static_cast<InnerSolver*>(this)->solve(w_prev, k, gama);
     };
     
@@ -154,11 +154,11 @@ public:
 class CoordinateDescent: public Subproblem<CoordinateDescent>
 {
 public:
-    CoordinateDescent(const Parameter* const _param, unsigned long _p): p(_p) {
-        lmd = _param->lmd;
-        l = _param->l;
-        cd_rate = _param->cd_rate;
-        msgFlag = _param->verbose;
+    CoordinateDescent(const Parameter* const _param, unsigned long _p)
+                      : p(_p), lmd(_param->lmd), l(_param->l),
+                        cd_rate(_param->cd_rate),
+                        msgFlag(_param->verbose)
+    {
         D = new double[p];
         H_diag = new double[p]; // p
         d_bar = new double[2*l]; // 2*l
@@ -191,7 +191,7 @@ public:
         }
     };
     
-    double objective_value(const double gama) {
+    double objective_value(const double gama) const {
         double order1 = lcddot((int)p, D, 1, L_grad, 1);
         double order2 = 0;
         int cblas_M = (int) numActive;
@@ -208,20 +208,14 @@ public:
         return order1 + order2;
     }
     
-    const double* solve(const double* w_prev,
+    const double* solve(const double* const w_prev,
                         const unsigned short k,
-                        double gama) {
+                        const double gama) {
         double z = 0.0;
-        double Hd_j;
-        double Hii;
-        double G;
-        double Gp;
-        double Gn;
-        double wpd;
-        double Hwd;
-        double Qd_bar;
-        double dH_diag = gama-gama0;
-        unsigned long max_cd_pass = 1 + k / cd_rate;
+        double Hd_j, Hii, G, Gp, Gn;
+        double wpd, Hwd, Qd_bar;
+        const double dH_diag = gama-gama0;
+        const unsigned long max_cd_pass = 1 + k / cd_rate;
         for (unsigned long cd_pass = 1; cd_pass <= max_cd_pass; cd_pass++) {
             double diffd = 0;
             double normd = 0;
@@ -257,23 +251,16 @@ public:
     
 private:
     /* own */
-    double* D;
-    double* d_bar;
-    double* H_diag;
+    double *D, *d_bar, *H_diag;
     
-    double* Q;
-    double* Q_bar;
-    double* L_grad;
-    double* buffer;
+    double *Q, *Q_bar, *L_grad, *buffer;
+    const unsigned long cd_rate, l, p;
     unsigned long* permut;
     ushort_pair_t* idxs;
-    double lmd;
+    const double lmd;
     double gama0;
-    unsigned long cd_rate;
-    unsigned long l;
     unsigned long numActive;
-    int msgFlag;
-    unsigned long p;
+    const int msgFlag;
     unsigned short m;
     
 };
@@ -387,7 +374,7 @@ public:
         double elapsedTimeBegin = CFAbsoluteTimeGetCurrent();
         initialStep();
         int error = 0;
-        unsigned short max_inner_iter = 200;
+        const unsigned short max_inner_iter = 200;
         for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
             computeWorkSet();
             lR->computeLowRankApprox_v2(work_set);
@@ -409,7 +396,7 @@ public:
             unsigned short inner_iter;
             for (inner_iter = 0; inner_iter < max_inner_iter; inner_iter++) {
                 const double* d = subprob->solve(w_prev, newton_iter, gama);
-                bool good_d = sufficientDecreaseCheck(d, subprob, gama, &rho_trial);
+                const bool good_d = sufficientDecreaseCheck(d, subprob, gama, &rho_trial);
                 if (good_d) {
                     if (msgFlag >= LHAC_MSG_SD)
                         printf("\t \t \t # of line searches = %3d; model quality: %+.3f\n", inner_iter, rho_trial);
@@ -1060,8 +1047,8 @@ private:
     }
     
     template <typename InnerSolver>
-    bool sufficientDecreaseCheck(const double* D, Subproblem<InnerSolver>* const subprob,
-                                 const double gama, double* rho_trial) {
+    const bool sufficientDecreaseCheck(const double* D, Subproblem<InnerSolver>* const subprob,
+                                       const double gama, double* rho_trial) {
         for (unsigned long i = 0; i < p; i++) {
             w[i] = w_prev[i] + D[i];
         }
