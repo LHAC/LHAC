@@ -322,8 +322,7 @@ int main(int argc, const char * argv[])
             break;
     }
     if (sols != NULL && param != NULL) {
-//        predict(sols, param);
-        predict(sols->w, sols->p, param);
+//        predict(sols->w, sols->p, param);
         delete sols;
         delete param;
     }
