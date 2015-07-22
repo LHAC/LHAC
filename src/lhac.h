@@ -128,6 +128,17 @@ struct Solution {
     };
 };
 
+inline void fistaUpdate(const unsigned long p, double* const t,
+                        double* const x, double* const w) {
+    double t_ = *t;
+    *t = (1 + sqrt(1+4*t_*t_))*0.5;
+    double c = (t_ - 1) / *t;
+    for (unsigned long i = 0; i < p; i++) {
+        double yi = w[i] + c*(w[i] - x[i]); // x is x_{k-1}
+        x[i] = w[i];
+        w[i] = yi;
+    }
+};
 
 
 template <typename InnerSolver>
@@ -279,11 +290,13 @@ public:
     msgFlag(_param->verbose)
     {
         w_ = new double[p];
+        x = new double[p];
         d_bar = new double[2*l]; // 2*l
     };
     
     ~ProximalGradient() {
         delete [] w_;
+        delete [] x;
         delete [] d_bar;
     };
     
@@ -325,6 +338,8 @@ public:
                 f_curr += Dj*L_grad[idx] + 0.5*(gama*Dj*Dj - Dj*Qd_bar[idx_Q]);
             }
         }
+        double tf = 1.0;
+        memcpy(x, w, p*sizeof(double));
         for (unsigned long sub_iter = 1; sub_iter <= max_sub_iter; sub_iter++) {
             memcpy(w_, w, p*sizeof(double));
             const double* w_curr = w_;
@@ -402,7 +417,27 @@ public:
                 nb += backtrack;
                 break;
             }
-            f_curr = f_trial;
+            fistaUpdate(p, &tf, x, w); // w becomes y_{k+1} from x_k, x becomes x_k
+            memset(d_bar, 0, 2*l*sizeof(double));
+            for (unsigned long ii = 0; ii < numActive; ii++) {
+                unsigned long idx = idxs[ii].j;
+                unsigned long idx_Q = permut[ii];
+                unsigned long Q_idx_m = idx_Q*m;
+                z = w[idx] - w_prev[idx];
+                for (unsigned long k = Q_idx_m, j = 0; j < m; j++)
+                    d_bar[j] += z*Q_bar[k+j];
+            }
+            int cblas_M = (int) numActive;
+            int cblas_N = (int) m;
+            lcdgemv(CblasColMajor, CblasTrans, Q, d_bar, Qd_bar, cblas_N, cblas_M, cblas_N);
+            f_curr = 0.0;
+            for (unsigned long ii = 0; ii < numActive; ii++) {
+                unsigned long idx = idxs[ii].j;
+                unsigned long idx_Q = permut[ii];
+                double Dj = w[idx] - w_prev[idx];
+                f_curr += Dj*L_grad[idx] + 0.5*(gama*Dj*Dj - Dj*Qd_bar[idx_Q]);
+            }
+//            f_curr = f_trial;
             if (diffd <= 1e-15)
                 break;
         }
@@ -417,7 +452,7 @@ public:
     
 private:
     /* own */
-    double *d_bar, *w_;
+    double *d_bar, *w_, *x;
     
     double f_curr, f_trial;
     double ista_size, max_H_diag;
@@ -433,17 +468,7 @@ private:
     
 };
 
-inline void fistaUpdate(const unsigned long p, double* const t,
-                        double* const x, double* const w) {
-    double t_ = *t;
-    *t = (1 + sqrt(1+4*t_*t_))*0.5;
-    double c = (t_ - 1) / *t;
-    for (unsigned long i = 0; i < p; i++) {
-        double yi = w[i] + c*(w[i] - x[i]); // x is x_{k-1}
-        x[i] = w[i];
-        w[i] = yi;
-    }
-};
+
 
 
 template <typename Derived>
