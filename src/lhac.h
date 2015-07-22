@@ -433,6 +433,18 @@ private:
     
 };
 
+inline void fistaUpdate(const unsigned long p, double* const t,
+                        double* const x, double* const w) {
+    double t_ = *t;
+    *t = (1 + sqrt(1+4*t_*t_))*0.5;
+    double c = (t_ - 1) / *t;
+    for (unsigned long i = 0; i < p; i++) {
+        double yi = w[i] + c*(w[i] - x[i]); // x is x_{k-1}
+        x[i] = w[i];
+        w[i] = yi;
+    }
+};
+
 
 template <typename Derived>
 class LHAC
@@ -612,7 +624,7 @@ public:
             if (error) {
                 break;
             }
-            fistaUpdate(&t, x);
+            fistaUpdate(p, &t, x, w);
             obj->add(mdl->computeObject(w), computeReg(w));
             memcpy(L_grad_prev, L_grad, p*sizeof(double));
             mdl->computeGradient(w, L_grad);
@@ -762,16 +774,7 @@ private:
         return 1;
     }
     
-    void fistaUpdate(double* const t, double* const x) {
-        double t_ = *t;
-        *t = (1 + sqrt(1+4*t_*t_))*0.5;
-        double c = (t_ - 1) / *t;
-        for (unsigned long i = 0; i < p; i++) {
-            double yi = w[i] + c*(w[i] - x[i]); // x is x_{k-1}
-            x[i] = w[i];
-            w[i] = yi;
-        }
-    }
+
 
     /* may generalize to other regularizations beyond l1 */
     double computeReg(const double* const wnew) {
