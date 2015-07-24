@@ -262,4 +262,16 @@ static void transformToDenseFormat(training_set* Dset, training_set_sp* Dset_sp)
     return;
 };
 
+static void printout(const char* desc, double* x, unsigned long s1, unsigned long s2)
+{
+    printf( "\n%s\n", desc );
+    for (unsigned long i = 0, k = 0; i < s2; i++, k += s1) {
+        printf("%+.8e", x[k]);
+        for (unsigned long j = 1; j < s1; j++) {
+            printf(",%+.8e", x[j+k]);
+        }
+        printf("\n");
+    }
+};
+
 #endif

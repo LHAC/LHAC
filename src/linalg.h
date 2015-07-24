@@ -74,6 +74,8 @@ extern "C" {
     int dpotri_(char *uplo, INTT *n, double *a, INTT *lda, INTT *info);
     int dgetrf_(INTT *m, INTT *n, double *a, INTT *lda, INTT *ipiv, INTT *info);
     int dgetri_(INTT *n, double *a, INTT *lda, INTT *ipiv, double *work, INTT *lwork, INTT *info);
+    void dsyev_(char *jobz, char *uplo, INTT *n, double *a, INTT *lda, double *w,
+               double *work, INTT *lwork, INTT *info);
 }
 
 
@@ -89,6 +91,16 @@ inline void lcdpotri_(double* w, const unsigned long n, int* _info) {
     INTT info = 0;
     INTT p0 = (INTT) n;
     dpotri_((char*) "U", &p0, w, &p0, &info);
+    
+    *_info = (int) info;
+}
+
+inline void lcdsyev_(double* A, double* w, const unsigned long n, int* _info) {
+    INTT info = 0;
+    INTT p0 = (INTT) n;
+    INTT lwork = (INTT) 3*n;
+    double work[lwork];
+    dsyev_((char*) "N", (char*) "U", &p0, A, &p0, w, work, &lwork, &info);
     
     *_info = (int) info;
 }

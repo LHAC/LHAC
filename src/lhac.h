@@ -15,6 +15,7 @@
 #include "linalg.h"
 #include "timing.h"
 #include "Parameter.h"
+#include "utils.h"
 #include <assert.h>
 #ifdef _OPENMP
 #include <omp.h>
@@ -23,8 +24,6 @@
 #define max(a,b) (a>b?a:b)
 
 #define MAX_LENS 1024
-
-#define __MATLAB_API__
 
 
 enum { LHAC_MSG_NO=0, LHAC_MSG_NEWTON, LHAC_MSG_SD, LHAC_MSG_CD, LHAC_MSG_MAX };
@@ -866,10 +865,18 @@ public:
         int error = 0;
         const unsigned short max_inner_iter = 200;
         Subproblem<s1>* subprob = sb1;
+        double* H = new double[p*p];
         for (newton_iter = 1; newton_iter < max_iter; newton_iter++) {
             computeWorkSet();
             lR->computeLowRankApprox_v2(work_set);
             normsg = computeSubgradient();
+            if (work_set->numActive < 1000) {
+                int numActive = (int) work_set->numActive;
+                lR->full(H, numActive);
+                int info = -1;
+                lcdsyev_(H, w_prev, numActive, &info);
+                printf("=%.8e\n", w_prev[numActive-1]/w_prev[0]);
+            }
             /* inner solver starts*/
             subprob->build(lR, L_grad, work_set);
             double gama = lR->gama;
@@ -901,8 +908,16 @@ public:
         computeWorkSet();
         lR->computeLowRankApprox_v2(work_set);
         normsg = computeSubgradient();
+        int numActive = (int) work_set->numActive;
+        printf("%.8e\n", lR->gama);
+//        printout("@Q", lR->Q, lR->m, numActive);
+//        printout("@Q_bar", lR->Q_bar, lR->m, numActive);
+        lR->full(H, numActive);
+        int info = -1;
+        lcdsyev_(H, w_prev, numActive, &info);
+        printf("=%.8e\n", w_prev[numActive-1]/w_prev[0]);
         double elapsedTime = CFAbsoluteTimeGetCurrent()-elapsedTimeBegin;
-        printf("%.4e  iter %3d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
+        printf("=%.4e  iter %3d:   obj.f = %+.4e    obj.normsg = %+.4e   |work_set| = %ld\n",
                elapsedTime, newton_iter, obj->f, normsg, work_set->numActive);
         double gama = lR->gama;
         memcpy(w_prev, w, p*sizeof(double));

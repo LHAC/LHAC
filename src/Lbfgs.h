@@ -118,8 +118,8 @@ public:
 
 class LBFGS {
 public:
-    double* Q;
-    double* Q_bar;
+    double* Q; // row major
+    double* Q_bar; // column major
     unsigned short m; // no. of cols in Q
     double gama;
     
@@ -172,6 +172,25 @@ public:
         delete [] buff2;
         delete [] permut_mx;
         delete [] permut;
+    };
+    
+    inline double* full(double* H, const int numActive) const {
+        if (H == NULL)
+            H = new double[numActive*numActive];
+        /*******************************************************************************
+         for (int j = 0, k = 0; j < numActive; j++, k += numActive ) {
+             int qj = j*m;
+             for (int i = 0; i < numActive; i++) {
+                 int qi = i*m;
+                 H[k+i] = lcddot(m, &Q[qi], 1, &Q_bar[qj], 1);
+             }
+         }
+         *******************************************************************************/
+        lcgdgemm(CblasTrans, CblasNoTrans, numActive, numActive, m,
+                 -1.0, Q, m, Q_bar, m, 0.0, H, numActive);
+        for (int i = 0, ii = 0; i < numActive; i++, ii += numActive)
+            H[i+ii] = gama + H[i+ii];
+        return H;
     };
     
     inline void initData(const double* const w, const double* const w_prev,
