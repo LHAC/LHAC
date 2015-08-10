@@ -21,7 +21,9 @@ enum SPARSE_TRANSPOSE {SparseNoTrans=12, SparseTrans=13};
 class LogReg : public Objective<LogReg>
 {
 public:
-    unsigned long getDims() const;
+    unsigned long getSize() const { return _N; };
+    
+    unsigned long getDims() const { return _p; };
     
     double computeObject(double* wnew);
     

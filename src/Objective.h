@@ -14,6 +14,10 @@ template <typename Derived>
 class Objective
 {
 public:
+    inline unsigned long getSize() {
+        return static_cast<Derived*>(this)->getSize();
+    };
+    
     inline unsigned long getDims() {
         return static_cast<Derived*>(this)->getDims();
     };

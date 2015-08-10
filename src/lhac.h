@@ -32,6 +32,18 @@ enum { LHAC_MSG_NO=0, LHAC_MSG_NEWTON, LHAC_MSG_SD, LHAC_MSG_CD, LHAC_MSG_MAX };
 enum{  GREEDY= 1, STD, GREEDY_CUTZERO, GREEDY_CUTGRAD, GREEDY_ADDZERO, STD_CUTGRAD, STD_CUTGRAD_AGGRESSIVE };
 
 
+inline void fistaUpdate(const unsigned long p, double* const t,
+                        double* const x, double* const w) {
+    double t_ = *t;
+    *t = (1 + sqrt(1+4*t_*t_))*0.5;
+    double c = (t_ - 1) / *t;
+    for (unsigned long i = 0; i < p; i++) {
+        double yi = w[i] + c*(w[i] - x[i]); // x is x_{k-1}
+        x[i] = w[i];
+        w[i] = yi;
+    }
+};
+
 
 struct Func {
     double f;
@@ -127,17 +139,7 @@ struct Solution {
     };
 };
 
-inline void fistaUpdate(const unsigned long p, double* const t,
-                        double* const x, double* const w) {
-    double t_ = *t;
-    *t = (1 + sqrt(1+4*t_*t_))*0.5;
-    double c = (t_ - 1) / *t;
-    for (unsigned long i = 0; i < p; i++) {
-        double yi = w[i] + c*(w[i] - x[i]); // x is x_{k-1}
-        x[i] = w[i];
-        w[i] = yi;
-    }
-};
+
 
 
 template <typename InnerSolver>
@@ -681,7 +683,7 @@ public:
         l = param->l;
         opt_outer_tol = param->opt_outer_tol;
         max_iter = param->max_iter;
-        lmd = param->lmd;
+        lmd = (param->lmd == 0.0)?1.0/mdl->getSize():param->lmd;
         msgFlag = param->verbose;
         
         w_prev = new double[p];
@@ -760,6 +762,7 @@ public:
                 break;
             }
             error = suffcientDecrease();
+            
             if (error) {
                 break;
             }
@@ -909,7 +912,6 @@ public:
         lR->computeLowRankApprox_v2(work_set);
         normsg = computeSubgradient();
         int numActive = (int) work_set->numActive;
-        printf("%.8e\n", lR->gama);
 //        printout("@Q", lR->Q, lR->m, numActive);
 //        printout("@Q_bar", lR->Q_bar, lR->m, numActive);
         lR->full(H, numActive);
@@ -1090,8 +1092,6 @@ private:
     }
     
 
-
-    /* may generalize to other regularizations beyond l1 */
     double computeReg(const double* const wnew) {
         double gval = 0.0;
         for (unsigned long i = 0; i < p; i++)
@@ -1099,12 +1099,30 @@ private:
         return gval;
     }
 
-    double computeSubgradient() {
+    double computeSubgradient() const {
         double subgrad = 0.0;
         for (unsigned long i = 0; i < p; i++) {
             double g = L_grad[i];
             if (w[i] != 0.0 || (fabs(g) > lmd)) {
                 if (w[i] > 0)
+                    g += lmd;
+                else if (w[i] < 0)
+                    g -= lmd;
+                else
+                    g = fabs(g) - lmd;
+                subgrad += fabs(g);
+            }
+        }
+        return subgrad;
+    }
+    
+    double computefplusGamma(const double* const df,
+                             const double* const w_) const {
+        double subgrad = 0.0;
+        for (unsigned long i = 0; i < p; i++) {
+            double g = df[i];
+            if (w_[i] != 0.0 || (fabs(g) > lmd)) {
+                if (w_[i] > 0)
                     g += lmd;
                 else if (w[i] < 0)
                     g -= lmd;
@@ -1448,7 +1466,6 @@ private:
         double f_mdl;
         double rho_trial;
         memcpy(w_prev, w, p*sizeof(double));
-        const double lmd = param->lmd;
         const unsigned long l = param->l;
         double* Q = lR->Q;
         const double* Q_bar = lR->Q_bar;
@@ -1497,6 +1514,10 @@ private:
                     printf("\t\t Coordinate descent pass %ld:   Change in d = %+.4e   norm(d) = %+.4e\n",
                            cd_pass, diffd, normd);
                 }
+//                for (unsigned long i = 0; i < p; i++) {
+//                    w[i] = w_prev[i] + D[i];
+//                }
+//                printf("%.4e\n", computefplusGamma(L_grad, w));
             }
             for (unsigned long i = 0; i < p; i++) {
                 w[i] = w_prev[i] + D[i];

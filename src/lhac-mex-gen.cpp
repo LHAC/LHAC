@@ -119,12 +119,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int loss = LOG;
     char loss_str[MAX_STR_LEN];
     bool isCached = true;
-    double lambda = 0.001;
+    // default lambda 1/N
+    double lambda = 0.0;
     double posweight = 1.0;
     // LBFGS limited memory parameter
     int limited_memory = 10;
     int method_flag = 2;
     double rho = 0.5;
+    int dense = 1;
     tf = mxGetField(prhs[argIdx], 0, "v");
     if (tf) {
         verbose = mxGetScalar(tf);
@@ -186,6 +188,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (tf) {
         lambda = (double) mxGetScalar(tf);
     }
+    tf = mxGetField(prhs[argIdx], 0, "dense");
+    if (tf) {
+        dense = mxGetScalar(tf);
+    }
     tf = mxGetField(prhs[argIdx], 0, "weight");
     if (tf) {
         posweight = (double) mxGetScalar(tf);
@@ -216,7 +222,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     param->active_set = active_set;
     param->loss = loss;
     param->isCached = isCached;
-    param->dense = 1;
+    param->dense = dense;
     param->posweight = posweight;
     param->method_flag = method_flag;
     

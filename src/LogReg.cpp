@@ -56,6 +56,10 @@ LogReg::LogReg(const Parameter* param)
             _Dset_sp_row = NULL;
             _Dset_sp_col = NULL;
             break;
+        
+        case SPARSE:
+            _Dset = NULL;
+            break;
             
         default:
             break;
@@ -77,11 +81,6 @@ LogReg::LogReg(const Parameter* param, double* X, double* y,
     _Dset_sp_col = NULL;
     _Dset = NULL;
     _posweight = param->posweight;
-}
-
-unsigned long LogReg::getDims() const
-{
-    return _p;
 }
 
 void LogReg::sparseVectorProduct(const SPARSE_TRANSPOSE trans,

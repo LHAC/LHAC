@@ -72,11 +72,6 @@ Lasso::Lasso(const Parameter* param, double* X, double* y,
     }
 }
 
-unsigned long Lasso::getDims() const
-{
-    return _p;
-}
-
 double Lasso::computeObject(double* wnew)
 {
     double order2 = 0;

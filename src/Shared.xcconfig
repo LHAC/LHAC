@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 Xiaocheng Tang. All rights reserved.
 //
 MATLAB_ROOT=/Applications/MATLAB_R2013a.app
-OTHER_CFLAGS = -DUSE_CBLAS
-//OTHER_CFLAGS = -DUSE_CBLAS -DCOMPARE_SUBS
+//OTHER_CFLAGS = -DUSE_CBLAS
+OTHER_CFLAGS = -DUSE_CBLAS -DCOMPARE_SUBS
 //OTHER_LDFLAGS=-framework Accelerate
 OTHER_LDFLAGS=-framework Accelerate -framework CoreFoundation -lmex -lmx -lmat -undefined error
 HEADER_SEARCH_PATHS=$(MATLAB_ROOT)/extern/include $(MATLAB_ROOT)/simulink/include

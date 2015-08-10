@@ -15,7 +15,9 @@
 class Lasso : public Objective<Lasso>
 {
 public:
-    unsigned long getDims() const;
+    unsigned long getSize() const { return _N; };
+    
+    unsigned long getDims() const { return _p; };
     
     double computeObject(double* wnew);
     
