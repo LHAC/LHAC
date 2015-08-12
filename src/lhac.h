@@ -286,7 +286,8 @@ private:
     double *D, *d_bar, *H_diag;
     
     double *Q, *Q_bar, *L_grad, *buffer;
-    const unsigned long cd_rate, l, p;
+    const double cd_rate;
+    const unsigned long l, p;
     unsigned long* permut;
     ushort_pair_t* idxs;
     const double lmd;
@@ -344,7 +345,8 @@ public:
 #endif
         double z = 0.0;
         double Q_grad_j, Hd_j, Qd_bar_j;
-        const unsigned long max_sub_iter = 1 + k / cd_rate;
+//        const unsigned long max_sub_iter = 1 + k / cd_rate;
+        const unsigned long max_sub_iter = 1 + k;
         unsigned long nb = 0;
         /* gama modified */
         if (f_curr != 0) {
@@ -462,7 +464,8 @@ private:
     double f_curr, f_trial;
     double ista_size, max_H_diag;
     double *Q, *Q_bar, *L_grad, *Qd_bar;
-    const unsigned long cd_rate, l, p;
+    const double cd_rate;
+    const unsigned long l, p;
     unsigned long* permut;
     ushort_pair_t* idxs;
     const double lmd;
@@ -522,7 +525,8 @@ public:
 #endif
         double z = 0.0;
         double Q_grad_j, Hd_j, Qd_bar_j;
-        const unsigned long max_sub_iter = 1 + k / cd_rate;
+//        const unsigned long max_sub_iter = 1 + k / cd_rate;
+        const unsigned long max_sub_iter = 1 + 2*k;
         unsigned long nb = 0;
         /* gama modified */
         if (f_curr != 0) {
@@ -655,7 +659,8 @@ private:
     double f_curr, f_trial;
     double ista_size, max_H_diag;
     double *Q, *Q_bar, *L_grad, *Qd_bar;
-    const unsigned long cd_rate, l, p;
+    const double cd_rate;
+    const unsigned long l, p;
     unsigned long* permut;
     ushort_pair_t* idxs;
     const double lmd;
@@ -965,8 +970,8 @@ public:
                 break;
                 
             case 41:
-//                error = piqnGeneral(new SubISTA(param, p));
-                error = piqnGeneral(new SubFISTA(param, p));
+                error = piqnGeneral(new SubISTA(param, p));
+//                error = piqnGeneral(new SubFISTA(param, p));
                 break;
             
             case 42:
@@ -1478,6 +1483,8 @@ private:
             for (unsigned long j = 0; j < m; j++) H_diag[i] -= Q_bar[k+j]*Q[k+j];
         }
         unsigned long max_cd_pass = 1 + newton_iter / param->cd_rate;
+//        unsigned long max_cd_pass = 1 + log(newton_iter);
+//        unsigned long max_cd_pass = 200;
         unsigned long* permut = work_set->permut;
         ushort_pair_t* idxs = work_set->idxs;
         unsigned long cd_pass;

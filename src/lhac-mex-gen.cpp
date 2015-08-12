@@ -110,7 +110,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // sufficient decrease (default) or backtrack
     int sd_flag = 1;
     // max_cdpass = 1 + iter / cdrate
-    unsigned long cd_rate = 6;
+    double cd_rate = 5;
     // for greedy active set
     unsigned long work_size = 500;
     // active set strategy -- standard (default)
@@ -149,7 +149,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     tf = mxGetField(prhs[argIdx], 0, "r");
     if (tf) {
-        cd_rate = mxGetScalar(tf);
+        cd_rate = (double) mxGetScalar(tf);
     }
     tf = mxGetField(prhs[argIdx], 0, "w");
     if (tf) {

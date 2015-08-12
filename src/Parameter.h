@@ -39,7 +39,7 @@ struct Parameter {
     
     double rho;
     
-    unsigned long cd_rate;
+    double cd_rate;
     
     // active set stragety
     unsigned long active_set;
