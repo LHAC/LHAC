@@ -92,6 +92,10 @@ struct Solution {
     inline void finalReport(const int error, double* wfinal) {
         memcpy(w, wfinal, p*sizeof(double));
         unsigned long last = size - 1;
+        double prec = 0.0;
+        if (normgs[0] != 0) {
+            prec = normgs[last] / normgs[0]; // avoid divided-by-zero error
+        }
         printf(
                "=========================== final report ========================\n"
                );
@@ -104,8 +108,13 @@ struct Solution {
                "In %3d iterations (%.4e seconds)\n"
                "With a precision of: %+.4e\n"
                "=================================================================\n",
-               fval[last], niter[last], t[last], normgs[last] / normgs[0]
+               fval[last], niter[last], t[last], prec
                );
+        if (last == 0 && prec == 0.0) {
+            printf(
+                   "Probably try a smaller value for lambda!\n"
+                   );
+        }
     };
     
     Solution(unsigned long max_iter, unsigned long _p) {
@@ -171,8 +180,8 @@ public:
 class CoordinateDescent: public Subproblem<CoordinateDescent>
 {
 public:
-    CoordinateDescent(const Parameter* const _param, unsigned long _p)
-                      : p(_p), lmd(_param->lmd), l(_param->l),
+    CoordinateDescent(const Parameter* const _param, unsigned long _p, double _lmd)
+                      : p(_p), lmd(_lmd), l(_param->l),
                         cd_rate(_param->cd_rate),
                         msgFlag(_param->verbose)
     {
@@ -302,8 +311,8 @@ private:
 class SubISTA: public Subproblem<SubISTA>
 {
 public:
-    SubISTA(const Parameter* const _param, unsigned long _p)
-    : p(_p), lmd(_param->lmd), l(_param->l),
+    SubISTA(const Parameter* const _param, unsigned long _p, double _lmd)
+    : p(_p), lmd(_lmd), l(_param->l),
     cd_rate(_param->cd_rate),
     msgFlag(_param->verbose)
     {
@@ -480,8 +489,8 @@ private:
 class SubFISTA: public Subproblem<SubFISTA>
 {
 public:
-    SubFISTA(const Parameter* const _param, unsigned long _p)
-    : p(_p), lmd(_param->lmd), l(_param->l),
+    SubFISTA(const Parameter* const _param, unsigned long _p, double _lmd)
+    : p(_p), lmd(_lmd), l(_param->l),
     cd_rate(_param->cd_rate),
     msgFlag(_param->verbose)
     {
@@ -525,8 +534,9 @@ public:
 #endif
         double z = 0.0;
         double Q_grad_j, Hd_j, Qd_bar_j;
-//        const unsigned long max_sub_iter = 1 + k / cd_rate;
-        const unsigned long max_sub_iter = 1 + 2*k;
+        const unsigned long max_sub_iter = 1 + k / cd_rate;
+//        printf("%f\n", cd_rate);
+//        const unsigned long max_sub_iter = 1 + 2*k;
         unsigned long nb = 0;
         /* gama modified */
         if (f_curr != 0) {
@@ -954,40 +964,43 @@ public:
         obj->add(mdl->computeObject(w), computeReg(w));
         mdl->computeGradient(w, L_grad);
         normsg0 = computeSubgradient();
+        sols->addEntry(obj->val, normsg0, 0.0, 0, 0);
         int error = 0;
         
-        switch (param->method_flag) {
-            case 1:
-                error = ista();
-                break;
+        if (normsg0 != 0.0) {
+            switch (param->method_flag) {
+                case 1:
+                    error = ista();
+                    break;
+                    
+                case 2:
+                    error = piqn();
+                    break;
+                    
+                case 3:
+                    error = fpiqn();
+                    break;
+                    
+                case 41:
+    //                error = piqnGeneral(new SubISTA(param, p, lmd));
+                    error = piqnGeneral(new SubFISTA(param, p, lmd));
+                    break;
                 
-            case 2:
-                error = piqn();
-                break;
-                
-            case 3:
-                error = fpiqn();
-                break;
-                
-            case 41:
-                error = piqnGeneral(new SubISTA(param, p));
-//                error = piqnGeneral(new SubFISTA(param, p));
-                break;
-            
-            case 42:
-                error = piqnGeneral(new CoordinateDescent(param, p));
-                break;
-                
-            case 5:
-                exp_compare_subsolvers(new CoordinateDescent(param, p),
-                                       new SubFISTA(param, p),
-                                       new SubISTA(param, p));
-                break;
-                
-            default:
-                error = 1;
-                fprintf(stderr, "ValueError: flag q only accept value 1 (ISTA), 2 (lhac) or 3 (f-lhac).\n");
-                break;
+                case 42:
+                    error = piqnGeneral(new CoordinateDescent(param, p, lmd));
+                    break;
+                    
+                case 5:
+                    exp_compare_subsolvers(new CoordinateDescent(param, p, lmd),
+                                           new SubFISTA(param, p, lmd),
+                                           new SubISTA(param, p, lmd));
+                    break;
+                    
+                default:
+                    error = 1;
+                    fprintf(stderr, "ValueError: flag q only accept value 1 (ISTA), 2 (lhac) or 3 (f-lhac).\n");
+                    break;
+            }
         }
         
         sols->finalReport(error, w);
@@ -1483,7 +1496,7 @@ private:
             for (unsigned long j = 0; j < m; j++) H_diag[i] -= Q_bar[k+j]*Q[k+j];
         }
         unsigned long max_cd_pass = 1 + newton_iter / param->cd_rate;
-//        unsigned long max_cd_pass = 1 + log(newton_iter);
+//        unsigned long max_cd_pass = 1 + log(newton_iter) * 15; //* param->cd_rate;
 //        unsigned long max_cd_pass = 200;
         unsigned long* permut = work_set->permut;
         ushort_pair_t* idxs = work_set->idxs;
