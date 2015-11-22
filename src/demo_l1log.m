@@ -18,14 +18,12 @@ param.cached = 0;
 param.filename = [pwd, '/', fname{1}, ext];
 param.weight = 2;
 
-fprintf('test 1 ---- reading data directly from file ---- 0%%...\n');
+% reading data directly from file using param.filename
 [w] = lhac(param);
-fprintf('test 1 ---- reading data directly from file ---- 100%%!\n');
-fprintf('test 2 ---- passing data from memory in MATLAB ---- 0%%...\n');
+% passing data from memory in MATLAB 
 load a9a
 [w, iter, fval, t] = lhac(param, data.y, full(data.X));
 fprintf('time = %.4e, iter = %d, optimal fval = %.4e\n', t(end), iter(end), fval(end));
-fprintf('test 2 ---- passing data from memory in MATLAB ---- 100%%!\n');
-//fprintf('Verify that the optimal objective value is around +1.523911e+04!\n');
+fprintf('Verify that the optimal objective value is around 4.7096e-01!\n');
 
 
