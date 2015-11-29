@@ -1,0 +1,46 @@
+# Ignore build directory
+/build*
+
+# sublime files
+*.sublime-project
+*.sublime-workspace
+
+# Ignore generated code files
+*.so
+*.o
+*.pyc
+*.cmd
+
+# Meta data of Mac OS X's Finder.app
+.DS_Store
+
+# LaTeX temporary files
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.thm
+auto
+_region_.tex
+auto
+*.swp
+*.fdb_latexmk
+
+# Biblatex temporary files
+*-blx.bib
+*.run.xml
+
+# ctags, cscope files
+/cscope.files
+/refresh_index.sh
+/tags*
+.tags*
+
+/Makefile
+.predictive
+.Rhistory
+eproject.cfg
+*.project.vim
