@@ -22,13 +22,13 @@ If you use LHAC in your research, please cite the following paper:
 
 ```
 @article{Scheinberg:2016wj,
-author = {Scheinberg, Katya and Tang, Xiaocheng},
-title = {{Practical inexact proximal quasi-Newton method with global complexity analysis}},
-journal = {Mathematical Programming},
-year = {2016},
-volume = {160},
-number = {1},
-pages = {495--529}
+  author = {Scheinberg, Katya and Tang, Xiaocheng},
+  title = {{Practical inexact proximal quasi-Newton method with global complexity analysis}},
+  journal = {Mathematical Programming},
+  year = {2016},
+  volume = {160},
+  number = {1},
+  pages = {495--529}
 }
 ```
 
