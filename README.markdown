@@ -1,6 +1,6 @@
 
 # Lss
-by Xiaocheng Tang [http://goo.gl/6QuMl]  
+by Xiaocheng Tang [https://mktal.github.io/]  
 
 **Lss**, or LHAC for Sparse inverse covariance Selection, implements the algorithm **LHAC** -- <b> L</b>ow rank <b>H</b>essian <b>A</b>pproximation in <b>A</b>ctive-set <b>C</b>oordinate descent ([paper](http://goo.gl/ERZb3i))  -- for solving _sparse inverse covariance selection_ problems, and recovers from a low-rank sample covariance matrix the inverse covariance matrix that is expected to have a sparse structure.
 
@@ -18,7 +18,19 @@ This package
 ## Citation
 If you use LHAC in your research, please cite the following paper:
 
-* Katya Scheinberg and Xiaocheng Tang, _Practical Inexact Proximal Quasi-Newton Method with Global Complexity Analysis_, submitted, 2014  ([BibTex](http://goo.gl/fVJgWN))
+* Katya Scheinberg and Xiaocheng Tang, _Practical Inexact Proximal Quasi-Newton Method with Global Complexity Analysis_, Mathematical Programming, 160(1), 495–529., 2016  
+
+```
+@article{Scheinberg:2016wj,
+author = {Scheinberg, Katya and Tang, Xiaocheng},
+title = {{Practical inexact proximal quasi-Newton method with global complexity analysis}},
+journal = {Mathematical Programming},
+year = {2016},
+volume = {160},
+number = {1},
+pages = {495--529}
+}
+```
 
 ## Build Guide
 [Download](http://goo.gl/6UGbOV) the package archive.
