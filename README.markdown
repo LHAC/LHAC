@@ -18,7 +18,7 @@ This package
 ## Citation
 If you use LHAC in your research, please cite the following paper:
 
-* Katya Scheinberg and Xiaocheng Tang, _Practical Inexact Proximal Quasi-Newton Method with Global Complexity Analysis_, Mathematical Programming, 160(1), 495–529., 2016  
+* Katya Scheinberg and Xiaocheng Tang, _Practical Inexact Proximal Quasi-Newton Method with Global Complexity Analysis_, Mathematical Programming Series A, 160(1), 495–529., 2016  
 
 ```
 @article{Scheinberg:2016wj,
